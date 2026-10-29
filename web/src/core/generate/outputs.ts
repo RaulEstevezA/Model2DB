@@ -5,6 +5,7 @@ import { buildRelational } from '../physical/relational.ts'
 import type { Dialect, Note, PhysicalSchema } from '../physical/types.ts'
 import { generateMongo } from './mongodb/mongodb.ts'
 import { mongooseOutput } from './odm/mongoose.ts'
+import { springDataMongoOutput } from './odm/springDataMongo.ts'
 import { beanieOutput, mongoengineOutput, pymongoOutput } from './odm/python/mongo.ts'
 import { efCoreOutput } from './orm/csharp/efcore.ts'
 import { hibernateOutput, jpaOutput, springDataJpaOutput } from './orm/jvm/jpa.ts'
@@ -116,6 +117,7 @@ export const OUTPUTS: readonly Output[] = [
   documental(mongoengineOutput),
   documental(beanieOutput),
   documental(mongooseOutput),
+  documental(springDataMongoOutput),
 ]
 
 export function findOutput(id: string): Output {

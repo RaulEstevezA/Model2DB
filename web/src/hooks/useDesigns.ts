@@ -38,12 +38,13 @@ export function useDesigns(schema: ModelSchema | null, target: StorageTarget, in
     const key = schema ? JSON.stringify(schema) : ''
     if (key === lastSchema.current) return
     lastSchema.current = key
+    // While the model cannot be read (a typo being fixed) the designs stay, so the next model keeps the decisions
+    if (!schema) return
     const previous = presentRef.current
-    history.reset(
-      schema
-        ? { relational: reconcile(previous.relational, schema, 'relational'), document: reconcile(previous.document, schema, 'document') }
-        : NO_DESIGNS,
-    )
+    history.reset({
+      relational: reconcile(previous.relational, schema, 'relational'),
+      document: reconcile(previous.document, schema, 'document'),
+    })
   }, [schema, history])
 
   const change = useCallback((next: Design) => history.push({ ...history.present, [next.target]: next }), [history])

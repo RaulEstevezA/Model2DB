@@ -83,6 +83,28 @@ describe('Model2DB', () => {
     await waitFor(() => expect(status()).not.toContain(`${pendingBefore} decision`))
   })
 
+  it('keeps the decisions while the model cannot be read for a moment', async () => {
+    await renderApp()
+    await loadShop()
+    const before = status()
+    const first = within(designPane()).getAllByRole('listitem')[0]
+    fireEvent.click(within(first).getByRole('button'))
+    const decision = (document.activeElement as HTMLElement).closest('[role="group"]') as HTMLElement
+    fireEvent.click(within(decision).getByRole('button', { name: /^Accept the suggestion/ }))
+    await waitFor(() => expect(status()).not.toBe(before))
+    const accepted = status()
+    const editor = document.querySelector('.input-pane .cm-content') as HTMLElement
+    // A syntax error, then the model again
+    const view = (await import('@codemirror/view')).EditorView.findFromDOM(editor)!
+    const original = view.state.doc.toString()
+    view.dispatch({ changes: { from: 0, insert: '{{{' } })
+    await waitFor(() =>
+      expect(within(designPane()).getByText('The proposed design will appear here when the model can be read.')).toBeTruthy(),
+    )
+    view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: original } })
+    await waitFor(() => expect(status()).toBe(accepted))
+  })
+
   it('moves between the workspace tabs with the arrow keys', async () => {
     await renderApp()
     const tabs = screen.getAllByRole('tab')

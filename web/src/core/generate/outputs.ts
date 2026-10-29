@@ -7,6 +7,7 @@ import { generateMongo } from './mongodb/mongodb.ts'
 import { djangoOutput } from './orm/python/django.ts'
 import { sqlalchemyOutput } from './orm/python/sqlalchemy.ts'
 import { sqlmodelOutput } from './orm/python/sqlmodel.ts'
+import { tortoiseOutput } from './orm/python/tortoise.ts'
 import { DIALECT_NAMES, generateSql } from './sql/sql.ts'
 import {
   fileBase,
@@ -90,6 +91,7 @@ export const OUTPUTS: readonly Output[] = [
   relational(djangoOutput),
   relational(sqlalchemyOutput),
   relational(sqlmodelOutput),
+  relational(tortoiseOutput),
 ]
 
 export function findOutput(id: string): Output {

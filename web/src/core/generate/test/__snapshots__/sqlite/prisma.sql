@@ -1,0 +1,43 @@
+-- SQLite schema written by Model2DB.
+-- Review it before running it: nothing here has been run.
+
+PRAGMA foreign_keys = ON;
+
+CREATE TABLE users (
+  id TEXT NOT NULL,
+  email TEXT NOT NULL,
+  name TEXT,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  profile_bio TEXT,
+  profile_website TEXT,
+  CONSTRAINT pk_users PRIMARY KEY (id),
+  CONSTRAINT uq_users_email UNIQUE (email)
+);
+
+CREATE TABLE posts (
+  id INTEGER PRIMARY KEY,
+  title TEXT NOT NULL,
+  body TEXT NOT NULL,
+  published INTEGER NOT NULL DEFAULT 0,
+  author_id TEXT NOT NULL,
+  CONSTRAINT fk_posts_author_id FOREIGN KEY (author_id) REFERENCES users (id)
+);
+CREATE INDEX ix_posts_author_id ON posts (author_id);
+
+CREATE TABLE comments (
+  id INTEGER PRIMARY KEY,
+  text TEXT NOT NULL,
+  written_at TEXT NOT NULL,
+  rating INTEGER,
+  post_id INTEGER NOT NULL,
+  CONSTRAINT fk_comments_post_id FOREIGN KEY (post_id) REFERENCES posts (id) ON DELETE CASCADE
+);
+CREATE INDEX ix_comments_post_id ON comments (post_id);
+
+CREATE TABLE post_tags (
+  post_id INTEGER NOT NULL,
+  position INTEGER NOT NULL,
+  value TEXT NOT NULL,
+  CONSTRAINT pk_post_tags PRIMARY KEY (post_id, position),
+  CONSTRAINT fk_post_tags_post_id FOREIGN KEY (post_id) REFERENCES posts (id) ON DELETE CASCADE
+);

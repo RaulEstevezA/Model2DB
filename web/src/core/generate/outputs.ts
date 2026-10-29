@@ -8,6 +8,7 @@ import { djangoOutput } from './orm/python/django.ts'
 import { sqlalchemyOutput } from './orm/python/sqlalchemy.ts'
 import { sqlmodelOutput } from './orm/python/sqlmodel.ts'
 import { tortoiseOutput } from './orm/python/tortoise.ts'
+import { drizzleOutput } from './orm/typescript/drizzle.ts'
 import { prismaOutput } from './orm/typescript/prisma.ts'
 import { sequelizeOutput } from './orm/typescript/sequelize.ts'
 import { typeormOutput } from './orm/typescript/typeorm.ts'
@@ -98,6 +99,7 @@ export const OUTPUTS: readonly Output[] = [
   relational(prismaOutput),
   relational(typeormOutput),
   relational(sequelizeOutput),
+  relational(drizzleOutput),
 ]
 
 export function findOutput(id: string): Output {

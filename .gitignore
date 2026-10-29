@@ -1,0 +1,152 @@
+# ==============================
+# Local working files (notes, plans, sample models): never versioned
+# ==============================
+**/local-data/
+
+# ==============================
+# AI assistants / agents
+# ==============================
+.claude/
+CLAUDE.md
+CLAUDE.local.md
+AGENTS.md
+.cursor/
+.cursorrules
+.cursorignore
+.windsurf/
+.windsurfrules
+.codeium/
+.continue/
+.aider*
+.copilot/
+.github/copilot-instructions.md
+.gemini/
+GEMINI.md
+.codex/
+.cline/
+.clinerules
+.roo/
+.roomodes
+.tabnine/
+.zed/
+
+# ==============================
+# Node / React / TypeScript
+# ==============================
+node_modules/
+.pnp
+.pnp.js
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# Builds
+dist/
+build/
+out/
+.vite/
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+*.tsbuildinfo
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+logs/
+
+# Tests / coverage
+coverage/
+.nyc_output/
+playwright-report/
+test-results/
+
+# Caches
+.eslintcache
+.stylelintcache
+.cache/
+
+# ==============================
+# Python
+# ==============================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+.python-version
+
+# Packaging
+*.egg-info/
+*.egg
+.eggs/
+wheels/
+sdist/
+
+# PyInstaller
+*.manifest
+
+# Tests / types / linters
+.pytest_cache/
+.tox/
+.coverage
+.coverage.*
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+
+# ==============================
+# Environment variables and secrets
+# ==============================
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# ==============================
+# Editors / IDEs
+# ==============================
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+
+# ==============================
+# Operating systems
+# ==============================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+.fseventsd
+.TemporaryItems
+Icon?
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+.directory
+.Trash-*
+.nfs*

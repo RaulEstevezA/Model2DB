@@ -10,7 +10,10 @@ from .mongodb.mongodb import generate_mongo
 from .odm.mongoose import MongooseOutput
 from .odm.python.mongo import BeanieOutput, MongoEngineOutput, PyMongoOutput
 from .odm.spring_data_mongo import SpringDataMongoOutput
+from .orm.csharp.efcore import EfCoreOutput
 from .orm.jvm.jpa import jpa_outputs
+from .orm.php.doctrine import DoctrineOutput
+from .orm.php.eloquent import EloquentOutput
 from .orm.python.django import DjangoOutput
 from .orm.python.sqlalchemy import SqlAlchemyOutput
 from .orm.python.sqlmodel import SqlModelOutput
@@ -106,6 +109,9 @@ OUTPUTS: tuple[Output, ...] = (
     _output(SequelizeOutput(), "relational"),
     _output(DrizzleOutput(), "relational"),
     *(_output(writer, "relational") for writer in jpa_outputs()),
+    _output(EfCoreOutput(), "relational"),
+    _output(EloquentOutput(), "relational"),
+    _output(DoctrineOutput(), "relational"),
     _output(PyMongoOutput(), "document"),
     _output(MongoEngineOutput(), "document"),
     _output(BeanieOutput(), "document"),

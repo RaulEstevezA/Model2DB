@@ -9,6 +9,8 @@ from ..physical.relational.schema import build_relational
 from .mongodb.mongodb import generate_mongo
 from .odm.mongoose import MongooseOutput
 from .odm.python.mongo import BeanieOutput, MongoEngineOutput, PyMongoOutput
+from .odm.spring_data_mongo import SpringDataMongoOutput
+from .orm.jvm.jpa import jpa_outputs
 from .orm.python.django import DjangoOutput
 from .orm.python.sqlalchemy import SqlAlchemyOutput
 from .orm.python.sqlmodel import SqlModelOutput
@@ -103,10 +105,12 @@ OUTPUTS: tuple[Output, ...] = (
     _output(TypeOrmOutput(), "relational"),
     _output(SequelizeOutput(), "relational"),
     _output(DrizzleOutput(), "relational"),
+    *(_output(writer, "relational") for writer in jpa_outputs()),
     _output(PyMongoOutput(), "document"),
     _output(MongoEngineOutput(), "document"),
     _output(BeanieOutput(), "document"),
     _output(MongooseOutput(), "document"),
+    _output(SpringDataMongoOutput(), "document"),
 )
 
 

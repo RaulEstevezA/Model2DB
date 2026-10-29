@@ -92,14 +92,6 @@ export function singularize(word: string): string {
   return word.slice(0, -1)
 }
 
-/** Makes a name usable as an identifier: never empty, not starting with a digit and not a reserved word. */
-export function safeIdentifier(name: string, reserved: ReadonlySet<string>, fallback: string): string {
-  if (name === '') return fallback
-  if (/^\p{N}/u.test(name)) return `_${name}`
-  if (reserved.has(name)) return `${name}_`
-  return name
-}
-
 /** Returns `name`, or `name2`, `name3`... if it is already taken, and marks the result as taken. */
 export function uniqueName(name: string, used: Set<string>): string {
   let result = name

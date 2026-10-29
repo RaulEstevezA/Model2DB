@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { nameWords, singularize, toCamelCase, toPascalCase, toScreamingSnakeCase, toSnakeCase } from './naming.ts'
-import { allFields, defaultRoot, describeType, emptySchema, needsValue, primitive, type FieldDef, type ModelSchema } from './schema.ts'
+import { allFields, defaultRoot, describeType, emptySchema, primitive, type FieldDef, type ModelSchema } from './schema.ts'
 
 const field = (name: string, overrides: Partial<FieldDef> = {}): FieldDef => ({
   name,
@@ -56,13 +56,6 @@ describe('schema helpers', () => {
   it('picks as root a model no other model refers to', () => {
     expect(defaultRoot(schema)).toBe('Base')
     expect(defaultRoot({ ...schema, root: 'User' })).toBe('User')
-  })
-
-  it('knows which fields need a value', () => {
-    expect(needsValue(field('a'))).toBe(true)
-    expect(needsValue(field('a', { optional: true }))).toBe(false)
-    expect(needsValue(field('a', { defaultValue: '' }))).toBe(false)
-    expect(needsValue(field('a', { generated: true }))).toBe(false)
   })
 
   it('describes types', () => {

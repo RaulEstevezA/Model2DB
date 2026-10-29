@@ -1,6 +1,7 @@
 import { convertCase, nameWords, toPascalCase, type NamingConvention } from '../../model/naming.ts'
 import { singularField } from '../../design/analysis.ts'
 import { findEnum, type ModelSchema } from '../../model/schema.ts'
+import { pluralize } from '../../physical/naming.ts'
 import type { Column, ForeignKey, PhysicalEnum, RelationalSchema, Table } from '../../physical/types.ts'
 
 /** The tables of a relational schema seen as ORM classes: one class per table (join tables become
@@ -67,12 +68,6 @@ function className(table: Table): string {
 function withoutId(name: string): string {
   const words = nameWords(name)
   return words.length > 1 && words[words.length - 1] === 'id' ? words.slice(0, -1).join('_') : `${name}_ref`
-}
-
-function pluralWord(word: string): string {
-  if (/(s|x|z|ch|sh)$/.test(word)) return `${word}es`
-  if (/[^aeiou]y$/.test(word)) return `${word.slice(0, -1)}ies`
-  return `${word}s`
 }
 
 export function buildEntities(physical: RelationalSchema, schema: ModelSchema, convention: NamingConvention): EntityView {
@@ -144,7 +139,7 @@ export function buildEntities(physical: RelationalSchema, schema: ModelSchema, c
     const owner = first && byTable.get(first.table)
     const other = second && byTable.get(second.table)
     if (!owner || !other) continue
-    const name = free(owner.name, convert(join.field ?? pluralWord(other.name.toLowerCase())))
+    const name = free(owner.name, convert(join.field ?? pluralize(other.name.toLowerCase())))
     const mirror = join.mirror ? free(other.name, convert(join.mirror)) : undefined
     const spec = { table: join, ownerColumn: first.columns[0], targetColumn: second.columns[0] }
     owner.navigations.push({
@@ -175,9 +170,4 @@ export function buildEntities(physical: RelationalSchema, schema: ModelSchema, c
 export function enumMembers(item: PhysicalEnum, schema: ModelSchema): { name: string; value: string | number }[] {
   const definition = findEnum(schema, item.name)
   return (definition?.values ?? []).map((value) => ({ name: value.name, value: value.value ?? value.name }))
-}
-
-/** The comments of the decisions still pending on a table, in the language's comment syntax. */
-export function todoLines(table: Table, prefix: string, text: (todo: Table['todos'][number], table: Table) => string): string[] {
-  return table.todos.map((todo) => `${prefix} ${text(todo, table)}`)
 }

@@ -141,9 +141,3 @@ export interface BuildOptions {
    * nothing, and VARCHAR(255) in the others, where unbounded text cannot be indexed */
   strings: 'auto' | 'varchar' | 'text'
 }
-
-export const DEFAULT_BUILD_OPTIONS: BuildOptions = {
-  naming: { tables: 'plural', columns: 'snake' },
-  dialect: 'postgresql',
-  strings: 'auto',
-}

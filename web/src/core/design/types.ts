@@ -138,10 +138,6 @@ export function findFieldDesign(design: Design, model: string, field: string): F
   return findModelDesign(design, model)?.fields.find((item) => item.field === field)
 }
 
-export function isPending(decision: Decision<unknown> | undefined): boolean {
-  return decision !== undefined && decision.status === 'pending'
-}
-
 export function sameValue<T>(a: T, b: T): boolean {
   return JSON.stringify(a) === JSON.stringify(b)
 }

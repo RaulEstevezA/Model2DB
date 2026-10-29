@@ -1,6 +1,6 @@
 import type { Annotation } from '../../model/schema.ts'
 import type { Cursor } from './lexer.ts'
-import type { RawField, RawType } from './raw.ts'
+import type { RawField } from './raw.ts'
 
 /** Reads `@Name`, `@pkg.Name(args)` at the cursor (Java, Kotlin, Dart, TypeScript and Python decorators). */
 export function readAtAnnotation(cursor: Cursor, source: string): Annotation | null {
@@ -169,9 +169,4 @@ export function applyAnnotations(field: RawField, annotations: Annotation[]): bo
     if (name === 'id' && annotations.some((item) => GENERATED.has(simple(item.name)))) field.generated = true
   }
   return true
-}
-
-/** The name of a raw type without generics, for checks like "is this a list?" */
-export function rawName(type: RawType | null): string {
-  return type ? (type.name.split(/\.|::|\\/).pop() ?? type.name) : ''
 }

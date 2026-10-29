@@ -1,15 +1,8 @@
-import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useDeferredValue, useMemo, useState } from 'react'
 import { canExclude, EMPTY_INPUT, pendingDecisions, readInput, type InputState } from './app/workspace.ts'
-import { reconcile } from './core/design/edit.ts'
-import { proposeDesign } from './core/design/propose.ts'
-import type { Design, StorageTarget } from './core/design/types.ts'
-import { findOutput, generate, type OutputSettings } from './core/generate/outputs.ts'
+import { generate } from './core/generate/outputs.ts'
 import { defaultRoot } from './core/model/schema.ts'
 import { modelRoles } from './core/physical/roles.ts'
-import type { Dialect, NamingOptions } from './core/physical/types.ts'
-import { isTrustedOrigin, readHandoff, takeIncoming, type Handoff } from './core/project/handoff.ts'
-import { findParser } from './core/parsers/registry.ts'
-import type { InputFormatId } from './core/parsers/types.ts'
 import { findExample, type ExampleId } from './examples/index.ts'
 import { AppFooter } from './components/AppFooter.tsx'
 import { AppHeader } from './components/AppHeader.tsx'
@@ -18,90 +11,36 @@ import { InputPane } from './components/InputPane.tsx'
 import { IntroPanel } from './components/IntroPanel.tsx'
 import { LinksPanel } from './components/LinksPanel.tsx'
 import { ResultPane } from './components/ResultPane.tsx'
-import { useHistory } from './hooks/useHistory.ts'
-import { useStoredState } from './hooks/useStoredState.ts'
+import { useDesigns } from './hooks/useDesigns.ts'
+import { useIncomingMessages, useInitialIncoming } from './hooks/useIncomingModel.ts'
+import { useOutputSettings } from './hooks/useOutputSettings.ts'
+import { useUndoShortcuts } from './hooks/useUndoShortcuts.ts'
 import { useI18n } from './i18n/useI18n.ts'
 import './App.css'
 
 type WorkspaceTab = 'input' | 'design' | 'result'
 const TABS: WorkspaceTab[] = ['input', 'design', 'result']
-const TOOL_NAMES: Record<string, string> = { api2class: 'Api2Class', mapper: 'Mapper', model2db: 'Model2DB', datacleanr: 'DataCleanr' }
-
-/** One design per kind of database, so going from PostgreSQL to MongoDB and back keeps the decisions. */
-type Designs = Record<StorageTarget, Design | null>
-const NO_DESIGNS: Designs = { relational: null, document: null }
-
-// Documents keep the field names of the model; tables follow the SQL convention
-const DEFAULT_NAMING: Record<StorageTarget, NamingOptions> = {
-  relational: { tables: 'plural', columns: 'snake' },
-  document: { tables: 'plural', columns: 'field' },
-}
-
-/** A model sent by another tool (Mapper's "Open in Model2DB"), as the input. */
-function inputFromHandoff(handoff: Handoff): InputState {
-  const receivedFrom = TOOL_NAMES[handoff.from]
-  if (handoff.text) {
-    const format = findParser(handoff.text.format as InputFormatId)?.id ?? null
-    return { text: handoff.text.content, format, receivedFrom }
-  }
-  return { text: JSON.stringify(handoff.schema, null, 2), format: 'modelschema', receivedFrom }
-}
-
-let startup: { input: InputState; tab: WorkspaceTab } | null = null
-
-/** What the page opens with: a model sent by another tool, or nothing. Computed once: the handoff can
- * only be read once. */
-function getStartup() {
-  if (startup) return startup
-  const incoming = typeof sessionStorage === 'undefined' ? null : takeIncoming(sessionStorage, 'model2db')
-  startup = incoming ? { input: inputFromHandoff(incoming), tab: 'design' } : { input: EMPTY_INPUT, tab: 'input' }
-  return startup
-}
 
 function App() {
   const { t } = useI18n()
-  const initial = getStartup()
-  const [input, setInput] = useState<InputState>(initial.input)
-  const [tab, setTab] = useState<WorkspaceTab>(initial.tab)
-  const history = useHistory<Designs>(NO_DESIGNS)
-
-  // Preferences (remembered); the model and the decisions are not
-  const [outputId, setOutputId] = useStoredState('model2db.output', () => 'postgresql')
-  const [namings, setNamings] = useStoredState<Record<StorageTarget, NamingOptions>>('model2db.naming', () => DEFAULT_NAMING)
-  const [strings, setStrings] = useStoredState<OutputSettings['strings']>('model2db.strings', () => 'auto')
-  const [engine, setEngine] = useStoredState<Dialect>('model2db.engine', () => 'postgresql')
-  const [migrations, setMigrations] = useStoredState('model2db.migrations', () => true)
-  const output = findOutput(outputId)
-  const target = output.target
-  const settings: OutputSettings = useMemo(
-    () => ({ naming: namings[target] ?? DEFAULT_NAMING[target], strings, engine, migrations }),
-    [namings, target, strings, engine, migrations],
-  )
+  const initial = useInitialIncoming()
+  const [tab, setTab] = useState<WorkspaceTab>(initial ? 'design' : 'input')
+  const [input, setInput] = useState<InputState>(initial ?? EMPTY_INPUT)
+  const receive = useCallback((received: InputState) => {
+    setInput(received)
+    setTab('design')
+  }, [])
+  useIncomingMessages(receive)
+  const { output, settings, setOutput, setSettings } = useOutputSettings()
 
   // Large inputs are parsed after the keystroke is painted, so typing stays smooth
   const deferredInput = useDeferredValue(input)
   const read = useMemo(() => readInput(deferredInput), [deferredInput])
   const schema = read.outcome?.ok ? read.outcome.schema : null
 
-  // A new proposal whenever the model changes, keeping what the user decided where it still applies
-  const lastSchema = useRef<string>('')
-  const presentRef = useRef(history.present)
-  useEffect(() => {
-    presentRef.current = history.present
-  }, [history.present])
-  useEffect(() => {
-    const key = schema ? JSON.stringify(schema) : ''
-    if (key === lastSchema.current) return
-    lastSchema.current = key
-    const previous = presentRef.current
-    history.reset(
-      schema
-        ? { relational: reconcile(previous.relational, schema, 'relational'), document: reconcile(previous.document, schema, 'document') }
-        : NO_DESIGNS,
-    )
-  }, [schema, history])
-
-  const design = schema ? history.present[target] : null
+  const designs = useDesigns(schema, output.target)
+  const { design } = designs
+  useUndoShortcuts(designs.history)
   const roles = useMemo(() => (schema && design ? modelRoles(schema, design) : new Map()), [schema, design])
   const pending = useMemo(() => (design ? pendingDecisions(design, roles) : []), [design, roles])
   const excludable = useMemo(
@@ -114,58 +53,20 @@ function App() {
     [schema, design, output, settings, title],
   )
 
-  const changeDesign = useCallback((next: Design) => history.push({ ...history.present, [next.target]: next }), [history])
-
-  function resetDesign() {
-    if (schema) history.push({ ...history.present, [target]: proposeDesign(schema, target) })
-  }
-
-  // A tool in another tab can also send a model with postMessage; only trusted origins are heard
-  useEffect(() => {
-    function listen(event: MessageEvent) {
-      if (!isTrustedOrigin(event.origin, window.location.origin)) return
-      const handoff = readHandoff(event.data)
-      if (!handoff) return
-      setInput(inputFromHandoff(handoff))
-      setTab('design')
-    }
-    window.addEventListener('message', listen)
-    return () => window.removeEventListener('message', listen)
-  }, [])
-
-  // Undo and redo with the keyboard, except while typing in a field (it has its own undo)
-  useEffect(() => {
-    function onKey(event: KeyboardEvent) {
-      if (!(event.metaKey || event.ctrlKey) || event.altKey) return
-      const element = event.target as HTMLElement | null
-      if (element && element.closest('input, textarea, select, [contenteditable="true"], .cm-editor') !== null) return
-      const key = event.key.toLowerCase()
-      if (key === 'z' && !event.shiftKey && history.canUndo) {
-        event.preventDefault()
-        history.undo()
-      } else if (((key === 'z' && event.shiftKey) || key === 'y') && history.canRedo) {
-        event.preventDefault()
-        history.redo()
-      }
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [history])
-
   function loadExample(id: ExampleId) {
     const example = findExample(id)
     if (!example) return
     if (input.text.trim() !== '' && !window.confirm(t.confirmReplace)) return
     // A different model: the decisions made on the previous one do not apply
-    presentRef.current = NO_DESIGNS
+    designs.startOver()
     setInput({ text: example.text, format: example.format })
-    setOutputId(example.output)
+    setOutput(example.output)
     setTab('design')
   }
 
   function changeInput(next: InputState) {
     // Clearing the input starts over: the decisions made on the previous model are discarded too
-    if (next.text.trim() === '') presentRef.current = NO_DESIGNS
+    if (next.text.trim() === '') designs.startOver()
     setInput(next)
   }
 
@@ -200,12 +101,9 @@ function App() {
               pending={pending}
               database={output.label}
               excludable={excludable}
-              onChange={changeDesign}
-              canUndo={history.canUndo}
-              canRedo={history.canRedo}
-              onUndo={history.undo}
-              onRedo={history.redo}
-              onReset={resetDesign}
+              onChange={designs.change}
+              history={designs.history}
+              onReset={designs.reset}
             />
           </div>
           <div className="workspace__result">
@@ -213,13 +111,8 @@ function App() {
               output={output}
               settings={settings}
               generated={generated}
-              onOutputChange={setOutputId}
-              onSettingsChange={(next) => {
-                setNamings((current) => ({ ...current, [target]: next.naming }))
-                setStrings(next.strings)
-                setEngine(next.engine)
-                setMigrations(next.migrations)
-              }}
+              onOutputChange={setOutput}
+              onSettingsChange={setSettings}
             />
           </div>
         </div>

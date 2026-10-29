@@ -62,7 +62,7 @@ export interface FieldDef {
   aliases?: string[]
   description?: string
   annotations?: Annotation[]
-  /** Computed or generated (`@GeneratedValue`, `readonly`, `@property`): it never needs a value from a mapping */
+  /** Computed or generated (`@GeneratedValue`, `readonly`, `@property`): the database or the framework fills it */
   generated?: boolean
   metadata?: Record<string, string | number | boolean>
 }
@@ -153,11 +153,6 @@ export function allFields(schema: ModelSchema, model: ModelDef, seen: Set<string
   return [...inherited.filter((field) => !own.has(field.name)), ...model.fields]
 }
 
-/** A target field that must receive a value: it cannot be missing or null and has no default. */
-export function needsValue(field: FieldDef): boolean {
-  return !field.optional && !field.nullable && field.defaultValue === undefined && !field.generated
-}
-
 /** The model chosen by default: the declared root, or the model no other model refers to, or the first. */
 export function defaultRoot(schema: ModelSchema): string | undefined {
   if (schema.root && findModel(schema, schema.root)) return schema.root
@@ -197,8 +192,4 @@ export function describeType(type: TypeRef): string {
 
 export function primitive(name: Primitive, bits?: 8 | 16 | 32 | 64): TypeRef {
   return bits ? { kind: 'primitive', name, bits } : { kind: 'primitive', name }
-}
-
-export function sameType(a: TypeRef, b: TypeRef): boolean {
-  return JSON.stringify(a) === JSON.stringify(b)
 }

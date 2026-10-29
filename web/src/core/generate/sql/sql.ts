@@ -1,7 +1,7 @@
-import type { Literal } from '../model/schema.ts'
-import { orderTables } from '../physical/order.ts'
-import type { Column, ColumnType, Dialect, ForeignKey, PhysicalEnum, RelationalSchema } from '../physical/types.ts'
-import { todoText } from './todos.ts'
+import type { Literal } from '../../model/schema.ts'
+import { orderTables } from '../../physical/order.ts'
+import type { Column, ColumnType, Dialect, ForeignKey, PhysicalEnum, RelationalSchema } from '../../physical/types.ts'
+import { todoText } from '../todos.ts'
 
 /** Writes the DDL of a relational schema for one dialect: types, enums, tables, constraints and indexes,
  * in an order that every database accepts (a table after the tables it refers to). */

@@ -3,10 +3,10 @@ import type { Design } from '../design/types.ts'
 import { buildDocument } from '../physical/document.ts'
 import { buildRelational } from '../physical/relational.ts'
 import type { Dialect, PhysicalSchema } from '../physical/types.ts'
-import { generateMongo } from './mongodb.ts'
+import { generateMongo } from './mongodb/mongodb.ts'
 import { djangoOutput } from './orm/python/django.ts'
 import { sqlalchemyOutput } from './orm/python/sqlalchemy.ts'
-import { DIALECT_NAMES, generateSql } from './sql.ts'
+import { DIALECT_NAMES, generateSql } from './sql/sql.ts'
 import {
   fileBase,
   type DocumentWriter,

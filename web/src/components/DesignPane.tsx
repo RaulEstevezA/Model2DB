@@ -4,6 +4,7 @@ import type { Design } from '../core/design/types.ts'
 import { allFields, type ModelSchema } from '../core/model/schema.ts'
 import type { ModelRole } from '../core/physical/roles.ts'
 import type { PhysicalSchema } from '../core/physical/types.ts'
+import type { History } from '../hooks/useHistory.ts'
 import { useI18n } from '../i18n/useI18n.ts'
 import { DecisionControl } from './DecisionControl.tsx'
 import { ModelCard } from './ModelCard.tsx'
@@ -19,10 +20,7 @@ interface DesignPaneProps {
   database: string
   excludable: Set<string>
   onChange: (design: Design) => void
-  canUndo: boolean
-  canRedo: boolean
-  onUndo: () => void
-  onRedo: () => void
+  history: Pick<History<unknown>, 'canUndo' | 'canRedo' | 'undo' | 'redo'>
   onReset: () => void
 }
 
@@ -37,10 +35,7 @@ export function DesignPane({
   database,
   excludable,
   onChange,
-  canUndo,
-  canRedo,
-  onUndo,
-  onRedo,
+  history,
   onReset,
 }: DesignPaneProps) {
   const { t } = useI18n()
@@ -81,10 +76,10 @@ export function DesignPane({
       title={t.designTitle}
       actions={
         <>
-          <button type="button" className="button" onClick={onUndo} disabled={!canUndo} title={t.undoTitle}>
+          <button type="button" className="button" onClick={history.undo} disabled={!history.canUndo} title={t.undoTitle}>
             {t.undo}
           </button>
-          <button type="button" className="button" onClick={onRedo} disabled={!canRedo} title={t.redoTitle}>
+          <button type="button" className="button" onClick={history.redo} disabled={!history.canRedo} title={t.redoTitle}>
             {t.redo}
           </button>
           <button

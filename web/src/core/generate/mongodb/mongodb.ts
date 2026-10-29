@@ -1,5 +1,5 @@
-import type { DocumentSchema } from '../physical/types.ts'
-import { todoText } from './todos.ts'
+import type { DocumentSchema } from '../../physical/types.ts'
+import { todoText } from '../todos.ts'
 
 /** Writes a mongosh script that creates each collection with its `$jsonSchema` validator and indexes. */
 

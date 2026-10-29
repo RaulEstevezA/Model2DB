@@ -157,7 +157,7 @@ export function buildDocument(schema: ModelSchema, design: Design, naming: Namin
 }
 
 /** A scalar field next to a reference that already holds the referenced id. */
-function keyHolder(field: FieldDef, fields: FieldDef[], item: ModelDesign, options: { naming: NamingOptions }): string | null {
+export function keyHolder(field: FieldDef, fields: FieldDef[], item: ModelDesign, options: { naming: NamingOptions }): string | null {
   const relation = field.annotations?.find((annotation) => annotation.name === 'relation')
   const named = relation?.args ? /fields\s*:\s*\[\s*(\w+)/.exec(relation.args)?.[1] : undefined
   const words = [...nameWords(field.name), 'id'].join('')

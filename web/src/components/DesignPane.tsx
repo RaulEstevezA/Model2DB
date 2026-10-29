@@ -57,7 +57,9 @@ export function DesignPane({
     const element = document.getElementById(decisionElementId(ref))
     if (!element) return
     element.scrollIntoView({ block: 'center' })
-    element.focus({ preventScroll: true })
+    // The control itself, so its name and state are read; the decision when it has a single option
+    const control = element.querySelector<HTMLElement>('select, button') ?? element
+    control.focus({ preventScroll: true })
   }
 
   const kind = design?.target ?? 'relational'
@@ -66,7 +68,7 @@ export function DesignPane({
   const roleText = kind === 'relational' ? t.role : t.documentRole
 
   const footer = design ? (
-    <p className={pending.length > 0 ? 'design__status design__status--pending' : 'design__status'}>
+    <p className={pending.length > 0 ? 'design__status design__status--pending' : 'design__status'} role="status">
       {t.designSummary(stored.length, kind)} · {pending.length > 0 ? t.pendingCount(pending.length) : t.allDecided}
     </p>
   ) : null

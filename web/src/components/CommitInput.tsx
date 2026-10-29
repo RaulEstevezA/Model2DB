@@ -19,7 +19,6 @@ export function CommitInput({
   const [editing, setEditing] = useState(false)
   const shown = editing ? draft : value
   const commit = () => {
-    setEditing(false)
     if (draft.trim() !== value) onCommit(draft)
   }
   return (
@@ -36,13 +35,14 @@ export function CommitInput({
           setEditing(true)
         }}
         onChange={(event) => setDraft(event.target.value)}
-        onBlur={commit}
+        onBlur={() => {
+          commit()
+          setEditing(false)
+        }}
         onKeyDown={(event: KeyboardEvent<HTMLInputElement>) => {
+          // The field keeps the focus: typing goes on from what was applied or restored
           if (event.key === 'Enter') commit()
-          if (event.key === 'Escape') {
-            setDraft(value)
-            setEditing(false)
-          }
+          if (event.key === 'Escape') setDraft(value)
         }}
       />
     </label>

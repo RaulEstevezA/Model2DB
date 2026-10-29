@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import { sameValue, type Decision } from '../core/design/types.ts'
 import { useI18n } from '../i18n/useI18n.ts'
 import { ConfidenceBadge } from './ConfidenceBadge.tsx'
@@ -17,6 +18,8 @@ interface DecisionControlProps<T> {
  * A pending decision offers to accept the suggestion as it is, or to choose another option. */
 export function DecisionControl<T>({ id, subject, decision, optionLabel, onChoose, onAccept }: DecisionControlProps<T>) {
   const { t } = useI18n()
+  const container = useRef<HTMLDivElement>(null)
+  const select = useRef<HTMLSelectElement>(null)
   const pending = decision.status === 'pending'
   const index = Math.max(
     0,
@@ -25,10 +28,18 @@ export function DecisionControl<T>({ id, subject, decision, optionLabel, onChoos
   const why = decision.manual ? t.reason({ code: 'manual' }) : decision.reasons.map((reason) => t.reason(reason)).join(' ')
 
   return (
-    <div className={`decision${pending ? ' decision--pending' : ''}`} id={id} tabIndex={-1}>
+    <div
+      ref={container}
+      className={`decision${pending ? ' decision--pending' : ''}`}
+      id={id}
+      tabIndex={-1}
+      role="group"
+      aria-label={subject}
+    >
       <div className="decision__row">
         {decision.options.length > 1 ? (
           <select
+            ref={select}
             className="select decision__select"
             aria-label={subject}
             aria-describedby={`${id}-why`}
@@ -51,7 +62,11 @@ export function DecisionControl<T>({ id, subject, decision, optionLabel, onChoos
             className="button button--small"
             title={t.acceptTitle(subject)}
             aria-label={t.acceptTitle(subject)}
-            onClick={() => onAccept()}
+            onClick={() => {
+              onAccept()
+              // The button goes away once accepted: the focus stays on this decision instead of the page
+              ;(select.current ?? container.current)?.focus()
+            }}
           >
             {t.accept}
           </button>

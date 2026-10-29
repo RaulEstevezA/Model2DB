@@ -22,6 +22,7 @@ import { useStoredState } from './hooks/useStoredState.ts'
 import { useUndoShortcuts } from './hooks/useUndoShortcuts.ts'
 import { useI18n } from './i18n/useI18n.ts'
 import { downloadBlob } from './utils/download.ts'
+import { onTabListKeyDown } from './utils/tabs.ts'
 import './App.css'
 
 type WorkspaceTab = 'input' | 'design' | 'result'
@@ -158,9 +159,22 @@ function App() {
           onRememberChange={setRemember}
           onClearSaved={clearSaved}
         />
-        <div className="workspace__tabs" role="tablist" aria-label={t.workspaceTabs}>
+        <div
+          className="workspace__tabs"
+          role="tablist"
+          aria-label={t.workspaceTabs}
+          onKeyDown={(event) => onTabListKeyDown(event, (index) => setTab(TABS[index]))}
+        >
           {TABS.map((id) => (
-            <button key={id} type="button" role="tab" aria-selected={tab === id} className="workspace__tab" onClick={() => setTab(id)}>
+            <button
+              key={id}
+              type="button"
+              role="tab"
+              aria-selected={tab === id}
+              tabIndex={tab === id ? 0 : -1}
+              className="workspace__tab"
+              onClick={() => setTab(id)}
+            >
               {t.tabs[id]}
               {id === 'design' && pending.length > 0 && <span className="workspace__tab-badge">{pending.length}</span>}
               {id === 'input' && inputError && (

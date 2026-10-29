@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { I18nContext } from './I18nContext.ts'
 import { languages, messages, type Language } from './messages.ts'
 
-const STORAGE_KEY = 'mapper.language'
+const STORAGE_KEY = 'model2db.language'
 const SITE_LANGUAGE_KEY = 'lang' // Shared with the portfolio and the demos
 
 function isLanguage(value: unknown): value is Language {

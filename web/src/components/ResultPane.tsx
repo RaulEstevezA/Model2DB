@@ -9,6 +9,7 @@ import { useCopy } from '../hooks/useCopy.ts'
 import { CodeEditor } from './CodeEditor.tsx'
 import { ResultOptions } from './ResultOptions.tsx'
 import { Pane } from './Pane.tsx'
+import { onTabListKeyDown } from '../utils/tabs.ts'
 import './ResultPane.css'
 
 interface ResultPaneProps {
@@ -105,13 +106,19 @@ export function ResultPane({ output, settings, generated, onOutputChange, onSett
           </details>
         )}
         {files.length > 1 && (
-          <div className="result-pane__files" role="tablist" aria-label={t.filesLabel}>
+          <div
+            className="result-pane__files"
+            role="tablist"
+            aria-label={t.filesLabel}
+            onKeyDown={(event) => onTabListKeyDown(event, setSelected)}
+          >
             {files.map((item, index) => (
               <button
                 key={item.name}
                 type="button"
                 role="tab"
                 aria-selected={item === file}
+                tabIndex={item === file ? 0 : -1}
                 className="result-pane__file-tab"
                 onClick={() => setSelected(index)}
               >

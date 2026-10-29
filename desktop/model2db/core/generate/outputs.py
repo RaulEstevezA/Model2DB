@@ -7,6 +7,10 @@ from ..model.schema import default_root
 from ..physical.document import build_document
 from ..physical.relational.schema import build_relational
 from .mongodb.mongodb import generate_mongo
+from .orm.python.django import DjangoOutput
+from .orm.python.sqlalchemy import SqlAlchemyOutput
+from .orm.python.sqlmodel import SqlModelOutput
+from .orm.python.tortoise import TortoiseOutput
 from .sql.sql import DIALECT_NAMES, generate_sql
 from .types import WriteContext, file_base, generated_file
 
@@ -85,6 +89,10 @@ OUTPUTS: tuple[Output, ...] = (
         for dialect in ("postgresql", "mysql", "mariadb", "sqlite", "sqlserver", "oracle")
     ),
     _output(_MongoWriter(), "document"),
+    _output(DjangoOutput(), "relational"),
+    _output(SqlAlchemyOutput(), "relational"),
+    _output(SqlModelOutput(), "relational"),
+    _output(TortoiseOutput(), "relational"),
 )
 
 

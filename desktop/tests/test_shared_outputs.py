@@ -29,7 +29,7 @@ def expected_files(output_id: str, example_id: str) -> dict[str, str]:
     return {
         path.relative_to(folder).as_posix(): path.read_text(encoding="utf-8")
         for path in folder.rglob("*")
-        if path.is_file()
+        if path.is_file() and "__pycache__" not in path.parts
     }
 
 

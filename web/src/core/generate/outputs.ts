@@ -6,6 +6,7 @@ import { buildRelational } from '../physical/relational.ts'
 import type { BuildOptions, Dialect, PhysicalSchema } from '../physical/types.ts'
 import { DIALECT_NAMES, generateSql } from './sql.ts'
 import { generateMongo } from './mongodb.ts'
+import { djangoOutput } from './orm/python/django.ts'
 import { sqlalchemyOutput } from './orm/python/sqlalchemy.ts'
 import {
   fileBase,
@@ -53,7 +54,7 @@ const mongoOutput: DocumentOutput = {
 }
 
 /** Every output, in the order the selector shows them. Adding one means listing it here. */
-export const OUTPUTS: readonly Output[] = [...sqlOutputs, mongoOutput, sqlalchemyOutput]
+export const OUTPUTS: readonly Output[] = [...sqlOutputs, mongoOutput, djangoOutput, sqlalchemyOutput]
 
 export function findOutput(id: string): Output {
   return OUTPUTS.find((output) => output.id === id) ?? OUTPUTS[0]

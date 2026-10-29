@@ -101,6 +101,8 @@ export type NoteCode =
   | 'enumCheckedInCode'
   /** Written by an output: the ORM stores an enum with an enum type of its own instead of a CHECK */
   | 'ormEnumType'
+  /** Written by an output: values of a PostgreSQL enum type need a cast the ORM cannot write */
+  | 'enumNeedsCast'
 
 export interface RelationalSchema {
   kind: 'relational'

@@ -359,6 +359,8 @@ const en = {
         return `${p(params, 'orm')} checks the values of “${p(params, 'enum')}” in the application: the database does not restrict them.`
       case 'ormEnumType':
         return `${p(params, 'orm')} stores “${p(params, 'enum')}” with an enum type of the database, not with a CHECK constraint.`
+      case 'enumNeedsCast':
+        return `${p(params, 'orm')} sends “${p(params, 'enum')}” as text, and PostgreSQL does not cast it to its enum type: choose a CHECK constraint, or Hibernate.`
     }
   },
 }
@@ -678,6 +680,8 @@ const es: Messages = {
         return `${p(params, 'orm')} comprueba los valores de «${p(params, 'enum')}» en la aplicación: la base de datos no los restringe.`
       case 'ormEnumType':
         return `${p(params, 'orm')} guarda «${p(params, 'enum')}» con un tipo enumerado de la base de datos, no con una restricción CHECK.`
+      case 'enumNeedsCast':
+        return `${p(params, 'orm')} envía «${p(params, 'enum')}» como texto, y PostgreSQL no lo convierte a su tipo enumerado: elige una restricción CHECK, o Hibernate.`
     }
   },
 }

@@ -8,6 +8,7 @@ import { djangoOutput } from './orm/python/django.ts'
 import { sqlalchemyOutput } from './orm/python/sqlalchemy.ts'
 import { sqlmodelOutput } from './orm/python/sqlmodel.ts'
 import { tortoiseOutput } from './orm/python/tortoise.ts'
+import { prismaOutput } from './orm/typescript/prisma.ts'
 import { DIALECT_NAMES, generateSql } from './sql/sql.ts'
 import {
   fileBase,
@@ -92,6 +93,7 @@ export const OUTPUTS: readonly Output[] = [
   relational(sqlalchemyOutput),
   relational(sqlmodelOutput),
   relational(tortoiseOutput),
+  relational(prismaOutput),
 ]
 
 export function findOutput(id: string): Output {

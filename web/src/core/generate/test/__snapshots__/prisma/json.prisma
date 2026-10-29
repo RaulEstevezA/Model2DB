@@ -1,0 +1,61 @@
+// Prisma schema written by Model2DB from Invoice. Review it, then run `npx prisma migrate dev --name init`.
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Invoice {
+  invoiceId  Int @id(map: "pk_invoices") @map("invoice_id")
+  number     String
+  issuedAt   DateTime @map("issued_at") @db.Timestamptz
+  currency   String
+  paid       Boolean
+  customerId Int @map("customer_id")
+  notes      Json?
+  customer   Customer @relation("Invoice_customer", fields: [customerId], references: [customerId])
+  lines      Line[] @relation("Line_invoice")
+  labels     InvoiceLabel[] @relation("InvoiceLabel_invoice")
+
+  @@index([customerId], map: "ix_invoices_customer_id")
+  @@map("invoices")
+}
+
+model Customer {
+  customerId            Int @id(map: "pk_customers") @map("customer_id")
+  name                  String
+  email                 String
+  billingAddressStreet  String @map("billing_address_street")
+  billingAddressCity    String @map("billing_address_city")
+  billingAddressZipCode String @map("billing_address_zip_code")
+  invoices              Invoice[] @relation("Invoice_customer")
+
+  @@map("customers")
+}
+
+model Line {
+  id          BigInt @id(map: "pk_lines") @default(autoincrement())
+  description String
+  qty         Int
+  unitPrice   Float @map("unit_price")
+  taxRate     Float @map("tax_rate")
+  invoiceId   Int @map("invoice_id")
+  invoice     Invoice @relation("Line_invoice", fields: [invoiceId], references: [invoiceId], onDelete: Cascade)
+
+  @@index([invoiceId], map: "ix_lines_invoice_id")
+  @@map("lines")
+}
+
+model InvoiceLabel {
+  invoiceId Int @map("invoice_id")
+  position  Int
+  value     String
+  invoice   Invoice @relation("InvoiceLabel_invoice", fields: [invoiceId], references: [invoiceId], onDelete: Cascade)
+
+  @@id([invoiceId, position], map: "pk_invoice_labels")
+  @@map("invoice_labels")
+}

@@ -1,0 +1,58 @@
+// Prisma schema written by Model2DB from User. Review it, then run `npx prisma migrate dev --name init`.
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id             String @id(map: "pk_users")
+  email          String @unique(map: "uq_users_email")
+  name           String?
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+  profileBio     String? @map("profile_bio")
+  profileWebsite String? @map("profile_website")
+  posts          Post[] @relation("Post_author")
+
+  @@map("users")
+}
+
+model Post {
+  id        Int @id(map: "pk_posts") @default(autoincrement())
+  title     String @db.VarChar(200)
+  body      String
+  published Boolean @default(false)
+  authorId  String @map("author_id")
+  author    User @relation("Post_author", fields: [authorId], references: [id])
+  comments  Comment[] @relation("Comment_post")
+  tags      PostTag[] @relation("PostTag_post")
+
+  @@index([authorId], map: "ix_posts_author_id")
+  @@map("posts")
+}
+
+model Comment {
+  id        BigInt @id(map: "pk_comments") @default(autoincrement())
+  text      String
+  writtenAt DateTime @map("written_at") @db.Timestamptz
+  rating    Int?
+  postId    Int @map("post_id")
+  post      Post @relation("Comment_post", fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId], map: "ix_comments_post_id")
+  @@map("comments")
+}
+
+model PostTag {
+  postId   Int @map("post_id")
+  position Int
+  value    String
+  post     Post @relation("PostTag_post", fields: [postId], references: [id], onDelete: Cascade)
+
+  @@id([postId, position], map: "pk_post_tags")
+  @@map("post_tags")
+}

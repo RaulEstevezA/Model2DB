@@ -1,0 +1,62 @@
+// Prisma schema written by Model2DB from Author. Review it, then run `npx prisma migrate dev --name init`.
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Genre {
+  FICTION
+  ESSAY
+  POETRY
+  SCIENCE
+  @@map("genre")
+}
+
+model Author {
+  id    BigInt @id(map: "pk_authors") @default(autoincrement())
+  name  String @db.VarChar(120)
+  email String @unique(map: "uq_authors_email")
+  books Book[] @relation("Book_author")
+
+  @@map("authors")
+}
+
+model Book {
+  id          BigInt @id(map: "pk_books") @default(autoincrement())
+  isbn        String @unique(map: "uq_books_isbn") @db.VarChar(13)
+  title       String
+  price       Decimal @db.Decimal(8, 2)
+  publishedOn DateTime @map("published_on") @db.Date
+  genre       Genre
+  authorId    BigInt @map("author_id")
+  shelfRoom   String @map("shelf_room")
+  shelfRow    Int? @map("shelf_row")
+  author      Author @relation("Book_author", fields: [authorId], references: [id])
+  tags        BookTagLink[] @relation("BookTagLink_book")
+
+  @@index([authorId], map: "ix_books_author_id")
+  @@map("books")
+}
+
+model Tag {
+  code         String @id(map: "pk_tags")
+  label        String
+  bookTagLinks BookTagLink[] @relation("BookTagLink_tag")
+
+  @@map("tags")
+}
+
+model BookTagLink {
+  bookId  BigInt @map("book_id")
+  book    Book @relation("BookTagLink_book", fields: [bookId], references: [id], onDelete: Cascade)
+  tagCode String @map("tag_code")
+  tag     Tag @relation("BookTagLink_tag", fields: [tagCode], references: [code], onDelete: Cascade)
+
+  @@id([bookId, tagCode], map: "pk_books_tags")
+  @@map("books_tags")
+}

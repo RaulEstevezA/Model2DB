@@ -1,0 +1,101 @@
+// Prisma schema written by Model2DB from Order. Review it, then run `npx prisma migrate dev --name init`.
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum OrderStatus {
+  draft
+  paid
+  shipped
+  cancelled
+  @@map("order_status")
+}
+
+model Customer {
+  id                        BigInt @id(map: "pk_customers")
+  email                     String
+  fullName                  String @map("full_name")
+  phone                     String?
+  createdAt                 DateTime @map("created_at") @db.Timestamptz
+  shippingAddressStreet     String @map("shipping_address_street")
+  shippingAddressCity       String @map("shipping_address_city")
+  shippingAddressPostalCode String @map("shipping_address_postal_code")
+  shippingAddressCountry    String @map("shipping_address_country")
+  orders                    Order[] @relation("Order_customer")
+
+  @@map("customers")
+}
+
+model Order {
+  id         BigInt @id(map: "pk_orders")
+  status     OrderStatus
+  couponCode String? @map("coupon_code")
+  placedAt   DateTime @map("placed_at") @db.Timestamptz
+  customerId BigInt @map("customer_id")
+  customer   Customer @relation("Order_customer", fields: [customerId], references: [id])
+  lines      OrderLine[] @relation("OrderLine_order")
+  tags       OrderTag[] @relation("OrderTag_order")
+
+  @@index([customerId], map: "ix_orders_customer_id")
+  @@map("orders")
+}
+
+model OrderLine {
+  id        BigInt @id(map: "pk_order_lines") @default(autoincrement())
+  quantity  Float
+  unitPrice Float @map("unit_price")
+  orderId   BigInt @map("order_id")
+  productId BigInt @map("product_id")
+  order     Order @relation("OrderLine_order", fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product @relation("OrderLine_product", fields: [productId], references: [id])
+
+  @@index([orderId], map: "ix_order_lines_order_id")
+  @@index([productId], map: "ix_order_lines_product_id")
+  @@map("order_lines")
+}
+
+model Product {
+  id         BigInt @id(map: "pk_products")
+  sku        String
+  name       String
+  price      Float
+  attributes Json
+  orderLines OrderLine[] @relation("OrderLine_product")
+  categories ProductCategoryLink[] @relation("ProductCategoryLink_product")
+
+  @@map("products")
+}
+
+model Category {
+  id       BigInt @id(map: "pk_categories")
+  name     String
+  products ProductCategoryLink[] @relation("ProductCategoryLink_category")
+
+  @@map("categories")
+}
+
+model OrderTag {
+  orderId  BigInt @map("order_id")
+  position Int
+  value    String
+  order    Order @relation("OrderTag_order", fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@id([orderId, position], map: "pk_order_tags")
+  @@map("order_tags")
+}
+
+model ProductCategoryLink {
+  productId  BigInt @map("product_id")
+  product    Product @relation("ProductCategoryLink_product", fields: [productId], references: [id], onDelete: Cascade)
+  categoryId BigInt @map("category_id")
+  category   Category @relation("ProductCategoryLink_category", fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([productId, categoryId], map: "pk_categories_products")
+  @@map("categories_products")
+}

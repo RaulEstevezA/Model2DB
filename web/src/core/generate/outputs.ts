@@ -6,6 +6,7 @@ import type { Dialect, PhysicalSchema } from '../physical/types.ts'
 import { generateMongo } from './mongodb/mongodb.ts'
 import { djangoOutput } from './orm/python/django.ts'
 import { sqlalchemyOutput } from './orm/python/sqlalchemy.ts'
+import { sqlmodelOutput } from './orm/python/sqlmodel.ts'
 import { DIALECT_NAMES, generateSql } from './sql/sql.ts'
 import {
   fileBase,
@@ -84,6 +85,7 @@ export const OUTPUTS: readonly Output[] = [
   documental(mongoWriter),
   relational(djangoOutput),
   relational(sqlalchemyOutput),
+  relational(sqlmodelOutput),
 ]
 
 export function findOutput(id: string): Output {

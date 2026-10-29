@@ -18,7 +18,7 @@ depends_on = None
 def upgrade() -> None:
     op.create_table(
         "authors",
-        sa.Column("id", sa.BigInteger, sa.Identity(), nullable=False),
+        sa.Column("id", sa.BigInteger().with_variant(sa.Integer(), "sqlite"), sa.Identity(), nullable=False),
         sa.Column("name", sa.String(120), nullable=False),
         sa.Column("email", sa.Text, nullable=False),
         sa.PrimaryKeyConstraint("id", name="pk_authors"),
@@ -26,7 +26,7 @@ def upgrade() -> None:
     )
     op.create_table(
         "books",
-        sa.Column("id", sa.BigInteger, sa.Identity(), nullable=False),
+        sa.Column("id", sa.BigInteger().with_variant(sa.Integer(), "sqlite"), sa.Identity(), nullable=False),
         sa.Column("isbn", sa.String(13), nullable=False),
         sa.Column("title", sa.Text, nullable=False),
         sa.Column("price", sa.Numeric(8, 2), nullable=False),

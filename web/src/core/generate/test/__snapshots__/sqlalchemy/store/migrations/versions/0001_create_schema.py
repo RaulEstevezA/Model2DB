@@ -51,7 +51,7 @@ def upgrade() -> None:
     )
     op.create_table(
         "order_lines",
-        sa.Column("id", sa.BigInteger, sa.Identity(), nullable=False),
+        sa.Column("id", sa.BigInteger().with_variant(sa.Integer(), "sqlite"), sa.Identity(), nullable=False),
         sa.Column("quantity", sa.Double, nullable=False),
         sa.Column("unit_price", sa.Double, nullable=False),
         sa.Column("order_id", sa.BigInteger, nullable=False),

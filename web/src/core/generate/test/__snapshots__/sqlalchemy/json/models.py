@@ -43,7 +43,7 @@ class Customer(Base):
 class Line(Base):
     __tablename__ = "lines"
 
-    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    id: Mapped[int] = mapped_column(BigInteger().with_variant(Integer(), "sqlite"), primary_key=True)
     description: Mapped[str] = mapped_column(Text)
     qty: Mapped[int] = mapped_column(Integer)
     unit_price: Mapped[float] = mapped_column(Double)

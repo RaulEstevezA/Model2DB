@@ -37,7 +37,7 @@ books_tags = Table(
 class Author(Base):
     __tablename__ = "authors"
 
-    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    id: Mapped[int] = mapped_column(BigInteger().with_variant(Integer(), "sqlite"), primary_key=True)
     name: Mapped[str] = mapped_column(String(120))
     email: Mapped[str] = mapped_column(Text, unique=True)
 
@@ -47,7 +47,7 @@ class Author(Base):
 class Book(Base):
     __tablename__ = "books"
 
-    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    id: Mapped[int] = mapped_column(BigInteger().with_variant(Integer(), "sqlite"), primary_key=True)
     isbn: Mapped[str] = mapped_column(String(13), unique=True)
     title: Mapped[str] = mapped_column(Text)
     price: Mapped[decimal.Decimal] = mapped_column(Numeric(8, 2))

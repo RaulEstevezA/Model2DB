@@ -41,7 +41,7 @@ def upgrade() -> None:
     op.create_index("ix_invoices_customer_id", "invoices", ["customer_id"], unique=False)
     op.create_table(
         "lines",
-        sa.Column("id", sa.BigInteger, sa.Identity(), nullable=False),
+        sa.Column("id", sa.BigInteger().with_variant(sa.Integer(), "sqlite"), sa.Identity(), nullable=False),
         sa.Column("description", sa.Text, nullable=False),
         sa.Column("qty", sa.Integer, nullable=False),
         sa.Column("unit_price", sa.Double, nullable=False),

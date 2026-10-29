@@ -40,7 +40,7 @@ def upgrade() -> None:
     op.create_index("ix_posts_author_id", "posts", ["author_id"], unique=False)
     op.create_table(
         "comments",
-        sa.Column("id", sa.BigInteger, sa.Identity(), nullable=False),
+        sa.Column("id", sa.BigInteger().with_variant(sa.Integer(), "sqlite"), sa.Identity(), nullable=False),
         sa.Column("text", sa.Text, nullable=False),
         sa.Column("written_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("rating", sa.Integer, nullable=True),

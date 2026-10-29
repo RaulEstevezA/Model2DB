@@ -42,7 +42,7 @@ class Post(Base):
 class Comment(Base):
     __tablename__ = "comments"
 
-    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    id: Mapped[int] = mapped_column(BigInteger().with_variant(Integer(), "sqlite"), primary_key=True)
     text: Mapped[str] = mapped_column(Text)
     written_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True))
     rating: Mapped[int | None] = mapped_column(Integer)

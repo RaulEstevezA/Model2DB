@@ -51,7 +51,7 @@ export function DecisionControl<T>({ id, subject, decision, optionLabel, onChoos
             className="button button--small"
             title={t.acceptTitle(subject)}
             aria-label={t.acceptTitle(subject)}
-            onClick={onAccept}
+            onClick={() => onAccept()}
           >
             {t.accept}
           </button>

@@ -58,14 +58,3 @@ export function tsEnum(name: string, members: { name: string; value: string | nu
     '}',
   ]
 }
-
-/** The statements of an SQL script, without its comments, to run them one by one. */
-export function sqlStatements(script: string): string[] {
-  return script
-    .split('\n')
-    .filter((line) => !line.startsWith('--'))
-    .join('\n')
-    .split(/;\s*\n/)
-    .map((statement) => statement.trim().replace(/;$/, ''))
-    .filter(Boolean)
-}

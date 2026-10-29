@@ -1,11 +1,10 @@
 import type { Literal } from '../../../model/schema.ts'
-import { orderTables } from '../../../physical/order.ts'
 import type { Column, ColumnType, Dialect, PhysicalEnum, RelationalSchema } from '../../../physical/types.ts'
-import { generateSql } from '../../sql/sql.ts'
+import { schemaStatements } from '../../sql/statements.ts'
 import { todoText } from '../../todos.ts'
 import { fileBase, type GeneratedFile, type RelationalWriter, type WriteContext } from '../../types.ts'
 import { buildEntities, enumMembers, type Attribute, type EntityClass, type EntityView } from '../entities.ts'
-import { sqlStatements, tsEnum, tsString, tsType } from './typescript.ts'
+import { tsEnum, tsString, tsType } from './typescript.ts'
 
 /** TypeORM entities, and a migration that runs the schema written for the chosen engine. */
 
@@ -214,9 +213,8 @@ function entitiesFile(view: EntityView, engine: Dialect, context: WriteContext):
 /** A migration that creates the tables with the engine's own DDL and drops them on the way back. */
 function migrationFile(physical: RelationalSchema, engine: Dialect, context: WriteContext): { name: string; content: string } {
   const className = `Create${context.title.replace(/\W/g, '')}Schema1735689600000`
-  const statements = sqlStatements(generateSql(physical, engine, { title: context.title }))
+  const { up, down } = schemaStatements(physical, engine, context.title)
   const quote = (sql: string) => '`' + sql.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$\{/g, '\\${') + '`'
-  const drops = [...orderTables(physical.tables).tables].reverse().map((table) => `DROP TABLE ${table.name}`)
   return {
     name: `migrations/1735689600000-Create${context.title.replace(/\W/g, '')}Schema.ts`,
     content: [
@@ -225,11 +223,11 @@ function migrationFile(physical: RelationalSchema, engine: Dialect, context: Wri
       '',
       `export class ${className} implements MigrationInterface {`,
       '  async up(queryRunner: QueryRunner): Promise<void> {',
-      ...statements.map((sql) => `    await queryRunner.query(${quote(sql)})`),
+      ...up.map((sql) => `    await queryRunner.query(${quote(sql)})`),
       '  }',
       '',
       '  async down(queryRunner: QueryRunner): Promise<void> {',
-      ...drops.map((sql) => `    await queryRunner.query(${quote(sql)})`),
+      ...down.map((sql) => `    await queryRunner.query(${quote(sql)})`),
       '  }',
       '}',
       '',

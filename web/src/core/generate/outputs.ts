@@ -4,6 +4,7 @@ import { buildDocument } from '../physical/document.ts'
 import { buildRelational } from '../physical/relational.ts'
 import type { Dialect, Note, PhysicalSchema } from '../physical/types.ts'
 import { generateMongo } from './mongodb/mongodb.ts'
+import { efCoreOutput } from './orm/csharp/efcore.ts'
 import { hibernateOutput, jpaOutput, springDataJpaOutput } from './orm/jvm/jpa.ts'
 import { djangoOutput } from './orm/python/django.ts'
 import { sqlalchemyOutput } from './orm/python/sqlalchemy.ts'
@@ -104,6 +105,7 @@ export const OUTPUTS: readonly Output[] = [
   relational(jpaOutput),
   relational(hibernateOutput),
   relational(springDataJpaOutput),
+  relational(efCoreOutput),
 ]
 
 export function findOutput(id: string): Output {

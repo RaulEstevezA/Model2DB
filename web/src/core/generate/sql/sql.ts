@@ -301,6 +301,11 @@ const RULES_BY_DIALECT: Record<Dialect, DialectRules> = {
   },
 }
 
+/** The database type of a column in a dialect (`VARCHAR(20)`), for writers that state it next to the code. */
+export function sqlColumnType(type: ColumnType, dialect: Dialect, enums: PhysicalEnum[]): string {
+  return RULES_BY_DIALECT[dialect].type(type, enums)
+}
+
 export const DIALECT_NAMES: Record<Dialect, string> = {
   postgresql: 'PostgreSQL',
   mysql: 'MySQL',

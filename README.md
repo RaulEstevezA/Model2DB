@@ -21,7 +21,7 @@ It proposes, but never decides an ambiguity: decisions to review wait for the us
 There are two versions, checked by shared test cases:
 
 - **Web**: React + TypeScript, in the browser. Not published yet.
-- **Desktop**: Python + PySide6. In progress: the model, the parsers and the design are ported; the outputs and the interface are next.
+- **[Desktop](./desktop/README_en.md)**: Python + PySide6. The same features and exactly the same files, on your computer.
 
 It is the last tool of the chain [Api2Class](https://github.com/RaulEstevezA/Api2Class) → [Mapper](https://github.com/RaulEstevezA/Mapper) → Model2DB, and works on its own as well.
 

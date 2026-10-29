@@ -44,9 +44,11 @@ web/src/
 
 ## Desktop version
 
-`desktop/` is the same tool as a Python (PySide6) application. `desktop/model2db/core/` mirrors `web/src/core/` module by module, with the same names, and works on plain dictionaries with the same keys as the TypeScript JSON, so its results can be compared with the web version's as JSON.
+`desktop/` is the same tool as a Python (PySide6) application. `desktop/model2db/core/` mirrors `web/src/core/` module by module, with the same names, and works on plain dictionaries with the same keys as the TypeScript JSON, so its results can be compared with the web version's as JSON. `desktop/model2db/core/workspace.py` mirrors `web/src/app/`, and `desktop/model2db/ui/` is the window: `session.py` holds the state that `App.tsx` and its hooks hold on the web.
 
-Both versions read the cases in `shared/test-cases/` ([shared/README.md](../shared/README.md)): calls of core functions with their results, and the files every output writes for every example. The web version writes the results (`UPDATE_SHARED=1`) and the desktop tests must give the same ones, so a change in the core is made in both versions.
+Porting notes: where JavaScript keeps insertion order (a `Set` that is iterated) Python uses a `dict`; `===` between objects is `is`; numbers are written with `js.js_string` (`1`, not `1.0`); and `localeCompare` is emulated where an output sorts with it (`orm/typescript/drizzle.py`).
+
+Both versions read the cases in `shared/test-cases/` ([shared/README.md](../shared/README.md)): calls of core functions with their results, the files every output writes for every example, and variants with other engines, decisions and settings. The web version writes the results (`UPDATE_SHARED=1`) and the desktop tests must give the same ones, so a change in the core is made in both versions.
 
 ## Principles
 

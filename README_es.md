@@ -61,7 +61,8 @@ Los formatos están documentados en [docs/interoperability.md](docs/interoperabi
 |---|---|---|
 | Tecnología | React + TypeScript + Vite | Python + PySide6 |
 | Se ejecuta en | El navegador | Aplicación instalable (Windows, macOS, Linux) |
-| Estado | Aún sin publicar | En desarrollo |
+| Documentación | Este README y [docs/](./docs) | [desktop/README_es.md](./desktop/README_es.md) |
+| Estado | Aún sin publicar | Completa; aún sin versiones empaquetadas: [ejecútala desde el código](./desktop/README_es.md#ejecutar-en-local) |
 
 ## Comportamiento compartido
 
@@ -81,14 +82,7 @@ npm run build    # compilación de producción en web/dist
 
 Los tests cubren los parsers, las propuestas y ediciones del diseño, los esquemas físicos, cada salida (snapshots de los cuatro ejemplos), los archivos de proyecto, los casos compartidos y los flujos principales de la interfaz.
 
-La versión de escritorio está en [`desktop/`](./desktop):
-
-```bash
-cd desktop
-python3 -m venv .venv
-.venv/bin/pip install -e ".[dev]"
-.venv/bin/python -m pytest -q
-```
+La versión de escritorio está en [`desktop/`](./desktop): consulta [desktop/README_es.md](./desktop/README_es.md#ejecutar-en-local) para ejecutarla, probarla y generar el ejecutable.
 
 ## Estructura del repositorio
 

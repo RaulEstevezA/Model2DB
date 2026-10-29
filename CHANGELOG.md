@@ -15,4 +15,4 @@ Notable changes to Model2DB, the web and the desktop version together. The forma
 - Web: save and open projects, and "Remember in this browser".
 - Web: English and Spanish, keyboard and screen reader support, layout from 320px.
 - Web: privacy-first traffic and page-view measurement with Cloudflare Web Analytics.
-- Desktop: the model, the parsers, the handoff and the design, matching the web version in the shared test cases.
+- Desktop: the same tool as a PySide6 application: the same design and exactly the same files for every output, checked by the shared test cases; projects, "Remember on this computer" and models from Mapper as files.

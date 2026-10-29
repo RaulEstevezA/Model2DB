@@ -2,7 +2,7 @@ import { defaultRoot, type ModelSchema } from '../model/schema.ts'
 import type { Design } from '../design/types.ts'
 import { buildDocument } from '../physical/document.ts'
 import { buildRelational } from '../physical/relational.ts'
-import type { Dialect, PhysicalSchema } from '../physical/types.ts'
+import type { Dialect, Note, PhysicalSchema } from '../physical/types.ts'
 import { generateMongo } from './mongodb/mongodb.ts'
 import { djangoOutput } from './orm/python/django.ts'
 import { sqlalchemyOutput } from './orm/python/sqlalchemy.ts'
@@ -36,7 +36,9 @@ function relational(writer: RelationalWriter): Output {
     generate(schema, design, settings, title) {
       const engine = engineOf(writer, settings)
       const physical = buildRelational(schema, design, { naming: settings.naming, strings: settings.strings, dialect: engine })
-      return { physical, files: writer.write(physical, { schema, design, settings: { ...settings, engine }, title }) }
+      const notes: Note[] = []
+      const files = writer.write(physical, { schema, design, settings: { ...settings, engine }, title, note: (note) => notes.push(note) })
+      return { physical: { ...physical, notes: [...physical.notes, ...notes] }, files }
     },
   }
 }
@@ -48,7 +50,9 @@ function documental(writer: DocumentWriter): Output {
     target: 'document',
     generate(schema, design, settings, title) {
       const physical = buildDocument(schema, design, settings.naming)
-      return { physical, files: writer.write(physical, { schema, design, settings, title }) }
+      const notes: Note[] = []
+      const files = writer.write(physical, { schema, design, settings, title, note: (note) => notes.push(note) })
+      return { physical: { ...physical, notes: [...physical.notes, ...notes] }, files }
     },
   }
 }

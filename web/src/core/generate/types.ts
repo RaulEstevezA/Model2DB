@@ -1,7 +1,7 @@
 import type { Design, StorageTarget } from '../design/types.ts'
 import type { ModelSchema } from '../model/schema.ts'
 import { toSnakeCase } from '../model/naming.ts'
-import type { BuildOptions, Dialect, DocumentSchema, NamingOptions, PhysicalSchema, RelationalSchema } from '../physical/types.ts'
+import type { BuildOptions, Dialect, DocumentSchema, NamingOptions, Note, PhysicalSchema, RelationalSchema } from '../physical/types.ts'
 
 /** Groups of the output selector */
 export type OutputGroup = 'relational' | 'document' | 'python' | 'typescript' | 'jvm' | 'csharp' | 'php'
@@ -29,6 +29,8 @@ export interface WriteContext {
   settings: OutputSettings
   /** The model the schema is mainly about: names the files */
   title: string
+  /** What the output could not write as the design says, shown with the result */
+  note: (note: Note) => void
 }
 
 /** What a writer for tables needs: the physical schema of the chosen engine. */

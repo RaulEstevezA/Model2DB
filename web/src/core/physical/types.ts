@@ -88,7 +88,17 @@ export interface Note {
   params: Record<string, string>
 }
 
-export type NoteCode = 'arrayAsJson' | 'nativeEnumAsCheck' | 'defaultPrecision' | 'inheritedFields' | 'cycleEmbedded' | 'renamedReserved'
+export type NoteCode =
+  | 'arrayAsJson'
+  | 'nativeEnumAsCheck'
+  | 'defaultPrecision'
+  | 'inheritedFields'
+  | 'cycleEmbedded'
+  | 'renamedReserved'
+  /** Written by an output: the ORM has no composite primary keys, so the table gets an `id` */
+  | 'compositeKeyAsId'
+  /** Written by an output: the ORM checks enum values in the application, not in the database */
+  | 'enumCheckedInCode'
 
 export interface RelationalSchema {
   kind: 'relational'

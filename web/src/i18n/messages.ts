@@ -353,6 +353,10 @@ const en = {
         return `“${p(params, 'model')}” contains itself: the inner copy is stored as a plain object.`
       case 'renamedReserved':
         return `“${p(params, 'name')}” is a reserved word and is quoted.`
+      case 'compositeKeyAsId':
+        return `${p(params, 'orm')} has no composite primary keys: “${p(params, 'table')}” gets an id column, and ${p(params, 'columns')} stay unique together.`
+      case 'enumCheckedInCode':
+        return `${p(params, 'orm')} checks the values of “${p(params, 'enum')}” in the application: the database does not restrict them.`
     }
   },
 }
@@ -666,6 +670,10 @@ const es: Messages = {
         return `«${p(params, 'model')}» se contiene a sí mismo: la copia interior se guarda como un objeto sin validar.`
       case 'renamedReserved':
         return `«${p(params, 'name')}» es una palabra reservada y va entre comillas.`
+      case 'compositeKeyAsId':
+        return `${p(params, 'orm')} no admite claves primarias compuestas: «${p(params, 'table')}» recibe una columna id, y ${p(params, 'columns')} siguen siendo únicas juntas.`
+      case 'enumCheckedInCode':
+        return `${p(params, 'orm')} comprueba los valores de «${p(params, 'enum')}» en la aplicación: la base de datos no los restringe.`
     }
   },
 }

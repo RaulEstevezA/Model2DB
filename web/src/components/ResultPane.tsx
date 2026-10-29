@@ -20,6 +20,13 @@ interface ResultPaneProps {
   onSettingsChange: (settings: OutputSettings) => void
 }
 
+/** The name a file tab shows: the file's own name, and its path only when another file has the same name.
+ * The footer shows the full path of the selected file. */
+function tabLabels(names: string[]): string[] {
+  const base = (name: string) => name.slice(name.lastIndexOf('/') + 1)
+  return names.map((name) => (names.filter((other) => base(other) === base(name)).length > 1 ? name : base(name)))
+}
+
 /** The schema for the chosen database, always up to date with the design. */
 export function ResultPane({ output, settings, generated, onOutputChange, onSettingsChange }: ResultPaneProps) {
   const { t } = useI18n()
@@ -36,6 +43,7 @@ export function ResultPane({ output, settings, generated, onOutputChange, onSett
       : physical.collections.reduce((total, collection) => total + collection.todos.length, 0)
     : 0
   const notes = physical?.notes ?? []
+  const labels = tabLabels(files.map((item) => item.name))
 
   useEffect(() => {
     let active = true
@@ -120,9 +128,10 @@ export function ResultPane({ output, settings, generated, onOutputChange, onSett
                 aria-selected={item === file}
                 tabIndex={item === file ? 0 : -1}
                 className="result-pane__file-tab"
+                title={item.name}
                 onClick={() => setSelected(index)}
               >
-                {item.name}
+                {labels[index]}
               </button>
             ))}
           </div>

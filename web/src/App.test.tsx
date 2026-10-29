@@ -162,6 +162,16 @@ describe('Model2DB', () => {
     await waitFor(() => expect(screen.getByRole('alert').textContent).toBe('The project is damaged ($.output.engine).'))
   })
 
+  it('names the file tabs by file, with the path in the title', async () => {
+    await renderApp()
+    await loadShop()
+    fireEvent.change(screen.getByRole('combobox', { name: 'Database' }), { target: { value: 'jpa' } })
+    const files = within(screen.getByRole('tablist', { name: 'Files' })).getAllByRole('tab')
+    expect(files.map((tab) => tab.textContent)).toContain('Order.java')
+    const order = files.find((tab) => tab.textContent === 'Order.java')!
+    expect(order.title).toBe('src/main/java/com/example/model/Order.java')
+  })
+
   it('opens a model sent by another tool, once', async () => {
     sessionStorage.setItem(
       'model2db.incoming',

@@ -1,5 +1,7 @@
 import type { Literal } from '../model/schema.ts'
-import type { Column, ColumnType, Dialect, ForeignKey, PhysicalEnum, RelationalSchema, Table, Todo } from '../physical/types.ts'
+import { orderTables } from '../physical/order.ts'
+import type { Column, ColumnType, Dialect, ForeignKey, PhysicalEnum, RelationalSchema } from '../physical/types.ts'
+import { todoText } from './todos.ts'
 
 /** Writes the DDL of a relational schema for one dialect: types, enums, tables, constraints and indexes,
  * in an order that every database accepts (a table after the tables it refers to). */
@@ -308,21 +310,6 @@ export const DIALECT_NAMES: Record<Dialect, string> = {
   oracle: 'Oracle Database',
 }
 
-/** A comment for each decision still pending, in English like the rest of the code. */
-export function todoText(todo: Todo, table: Table): string {
-  const { params } = todo
-  switch (todo.code) {
-    case 'relationPending':
-      return `TODO: decide how "${table.model}.${params.field}" is stored (pending in the design).`
-    case 'keyPending':
-      return `TODO: choose the primary key of "${params.model}".`
-    case 'targetNotStored':
-      return `TODO: "${table.model}.${params.field}" points to "${params.model}", which has no table of its own.`
-    case 'foreignKeyTargetNotStored':
-      return `TODO: "${params.column}" refers to "${params.model}", whose primary key is not decided yet.`
-  }
-}
-
 function literal(value: Literal, column: Column, rules: DialectRules, enums: PhysicalEnum[]): string | null {
   if (value === null) return null
   if (typeof value === 'boolean') return rules.boolean(value)
@@ -331,31 +318,6 @@ function literal(value: Literal, column: Column, rules: DialectRules, enums: Phy
   // An enum default may be written with the member's name (`ACTIVE`) while the column stores its value
   const stored = item?.values.find((candidate) => String(candidate).toLowerCase() === value.toLowerCase()) ?? value
   return typeof stored === 'number' ? String(stored) : `'${stored.replace(/'/g, "''")}'`
-}
-
-/** Tables in an order where each one comes after the tables it refers to; references that close a cycle
- * are returned apart, to be added once every table exists. */
-export function orderTables(tables: Table[]): { tables: Table[]; deferred: Map<string, ForeignKey[]> } {
-  const byName = new Map(tables.map((table) => [table.name, table]))
-  const done = new Set<string>()
-  const visiting = new Set<string>()
-  const result: Table[] = []
-  const deferred = new Map<string, ForeignKey[]>()
-  const visit = (table: Table) => {
-    if (done.has(table.name)) return
-    visiting.add(table.name)
-    for (const fk of table.foreignKeys) {
-      const target = byName.get(fk.table)
-      if (!target || target.name === table.name || done.has(target.name)) continue
-      if (visiting.has(target.name)) deferred.set(table.name, [...(deferred.get(table.name) ?? []), fk])
-      else visit(target)
-    }
-    visiting.delete(table.name)
-    done.add(table.name)
-    result.push(table)
-  }
-  for (const table of tables) visit(table)
-  return { tables: result, deferred }
 }
 
 export interface SqlOptions {
@@ -412,7 +374,7 @@ export function generateSql(schema: RelationalSchema, dialect: Dialect, options:
     for (const check of table.checks) lines.push(`CONSTRAINT ${q(check.name)} CHECK (${q(check.column)} IN (${stringList(check.values)}))`)
 
     out.push('')
-    for (const todo of table.todos) out.push(`-- ${todoText(todo, table)}`)
+    for (const todo of table.todos) out.push(`-- ${todoText(todo, table.model, 'table')}`)
     out.push(`CREATE TABLE ${q(table.name)} (`, lines.map((line, i) => `  ${line}${i < lines.length - 1 ? ',' : ''}`).join('\n'), ');')
     if (table.kind === 'lookup') {
       const enumItem = schema.enums.find((item) => item.sqlName === table.name)

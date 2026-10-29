@@ -1,7 +1,7 @@
-import type { Design } from '../design/types.ts'
+import type { Design, StorageTarget } from '../design/types.ts'
 import type { ModelSchema } from '../model/schema.ts'
 import { toSnakeCase } from '../model/naming.ts'
-import type { BuildOptions, Dialect, DocumentSchema, NamingOptions, RelationalSchema } from '../physical/types.ts'
+import type { BuildOptions, Dialect, DocumentSchema, NamingOptions, PhysicalSchema, RelationalSchema } from '../physical/types.ts'
 
 /** Groups of the output selector */
 export type OutputGroup = 'relational' | 'document' | 'python' | 'typescript' | 'jvm' | 'csharp' | 'php'
@@ -31,11 +31,11 @@ export interface WriteContext {
   title: string
 }
 
-export interface RelationalOutput {
+/** What a writer for tables needs: the physical schema of the chosen engine. */
+export interface RelationalWriter {
   id: string
   label: string
   group: OutputGroup
-  target: 'relational'
   /** Engines the user can choose; plain SQL outputs have their own and no choice */
   engines?: readonly Dialect[]
   /** The output can add a migration (and the option is shown) */
@@ -43,16 +43,31 @@ export interface RelationalOutput {
   write(physical: RelationalSchema, context: WriteContext): GeneratedFile[]
 }
 
-export interface DocumentOutput {
+/** What a writer for documents needs: the collections and their validators. */
+export interface DocumentWriter {
   id: string
   label: string
   group: OutputGroup
-  target: 'document'
   migrations?: boolean
   write(physical: DocumentSchema, context: WriteContext): GeneratedFile[]
 }
 
-export type Output = RelationalOutput | DocumentOutput
+/** An entry of the output selector, whatever kind of database it writes for. The interface reads only
+ * this; how the physical schema is built is each kind's business (generate/outputs.ts). */
+export interface Output {
+  id: string
+  label: string
+  group: OutputGroup
+  target: StorageTarget
+  engines?: readonly Dialect[]
+  migrations?: boolean
+  generate(
+    schema: ModelSchema,
+    design: Design,
+    settings: OutputSettings,
+    title: string,
+  ): { physical: PhysicalSchema; files: GeneratedFile[] }
+}
 
 /** Base of file names: the main model in snake_case (`order_line`). */
 export function fileBase(title: string): string {

@@ -1,20 +1,7 @@
-import type { Collection, DocumentSchema, Todo } from '../physical/types.ts'
+import type { DocumentSchema } from '../physical/types.ts'
+import { todoText } from './todos.ts'
 
 /** Writes a mongosh script that creates each collection with its `$jsonSchema` validator and indexes. */
-
-function todoText(todo: Todo, collection: Collection): string {
-  const { params } = todo
-  switch (todo.code) {
-    case 'relationPending':
-      return `TODO: decide how "${collection.model}.${params.field}" is stored (pending in the design).`
-    case 'keyPending':
-      return `TODO: choose the _id of "${params.model}".`
-    case 'targetNotStored':
-      return `TODO: "${collection.model}.${params.field}" points to "${params.model}", which has no collection of its own.`
-    case 'foreignKeyTargetNotStored':
-      return `TODO: "${params.column}" refers to "${params.model}", whose _id is not decided yet.`
-  }
-}
 
 const identifier = /^[A-Za-z_$][\w$]*$/
 
@@ -42,7 +29,7 @@ export function generateMongo(schema: DocumentSchema, options: { title?: string 
   ]
   for (const collection of schema.collections) {
     out.push('')
-    for (const todo of collection.todos) out.push(`// ${todoText(todo, collection)}`)
+    for (const todo of collection.todos) out.push(`// ${todoText(todo, collection.model, 'collection')}`)
     const name = JSON.stringify(collection.name)
     out.push(`db.createCollection(${name}, {`, `  validator: { $jsonSchema: ${toJs(collection.validator, '  ')} },`, '})')
     for (const index of collection.indexes) {

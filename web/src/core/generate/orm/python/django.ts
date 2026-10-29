@@ -1,7 +1,7 @@
 import type { Literal } from '../../../model/schema.ts'
 import type { Column, ColumnType, PhysicalEnum, RelationalSchema, Table } from '../../../physical/types.ts'
-import { todoText } from '../../sql.ts'
-import type { GeneratedFile, RelationalOutput, WriteContext } from '../../types.ts'
+import { todoText } from '../../todos.ts'
+import type { GeneratedFile, RelationalWriter, WriteContext } from '../../types.ts'
 import { buildEntities, enumMembers, type EntityClass, type EntityView } from '../entities.ts'
 import { orderTables, pyIdentifier, pyString } from './python.ts'
 
@@ -210,7 +210,7 @@ function modelsFile(view: EntityView, context: WriteContext): string {
   const cls = (name: string) => pyString(name)
   const write = (name: string, table: Table, fields: Field[], item: EntityClass | null) => {
     body.push('', '')
-    for (const todo of table.todos) body.push(`# ${todoText(todo, table)}`)
+    for (const todo of table.todos) body.push(`# ${todoText(todo, table.model, 'table')}`)
     body.push(`class ${name}(models.Model):`)
     const composite = compositeKey(table, fields, item)
     if (composite) body.push(`    pk = ${composite}`)
@@ -265,7 +265,7 @@ function migrationFile(physical: RelationalSchema, view: EntityView, context: Wr
     }
     const composite = compositeKey(table, fields, item, true)
     if (composite) lines.unshift(`                ("pk", ${composite}),`)
-    for (const todo of table.todos) operations.push(`        # ${todoText(todo, table)}`)
+    for (const todo of table.todos) operations.push(`        # ${todoText(todo, table.model, 'table')}`)
     operations.push(
       '        migrations.CreateModel(',
       `            name=${pyString(name)},`,
@@ -305,11 +305,10 @@ function migrationFile(physical: RelationalSchema, view: EntityView, context: Wr
   ].join('\n')
 }
 
-export const djangoOutput: RelationalOutput = {
+export const djangoOutput: RelationalWriter = {
   id: 'django',
   label: 'Django ORM',
   group: 'python',
-  target: 'relational',
   engines: ['postgresql', 'mysql', 'mariadb', 'sqlite', 'oracle'],
   migrations: true,
   write(physical, context): GeneratedFile[] {

@@ -1,4 +1,4 @@
-import { orderTables as orderWithCycles } from '../../sql.ts'
+import { orderTables as orderWithCycles } from '../../../physical/order.ts'
 import type { Table } from '../../../physical/types.ts'
 
 /** Pieces of Python shared by the Python generators. */

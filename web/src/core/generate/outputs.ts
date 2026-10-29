@@ -1,35 +1,61 @@
-import type { ModelSchema } from '../model/schema.ts'
-import { defaultRoot } from '../model/schema.ts'
+import { defaultRoot, type ModelSchema } from '../model/schema.ts'
 import type { Design } from '../design/types.ts'
 import { buildDocument } from '../physical/document.ts'
 import { buildRelational } from '../physical/relational.ts'
-import type { BuildOptions, Dialect, PhysicalSchema } from '../physical/types.ts'
-import { DIALECT_NAMES, generateSql } from './sql.ts'
+import type { Dialect, PhysicalSchema } from '../physical/types.ts'
 import { generateMongo } from './mongodb.ts'
 import { djangoOutput } from './orm/python/django.ts'
 import { sqlalchemyOutput } from './orm/python/sqlalchemy.ts'
+import { DIALECT_NAMES, generateSql } from './sql.ts'
 import {
   fileBase,
-  type DocumentOutput,
+  type DocumentWriter,
   type GeneratedFile,
   type Output,
   type OutputGroup,
   type OutputSettings,
-  type RelationalOutput,
-  type WriteContext,
+  type RelationalWriter,
 } from './types.ts'
 
 export type { GeneratedFile, Output, OutputGroup, OutputSettings, WriteContext } from './types.ts'
 
 export const OUTPUT_GROUPS: readonly OutputGroup[] = ['relational', 'document', 'python', 'typescript', 'jvm', 'csharp', 'php']
 
-const SQL_DIALECTS = ['postgresql', 'mysql', 'mariadb', 'sqlite', 'sqlserver', 'oracle'] as const
+/** The engine a writer builds for: its own (plain SQL), or the one chosen among those it supports. */
+function engineOf(writer: RelationalWriter, settings: OutputSettings): Dialect {
+  if (!writer.engines) return writer.id as Dialect
+  return writer.engines.includes(settings.engine) ? settings.engine : writer.engines[0]
+}
 
-const sqlOutputs = SQL_DIALECTS.map((dialect): RelationalOutput => ({
+/** A writer for tables as an output: it builds the relational schema for its engine first. */
+function relational(writer: RelationalWriter): Output {
+  return {
+    ...writer,
+    target: 'relational',
+    generate(schema, design, settings, title) {
+      const engine = engineOf(writer, settings)
+      const physical = buildRelational(schema, design, { naming: settings.naming, strings: settings.strings, dialect: engine })
+      return { physical, files: writer.write(physical, { schema, design, settings: { ...settings, engine }, title }) }
+    },
+  }
+}
+
+/** A writer for documents as an output: it builds the collections first. */
+function documental(writer: DocumentWriter): Output {
+  return {
+    ...writer,
+    target: 'document',
+    generate(schema, design, settings, title) {
+      const physical = buildDocument(schema, design, settings.naming)
+      return { physical, files: writer.write(physical, { schema, design, settings, title }) }
+    },
+  }
+}
+
+const sqlWriters = (['postgresql', 'mysql', 'mariadb', 'sqlite', 'sqlserver', 'oracle'] as const).map((dialect): RelationalWriter => ({
   id: dialect,
   label: DIALECT_NAMES[dialect],
   group: 'relational',
-  target: 'relational',
   write: (physical, context) => [
     {
       name: `${fileBase(context.title)}-${dialect}.sql`,
@@ -39,11 +65,10 @@ const sqlOutputs = SQL_DIALECTS.map((dialect): RelationalOutput => ({
   ],
 }))
 
-const mongoOutput: DocumentOutput = {
+const mongoWriter: DocumentWriter = {
   id: 'mongodb',
   label: 'MongoDB',
   group: 'document',
-  target: 'document',
   write: (physical, context) => [
     {
       name: `${fileBase(context.title)}-mongodb.js`,
@@ -54,17 +79,15 @@ const mongoOutput: DocumentOutput = {
 }
 
 /** Every output, in the order the selector shows them. Adding one means listing it here. */
-export const OUTPUTS: readonly Output[] = [...sqlOutputs, mongoOutput, djangoOutput, sqlalchemyOutput]
+export const OUTPUTS: readonly Output[] = [
+  ...sqlWriters.map(relational),
+  documental(mongoWriter),
+  relational(djangoOutput),
+  relational(sqlalchemyOutput),
+]
 
 export function findOutput(id: string): Output {
   return OUTPUTS.find((output) => output.id === id) ?? OUTPUTS[0]
-}
-
-/** The engine the physical schema is built for: the output's own, or the one chosen for an ORM. */
-export function engineOf(output: Output, settings: OutputSettings): Dialect {
-  if (output.target === 'document') return 'postgresql'
-  if (!output.engines) return output.id as Dialect
-  return output.engines.includes(settings.engine) ? settings.engine : output.engines[0]
 }
 
 export interface Generated {
@@ -77,13 +100,5 @@ export interface Generated {
 /** From the decisions to the files: the physical schema for the chosen database and its code. */
 export function generate(schema: ModelSchema, design: Design, output: Output, settings: OutputSettings, title?: string): Generated {
   const name = title ?? schema.root ?? defaultRoot(schema) ?? 'schema'
-  const options: BuildOptions = { naming: settings.naming, strings: settings.strings, dialect: engineOf(output, settings) }
-  const context: WriteContext = { schema, design, settings: { ...settings, engine: options.dialect }, title: name }
-  const archiveName = `${fileBase(name)}-${output.id}.zip`
-  if (output.target === 'document') {
-    const physical = buildDocument(schema, design, options)
-    return { physical, files: output.write(physical, context), archiveName }
-  }
-  const physical = buildRelational(schema, design, options)
-  return { physical, files: output.write(physical, context), archiveName }
+  return { ...output.generate(schema, design, settings, name), archiveName: `${fileBase(name)}-${output.id}.zip` }
 }

@@ -3,7 +3,7 @@ import { allFields, findEnum, findModel, type FieldDef, type ModelSchema, type T
 import { findModelDesign, type Design, type ModelDesign } from '../design/types.ts'
 import { columnName, constraintName, freeName, tableName } from './naming.ts'
 import { modelRoles } from './roles.ts'
-import type { BsonSchema, BuildOptions, Collection, DocumentSchema, Index, Note, Todo } from './types.ts'
+import type { BsonSchema, NamingOptions, Collection, DocumentSchema, Index, Note, Todo } from './types.ts'
 
 const PRIMITIVE_BSON: Record<string, string | undefined> = {
   string: 'string',
@@ -22,7 +22,8 @@ const PRIMITIVE_BSON: Record<string, string | undefined> = {
 
 /** Turns the active decisions of a design into MongoDB collections with a `$jsonSchema` validator and
  * their indexes. Embedded models become nested objects; references hold the other document's `_id`. */
-export function buildDocument(schema: ModelSchema, design: Design, options: BuildOptions): DocumentSchema {
+export function buildDocument(schema: ModelSchema, design: Design, naming: NamingOptions): DocumentSchema {
+  const options = { naming }
   const roles = modelRoles(schema, design)
   const notes: Note[] = []
   const used = new Set<string>()
@@ -156,7 +157,7 @@ export function buildDocument(schema: ModelSchema, design: Design, options: Buil
 }
 
 /** A scalar field next to a reference that already holds the referenced id. */
-function keyHolder(field: FieldDef, fields: FieldDef[], item: ModelDesign, options: BuildOptions): string | null {
+function keyHolder(field: FieldDef, fields: FieldDef[], item: ModelDesign, options: { naming: NamingOptions }): string | null {
   const relation = field.annotations?.find((annotation) => annotation.name === 'relation')
   const named = relation?.args ? /fields\s*:\s*\[\s*(\w+)/.exec(relation.args)?.[1] : undefined
   const words = [...nameWords(field.name), 'id'].join('')

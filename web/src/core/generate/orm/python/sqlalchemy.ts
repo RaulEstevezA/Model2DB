@@ -1,7 +1,7 @@
 import type { Literal } from '../../../model/schema.ts'
 import type { Column, ColumnType, PhysicalEnum, RelationalSchema, Table } from '../../../physical/types.ts'
-import { todoText } from '../../sql.ts'
-import type { GeneratedFile, RelationalOutput, WriteContext } from '../../types.ts'
+import { todoText } from '../../todos.ts'
+import type { GeneratedFile, RelationalWriter, WriteContext } from '../../types.ts'
 import { buildEntities, enumMembers, type Attribute, type EntityClass, type EntityView } from '../entities.ts'
 import { orderTables, pyIdentifier, pyString, pythonEnum } from './python.ts'
 
@@ -153,7 +153,7 @@ function modelsFile(view: EntityView, context: WriteContext): string {
 
   for (const item of view.classes) {
     body.push('', '')
-    for (const todo of item.table.todos) body.push(`# ${todoText(todo, item.table)}`)
+    for (const todo of item.table.todos) body.push(`# ${todoText(todo, item.table.model, 'table')}`)
     body.push(`class ${item.name}(Base):`, `    __tablename__ = ${pyString(item.table.name)}`, '')
     for (const attribute of item.attributes) {
       const type = typeParts(attribute.column.type, view.enums, false)
@@ -248,7 +248,7 @@ function migrationFile(physical: RelationalSchema, view: EntityView, context: Wr
       constraints.push(
         `        sa.ForeignKeyConstraint([${fk.columns.map(pyString).join(', ')}], [${fk.references.map((column) => pyString(`${fk.table}.${column}`)).join(', ')}], name=${pyString(fk.name)}${fk.onDelete ? `, ondelete=${pyString(fk.onDelete.toUpperCase())}` : ''}),`,
       )
-    for (const todo of table.todos) lines.push(`    # ${todoText(todo, table)}`)
+    for (const todo of table.todos) lines.push(`    # ${todoText(todo, table.model, 'table')}`)
     lines.push('    op.create_table(', `        ${pyString(table.name)},`, ...columns, ...constraints, '    )')
     for (const index of table.indexes)
       lines.push(
@@ -290,11 +290,10 @@ function attributeOf(view: EntityView, table: Table, column: Column): Attribute 
   return view.classes.find((item) => item.table === table)?.attributes.find((attribute) => attribute.column === column)
 }
 
-export const sqlalchemyOutput: RelationalOutput = {
+export const sqlalchemyOutput: RelationalWriter = {
   id: 'sqlalchemy',
   label: 'SQLAlchemy',
   group: 'python',
-  target: 'relational',
   engines: ['postgresql', 'mysql', 'mariadb', 'sqlite', 'sqlserver', 'oracle'],
   migrations: true,
   write(physical, context): GeneratedFile[] {

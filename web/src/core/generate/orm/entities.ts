@@ -1,5 +1,5 @@
 import { convertCase, nameWords, toPascalCase, type NamingConvention } from '../../model/naming.ts'
-import { singularField } from '../../design/propose.ts'
+import { singularField } from '../../design/analysis.ts'
 import { findEnum, type ModelSchema } from '../../model/schema.ts'
 import type { Column, ForeignKey, PhysicalEnum, RelationalSchema, Table } from '../../physical/types.ts'
 

@@ -1,5 +1,5 @@
 import { allFields, findModel, modelOf, type ModelSchema } from '../model/schema.ts'
-import { analyze, isParentOnly, isTopLevel, reaches } from '../design/propose.ts'
+import { analyze, isParentOnly, isTopLevel, reaches } from '../design/analysis.ts'
 import { findModelDesign, type Design, type RelationChoice } from '../design/types.ts'
 
 /** What happens to each model once the decisions are applied:

@@ -1,7 +1,7 @@
 import { nameWords, toPascalCase, toSnakeCase } from '../model/naming.ts'
 import { allFields, findEnum, findModel, type FieldDef, type ModelDef, type ModelSchema, type TypeRef } from '../model/schema.ts'
 import { declaredLength, declaredPrecision } from '../design/hints.ts'
-import { singularField } from '../design/propose.ts'
+import { singularField } from '../design/analysis.ts'
 import { findModelDesign, type Design, type FieldDesign, type KeyChoice } from '../design/types.ts'
 import { columnName, constraintName, freeName, joinNames, tableName } from './naming.ts'
 import { modelRoles } from './roles.ts'

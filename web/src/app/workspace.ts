@@ -1,5 +1,5 @@
 import type { DecisionRef } from '../core/design/edit.ts'
-import { analyze, isTopLevel } from '../core/design/propose.ts'
+import { analyze, isTopLevel } from '../core/design/analysis.ts'
 import type { Decision, Design } from '../core/design/types.ts'
 import type { ModelRole } from '../core/physical/roles.ts'
 import { allFields, type ModelSchema } from '../core/model/schema.ts'

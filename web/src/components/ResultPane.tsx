@@ -1,10 +1,12 @@
 import type { LanguageSupport } from '@codemirror/language'
 import { useEffect, useState } from 'react'
-import { OUTPUTS, type Generated, type Output, type OutputGroup, type OutputSettings } from '../core/generate/outputs.ts'
-import type { ColumnNaming, TableNaming } from '../core/physical/types.ts'
+import { OUTPUT_GROUPS, OUTPUTS, type Generated, type Output, type OutputSettings } from '../core/generate/outputs.ts'
+import { DIALECT_NAMES } from '../core/generate/sql.ts'
+import type { ColumnNaming, Dialect, TableNaming } from '../core/physical/types.ts'
 import { useI18n } from '../i18n/useI18n.ts'
 import { downloadBlob } from '../utils/download.ts'
 import { editorLanguage } from '../utils/editorLanguages.ts'
+import { createZip } from '../utils/zip.ts'
 import { CodeEditor } from './CodeEditor.tsx'
 import { Pane } from './Pane.tsx'
 import './ResultPane.css'
@@ -12,7 +14,6 @@ import './ResultPane.css'
 const TABLE_NAMINGS: TableNaming[] = ['plural', 'singular', 'model']
 const COLUMN_NAMINGS: ColumnNaming[] = ['snake', 'field']
 const STRINGS: OutputSettings['strings'][] = ['auto', 'varchar', 'text']
-const OUTPUT_GROUPS: OutputGroup[] = ['relational', 'document']
 
 interface ResultPaneProps {
   output: Output
@@ -27,6 +28,10 @@ export function ResultPane({ output, settings, generated, onOutputChange, onSett
   const { t } = useI18n()
   const [copied, setCopied] = useState(false)
   const [language, setLanguage] = useState<LanguageSupport | null>(null)
+  const [selected, setSelected] = useState(0)
+  const files = generated?.files ?? []
+  const file = files[Math.min(selected, files.length - 1)] ?? null
+  const fileLanguage = file?.editorLanguage ?? 'text'
   const relational = output.target === 'relational'
   const physical = generated?.physical
   const todos = physical
@@ -38,13 +43,13 @@ export function ResultPane({ output, settings, generated, onOutputChange, onSett
 
   useEffect(() => {
     let active = true
-    void editorLanguage(output.editorLanguage).then((loaded) => {
+    void editorLanguage(fileLanguage).then((loaded) => {
       if (active) setLanguage(loaded)
     })
     return () => {
       active = false
     }
-  }, [output.editorLanguage])
+  }, [fileLanguage])
 
   useEffect(() => {
     if (!copied) return
@@ -53,9 +58,9 @@ export function ResultPane({ output, settings, generated, onOutputChange, onSett
   }, [copied])
 
   async function copy() {
-    if (!generated) return
+    if (!file) return
     try {
-      await navigator.clipboard.writeText(generated.content)
+      await navigator.clipboard.writeText(file.content)
       setCopied(true)
     } catch {
       // Clipboard blocked (permissions, insecure context): the code can still be selected by hand
@@ -63,7 +68,13 @@ export function ResultPane({ output, settings, generated, onOutputChange, onSett
   }
 
   function download() {
-    if (generated) downloadBlob(new Blob([generated.content], { type: 'text/plain;charset=utf-8' }), generated.fileName)
+    if (!generated) return
+    if (files.length === 1) downloadBlob(new Blob([files[0].content], { type: 'text/plain;charset=utf-8' }), files[0].name)
+    else if (files.length > 1)
+      downloadBlob(
+        new Blob([createZip(files.map(({ name, content }) => ({ name, content })))], { type: 'application/zip' }),
+        generated.archiveName,
+      )
   }
 
   return (
@@ -88,15 +99,15 @@ export function ResultPane({ output, settings, generated, onOutputChange, onSett
       footer={
         <div className="result-pane__footer">
           <p className="result-pane__file">
-            {generated && <span className="mono">{generated.fileName}</span>}
+            {file && <span className="mono">{file.name}</span>}
             {todos > 0 && <span className="result-pane__todos">{t.pendingInResult(todos)}</span>}
           </p>
           <div className="actions">
-            <button type="button" className="button" onClick={() => void copy()} disabled={!generated}>
+            <button type="button" className="button" onClick={() => void copy()} disabled={!file}>
               {copied ? t.copied : t.copy}
             </button>
-            <button type="button" className="button button--primary" onClick={download} disabled={!generated}>
-              {t.download}
+            <button type="button" className="button button--primary" onClick={download} disabled={!file}>
+              {files.length > 1 ? t.downloadZip(files.length) : t.download}
             </button>
           </div>
         </div>
@@ -104,6 +115,22 @@ export function ResultPane({ output, settings, generated, onOutputChange, onSett
     >
       <div className="result-pane__body">
         <div className="result-pane__options">
+          {output.target === 'relational' && output.engines && (
+            <label className="field">
+              <span>{t.engineLabel}</span>
+              <select
+                className="select"
+                value={output.engines.includes(settings.engine) ? settings.engine : output.engines[0]}
+                onChange={(event) => onSettingsChange({ ...settings, engine: event.target.value as Dialect })}
+              >
+                {output.engines.map((item) => (
+                  <option key={item} value={item}>
+                    {DIALECT_NAMES[item]}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
           <label className="field">
             <span>{relational ? t.tablesNaming : t.collectionsNaming}</span>
             <select
@@ -152,6 +179,16 @@ export function ResultPane({ output, settings, generated, onOutputChange, onSett
               </select>
             </label>
           )}
+          {output.migrations && (
+            <label className="check result-pane__check">
+              <input
+                type="checkbox"
+                checked={settings.migrations}
+                onChange={(event) => onSettingsChange({ ...settings, migrations: event.target.checked })}
+              />
+              {t.includeMigration}
+            </label>
+          )}
         </div>
         {notes.length > 0 && (
           <details className="result-pane__notes">
@@ -163,9 +200,25 @@ export function ResultPane({ output, settings, generated, onOutputChange, onSett
             </ul>
           </details>
         )}
+        {files.length > 1 && (
+          <div className="result-pane__files" role="tablist" aria-label={t.filesLabel}>
+            {files.map((item, index) => (
+              <button
+                key={item.name}
+                type="button"
+                role="tab"
+                aria-selected={item === file}
+                className="result-pane__file-tab"
+                onClick={() => setSelected(index)}
+              >
+                {item.name}
+              </button>
+            ))}
+          </div>
+        )}
         <div className="result-pane__editor">
           <CodeEditor
-            value={generated?.content ?? ''}
+            value={file?.content ?? ''}
             language={language}
             readOnly
             label={t.resultLabel(output.label)}

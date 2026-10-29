@@ -1,4 +1,4 @@
--- SQLite schema written by Model2DB.
+-- SQLite schema written by Model2DB from Author.
 -- Review it before running it: nothing here has been run.
 
 PRAGMA foreign_keys = ON;

@@ -1,4 +1,4 @@
--- SQL Server schema written by Model2DB.
+-- SQL Server schema written by Model2DB from Order.
 -- Review it before running it: nothing here has been run.
 
 CREATE TABLE customers (

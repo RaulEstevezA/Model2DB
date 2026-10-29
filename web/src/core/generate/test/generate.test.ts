@@ -6,7 +6,8 @@ import { modelRoles } from '../../physical/roles.ts'
 import { schemaOf } from '../../test/helpers.ts'
 import { OUTPUTS, findOutput, generate, type OutputSettings } from '../outputs.ts'
 
-const settings: OutputSettings = { naming: { tables: 'plural', columns: 'snake' }, strings: 'auto' }
+const settings: OutputSettings = { naming: { tables: 'plural', columns: 'snake' }, strings: 'auto', engine: 'postgresql', migrations: true }
+const text = (generated: { files: { content: string }[] }) => generated.files.map((file) => file.content).join('\n')
 
 describe('every example in every database', () => {
   for (const example of EXAMPLES) {
@@ -14,7 +15,11 @@ describe('every example in every database', () => {
       it(`${example.id} → ${output.id}`, async () => {
         const schema = schemaOf(example.text, example.format, 'Invoice')
         const generated = generate(schema, proposeDesign(schema, output.target), output, settings, schema.root)
-        await expect(generated.content).toMatchFileSnapshot(`__snapshots__/${output.id}/${example.id}${output.extension}`)
+        for (const file of generated.files) {
+          const extension = file.name.slice(file.name.lastIndexOf('.'))
+          const name = generated.files.length === 1 ? `${example.id}${extension}` : `${example.id}/${file.name}`
+          await expect(file.content).toMatchFileSnapshot(`__snapshots__/${output.id}/${name}`)
+        }
       })
     }
   }
@@ -30,7 +35,7 @@ describe('pending decisions', () => {
 
   it('are written as a TODO instead of a table', () => {
     const design = proposeDesign(schema, 'relational')
-    const { content } = generate(schema, design, findOutput('postgresql'), settings)
+    const content = text(generate(schema, design, findOutput('postgresql'), settings))
     expect(content).toContain('-- TODO: decide how "Cart.products" is stored (pending in the design).')
     expect(content).not.toContain('carts_products')
     expect(modelRoles(schema, design).get('Product')).toBe('pending')
@@ -40,7 +45,7 @@ describe('pending decisions', () => {
     let design = proposeDesign(schema, 'relational')
     design = decide(design, { kind: 'relation', model: 'Cart', field: 'products' })
     design = decide(design, { kind: 'relation', model: 'Wishlist', field: 'products' }, 'join')
-    const { content } = generate(schema, design, findOutput('postgresql'), settings)
+    const content = text(generate(schema, design, findOutput('postgresql'), settings))
     expect(content).not.toContain('TODO')
     expect(content).toContain('CREATE TABLE carts_products')
     expect(content).toContain('CREATE TABLE products_wishlists')
@@ -50,7 +55,7 @@ describe('pending decisions', () => {
 describe('models that refer to each other', () => {
   it('are both stored', () => {
     const schema = schemaOf('interface Team { id: number; lead: Person }\ninterface Person { id: number; team: Team | null }', 'typescript')
-    const { content } = generate(schema, proposeDesign(schema, 'relational'), findOutput('postgresql'), settings)
+    const content = text(generate(schema, proposeDesign(schema, 'relational'), findOutput('postgresql'), settings))
     expect(content).toContain('CREATE TABLE teams')
     expect(content).toContain('CREATE TABLE persons')
     // The reference that closes the cycle is added once both tables exist
@@ -59,7 +64,7 @@ describe('models that refer to each other', () => {
 
   it('do not need ALTER TABLE in SQLite', () => {
     const schema = schemaOf('interface Team { id: number; lead: Person }\ninterface Person { id: number; team: Team | null }', 'typescript')
-    expect(generate(schema, proposeDesign(schema, 'relational'), findOutput('sqlite'), settings).content).not.toContain('ALTER TABLE')
+    expect(text(generate(schema, proposeDesign(schema, 'relational'), findOutput('sqlite'), settings))).not.toContain('ALTER TABLE')
   })
 })
 
@@ -68,22 +73,19 @@ describe('names', () => {
 
   it('quotes reserved words in each dialect', () => {
     const design = proposeDesign(schema, 'relational')
-    expect(generate(schema, design, findOutput('postgresql'), settings).content).toContain('"order" DOUBLE PRECISION NOT NULL')
-    expect(generate(schema, design, findOutput('mysql'), settings).content).toContain('`group` VARCHAR(255) NOT NULL')
-    expect(generate(schema, design, findOutput('sqlserver'), settings).content).toContain('[order] FLOAT NOT NULL')
+    expect(text(generate(schema, design, findOutput('postgresql'), settings))).toContain('"order" DOUBLE PRECISION NOT NULL')
+    expect(text(generate(schema, design, findOutput('mysql'), settings))).toContain('`group` VARCHAR(255) NOT NULL')
+    expect(text(generate(schema, design, findOutput('sqlserver'), settings))).toContain('[order] FLOAT NOT NULL')
     // Oracle also reserves usual field names
     const oracle = schemaOf('interface Level { id: number; level: number; comment: string }', 'typescript')
-    expect(generate(oracle, proposeDesign(oracle, 'relational'), findOutput('oracle'), settings).content).toContain(
+    expect(text(generate(oracle, proposeDesign(oracle, 'relational'), findOutput('oracle'), settings))).toContain(
       '"level" BINARY_DOUBLE NOT NULL',
     )
   })
 
   it('follows the naming chosen for tables and columns', () => {
     const design = proposeDesign(schema, 'relational')
-    const content = generate(schema, design, findOutput('postgresql'), {
-      ...settings,
-      naming: { tables: 'model', columns: 'field' },
-    }).content
+    const content = text(generate(schema, design, findOutput('postgresql'), { ...settings, naming: { tables: 'model', columns: 'field' } }))
     expect(content).toContain('CREATE TABLE "User"')
   })
 })

@@ -29,6 +29,10 @@ export interface ForeignKey {
   references: string[]
   /** `cascade` for rows that only exist as part of their owner (order lines, list values) */
   onDelete?: 'cascade' | 'set null'
+  /** Field of the table's model this key stands for (`Order.customer` → `customer`), for ORM navigation */
+  field?: string
+  /** Field of the referenced model that lists the rows of this table (`Order.lines`) */
+  inverse?: string
 }
 
 export interface Index {
@@ -60,6 +64,8 @@ export interface Table {
   model: string
   /** The field a list, map or join table comes from */
   field?: string
+  /** Join tables: the field of the other model that lists back, when both sides list each other */
+  mirror?: string
   columns: Column[]
   primaryKey: string[]
   foreignKeys: ForeignKey[]

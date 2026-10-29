@@ -58,3 +58,36 @@
 .result-pane__todos {
   color: var(--warning);
 }
+
+.result-pane__check {
+  align-self: flex-end;
+  min-height: 36px;
+}
+
+/* File tabs over the editor (components/tabs.md) */
+.result-pane__files {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-6) var(--space-8) 0;
+  border-bottom: var(--border-line);
+  overflow-x: auto;
+}
+
+.result-pane__file-tab {
+  flex-shrink: 0;
+  padding: var(--space-4) 10px;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  background: none;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: var(--font-caption);
+  cursor: pointer;
+}
+
+.result-pane__file-tab[aria-selected='true'] {
+  border-color: var(--border);
+  background: var(--page-bg);
+  color: var(--text);
+}

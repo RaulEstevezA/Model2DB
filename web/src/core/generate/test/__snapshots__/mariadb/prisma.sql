@@ -1,4 +1,4 @@
--- MariaDB schema written by Model2DB.
+-- MariaDB schema written by Model2DB from User.
 -- Review it before running it: nothing here has been run.
 
 CREATE TABLE users (

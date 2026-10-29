@@ -134,18 +134,29 @@ export function buildRelational(schema: ModelSchema, design: Design, options: Bu
     }
   }
 
-  const foreignKey = (table: Table, column: string, target: Entity, onDelete?: 'cascade' | 'set null') => {
+  const foreignKey = (
+    table: Table,
+    column: string,
+    target: Entity,
+    onDelete?: 'cascade' | 'set null',
+    navigation: { field?: string; inverse?: string } = {},
+  ) => {
     if (!target.key) {
       todo(table, 'foreignKeyTargetNotStored', { column, model: target.model.name })
       return
     }
-    if (table.foreignKeys.some((fk) => fk.columns.length === 1 && fk.columns[0] === column)) return
+    const existing = table.foreignKeys.find((fk) => fk.columns.length === 1 && fk.columns[0] === column)
+    if (existing) {
+      Object.assign(existing, navigation)
+      return
+    }
     table.foreignKeys.push({
       name: constraintName('fk', table.name, [column]),
       columns: [column],
       table: target.table.name,
       references: [target.key.column],
       ...(onDelete ? { onDelete } : {}),
+      ...navigation,
     })
     if (!table.primaryKey.includes(column) && !table.indexes.some((index) => index.columns[0] === column))
       table.indexes.push({ name: constraintName('ix', table.name, [column]), columns: [column], unique: false })
@@ -215,6 +226,8 @@ export function buildRelational(schema: ModelSchema, design: Design, options: Bu
 
   // ---------- Relations ----------
   const joins = new Set<string>()
+  // Lists whose foreign key is the child's own reference, which may be built later
+  const inverses: { table: Table; field: string; inverse: string }[] = []
   for (const entity of entities.values()) {
     const { table, model } = entity
     for (const field of allFields(schema, model)) {
@@ -257,7 +270,7 @@ export function buildRelational(schema: ModelSchema, design: Design, options: Bu
           // `customer: Customer` next to `customerId` (or Prisma's `@relation(fields: [customerId])`): reuse it
           const existing = existingKeyColumn(entity, field, options, schema)
           if (existing) {
-            foreignKey(table, existing, target)
+            foreignKey(table, existing, target, undefined, { field: field.name })
             break
           }
           if (!target.key) {
@@ -266,7 +279,7 @@ export function buildRelational(schema: ModelSchema, design: Design, options: Bu
           }
           const name = freeName(keyColumnName(decided.column ?? field.name, target.key.column, options), entity.used)
           table.columns.push({ name, type: target.key.type, nullable, source: path })
-          foreignKey(table, name, target)
+          foreignKey(table, name, target, undefined, { field: field.name })
           break
         }
         case 'child':
@@ -300,8 +313,11 @@ export function buildRelational(schema: ModelSchema, design: Design, options: Bu
         const decided = child.design.find((item) => item.field === back.name)
         if (!decided?.include) continue
         if (back.type.kind === 'model' && back.type.name === owner.model.name) {
-          // The child's own reference already creates the foreign key
-          if (decided.relation?.status === 'active' && decided.relation.value === 'reference') return
+          // The child's own reference creates the foreign key; this list is its other side
+          if (decided.relation?.status === 'active' && decided.relation.value === 'reference') {
+            inverses.push({ table: child.table, field: back.name, inverse: field.name })
+            return
+          }
           continue
         }
         const words = nameWords(back.name)
@@ -311,7 +327,7 @@ export function buildRelational(schema: ModelSchema, design: Design, options: Bu
           words[words.length - 1] === 'id' &&
           words.slice(0, -1).join('') === ownerWords
         ) {
-          foreignKey(child.table, fieldColumn(back, decided, options), owner)
+          foreignKey(child.table, fieldColumn(back, decided, options), owner, undefined, { inverse: field.name })
           return
         }
       }
@@ -323,7 +339,13 @@ export function buildRelational(schema: ModelSchema, design: Design, options: Bu
     const owned =
       !self && !findModelDesign(design, child.model.name)?.key?.reasons.some((r) => r.code === 'keyDeclared' || r.code === 'keyNamed')
     child.table.columns.push({ name, type: owner.key.type, nullable: self || !owned, source: `${owner.model.name}.${field.name}` })
-    foreignKey(child.table, name, owner, owned ? 'cascade' : undefined)
+    foreignKey(
+      child.table,
+      name,
+      owner,
+      owned ? 'cascade' : undefined,
+      self ? { field: 'parent', inverse: field.name } : { inverse: field.name },
+    )
   }
 
   /** A list of plain values: one row per value, in order. */
@@ -400,6 +422,7 @@ export function buildRelational(schema: ModelSchema, design: Design, options: Bu
     joins.add(pair)
     const names = self ? [owner.table.name, toSnakeCase(field.name)] : [owner.table.name, other.table.name].sort()
     const table = newTable(names.join('_'), 'join', owner.model.name, field.name)
+    if (mirror) table.mirror = mirror.name
     const used = new Set<string>()
     const first = freeName(keyColumnName(owner.model.name, owner.key.column, options), used)
     const second = freeName(keyColumnName(self ? singularField(field.name) : other.model.name, other.key.column, options), used)
@@ -410,6 +433,11 @@ export function buildRelational(schema: ModelSchema, design: Design, options: Bu
     // The primary key already indexes the first column
     table.indexes = table.indexes.filter((index) => index.columns[0] !== first)
     extraTables.push(table)
+  }
+
+  for (const item of inverses) {
+    const fk = item.table.foreignKeys.find((candidate) => candidate.field === item.field)
+    if (fk) fk.inverse = item.inverse
   }
 
   // ---------- Enums ----------

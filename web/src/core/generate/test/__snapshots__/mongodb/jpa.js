@@ -1,4 +1,4 @@
-// MongoDB collections written by Model2DB. Run it with mongosh.
+// MongoDB collections written by Model2DB from Author. Run it with mongosh.
 // Review it before running it: nothing here has been run.
 
 db.createCollection("authors", {

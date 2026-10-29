@@ -1,67 +1,87 @@
 import type { ModelSchema } from '../model/schema.ts'
+import { defaultRoot } from '../model/schema.ts'
 import type { Design } from '../design/types.ts'
 import { buildDocument } from '../physical/document.ts'
 import { buildRelational } from '../physical/relational.ts'
-import type { BuildOptions, Dialect, NamingOptions, PhysicalSchema } from '../physical/types.ts'
-import { toSnakeCase } from '../model/naming.ts'
+import type { BuildOptions, Dialect, PhysicalSchema } from '../physical/types.ts'
 import { DIALECT_NAMES, generateSql } from './sql.ts'
 import { generateMongo } from './mongodb.ts'
+import {
+  fileBase,
+  type DocumentOutput,
+  type GeneratedFile,
+  type Output,
+  type OutputGroup,
+  type OutputSettings,
+  type RelationalOutput,
+  type WriteContext,
+} from './types.ts'
 
-/** Every database Model2DB writes for, in the order the selector shows them. */
-export type OutputId = Dialect | 'mongodb'
+export type { GeneratedFile, Output, OutputGroup, OutputSettings, WriteContext } from './types.ts'
 
-/** Groups of the database selector */
-export type OutputGroup = 'relational' | 'document'
+export const OUTPUT_GROUPS: readonly OutputGroup[] = ['relational', 'document', 'python', 'typescript', 'jvm', 'csharp', 'php']
 
-export interface Output {
-  id: OutputId
-  label: string
-  group: OutputGroup
-  target: 'relational' | 'document'
-  /** Highlighting used by the result editor (utils/editorLanguages.ts) */
-  editorLanguage: string
-  extension: string
+const SQL_DIALECTS = ['postgresql', 'mysql', 'mariadb', 'sqlite', 'sqlserver', 'oracle'] as const
+
+const sqlOutputs = SQL_DIALECTS.map((dialect): RelationalOutput => ({
+  id: dialect,
+  label: DIALECT_NAMES[dialect],
+  group: 'relational',
+  target: 'relational',
+  write: (physical, context) => [
+    {
+      name: `${fileBase(context.title)}-${dialect}.sql`,
+      content: generateSql(physical, dialect, { title: context.title }),
+      editorLanguage: 'sql',
+    },
+  ],
+}))
+
+const mongoOutput: DocumentOutput = {
+  id: 'mongodb',
+  label: 'MongoDB',
+  group: 'document',
+  target: 'document',
+  write: (physical, context) => [
+    {
+      name: `${fileBase(context.title)}-mongodb.js`,
+      content: generateMongo(physical, { title: context.title }),
+      editorLanguage: 'javascript',
+    },
+  ],
 }
 
-export const OUTPUTS: readonly Output[] = [
-  ...(['postgresql', 'mysql', 'mariadb', 'sqlite', 'sqlserver', 'oracle'] as const).map((id): Output => ({
-    id,
-    label: DIALECT_NAMES[id],
-    group: 'relational',
-    target: 'relational',
-    editorLanguage: 'sql',
-    extension: '.sql',
-  })),
-  { id: 'mongodb', label: 'MongoDB', group: 'document', target: 'document', editorLanguage: 'javascript', extension: '.js' },
-]
+/** Every output, in the order the selector shows them. Adding one means listing it here. */
+export const OUTPUTS: readonly Output[] = [...sqlOutputs, mongoOutput]
 
 export function findOutput(id: string): Output {
   return OUTPUTS.find((output) => output.id === id) ?? OUTPUTS[0]
 }
 
-export interface OutputSettings {
-  naming: NamingOptions
-  strings: BuildOptions['strings']
+/** The engine the physical schema is built for: the output's own, or the one chosen for an ORM. */
+export function engineOf(output: Output, settings: OutputSettings): Dialect {
+  if (output.target === 'document') return 'postgresql'
+  if (!output.engines) return output.id as Dialect
+  return output.engines.includes(settings.engine) ? settings.engine : output.engines[0]
 }
 
 export interface Generated {
   physical: PhysicalSchema
-  fileName: string
-  content: string
+  files: GeneratedFile[]
+  /** Name of the .zip when there are several files */
+  archiveName: string
 }
 
-/** From the decisions to the file: the physical schema for the chosen database and its code. */
+/** From the decisions to the files: the physical schema for the chosen database and its code. */
 export function generate(schema: ModelSchema, design: Design, output: Output, settings: OutputSettings, title?: string): Generated {
-  const options: BuildOptions = {
-    naming: settings.naming,
-    strings: settings.strings,
-    dialect: output.id === 'mongodb' ? 'postgresql' : output.id,
-  }
-  const base = toSnakeCase(title ?? 'schema') || 'schema'
+  const name = title ?? schema.root ?? defaultRoot(schema) ?? 'schema'
+  const options: BuildOptions = { naming: settings.naming, strings: settings.strings, dialect: engineOf(output, settings) }
+  const context: WriteContext = { schema, design, settings: { ...settings, engine: options.dialect }, title: name }
+  const archiveName = `${fileBase(name)}-${output.id}.zip`
   if (output.target === 'document') {
     const physical = buildDocument(schema, design, options)
-    return { physical, fileName: `${base}-mongodb${output.extension}`, content: generateMongo(physical, { title }) }
+    return { physical, files: output.write(physical, context), archiveName }
   }
   const physical = buildRelational(schema, design, options)
-  return { physical, fileName: `${base}-${output.id}${output.extension}`, content: generateSql(physical, output.id as Dialect, { title }) }
+  return { physical, files: output.write(physical, context), archiveName }
 }

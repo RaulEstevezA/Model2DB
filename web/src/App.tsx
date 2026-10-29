@@ -6,7 +6,7 @@ import type { Design, StorageTarget } from './core/design/types.ts'
 import { findOutput, generate, type OutputSettings } from './core/generate/outputs.ts'
 import { defaultRoot } from './core/model/schema.ts'
 import { modelRoles } from './core/physical/roles.ts'
-import type { NamingOptions } from './core/physical/types.ts'
+import type { Dialect, NamingOptions } from './core/physical/types.ts'
 import { isTrustedOrigin, readHandoff, takeIncoming, type Handoff } from './core/project/handoff.ts'
 import { findParser } from './core/parsers/registry.ts'
 import type { InputFormatId } from './core/parsers/types.ts'
@@ -69,11 +69,13 @@ function App() {
   const [outputId, setOutputId] = useStoredState('model2db.output', () => 'postgresql')
   const [namings, setNamings] = useStoredState<Record<StorageTarget, NamingOptions>>('model2db.naming', () => DEFAULT_NAMING)
   const [strings, setStrings] = useStoredState<OutputSettings['strings']>('model2db.strings', () => 'auto')
+  const [engine, setEngine] = useStoredState<Dialect>('model2db.engine', () => 'postgresql')
+  const [migrations, setMigrations] = useStoredState('model2db.migrations', () => true)
   const output = findOutput(outputId)
   const target = output.target
   const settings: OutputSettings = useMemo(
-    () => ({ naming: namings[target] ?? DEFAULT_NAMING[target], strings }),
-    [namings, target, strings],
+    () => ({ naming: namings[target] ?? DEFAULT_NAMING[target], strings, engine, migrations }),
+    [namings, target, strings, engine, migrations],
   )
 
   // Large inputs are parsed after the keystroke is painted, so typing stays smooth
@@ -215,6 +217,8 @@ function App() {
               onSettingsChange={(next) => {
                 setNamings((current) => ({ ...current, [target]: next.naming }))
                 setStrings(next.strings)
+                setEngine(next.engine)
+                setMigrations(next.migrations)
               }}
             />
           </div>

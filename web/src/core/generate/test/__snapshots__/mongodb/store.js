@@ -1,4 +1,4 @@
-// MongoDB collections written by Model2DB. Run it with mongosh.
+// MongoDB collections written by Model2DB from Order. Run it with mongosh.
 // Review it before running it: nothing here has been run.
 
 // TODO: decide how "Order.lines.product" is stored (pending in the design).

@@ -1,0 +1,134 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app__main {
+  flex: 1;
+  width: 100%;
+  max-width: var(--content-width-wide);
+  margin: 0 auto;
+  padding: var(--page-padding);
+}
+
+.workspace {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-cards);
+  margin-top: var(--space-16);
+}
+
+/* The model and its design side by side, the design wider; each pane scrolls inside */
+.workspace__top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  gap: var(--gap-cards);
+  height: max(520px, calc(100vh - 140px));
+}
+
+.workspace__top > .pane,
+.workspace__top > .input-pane {
+  min-height: 0;
+}
+
+.workspace__result {
+  display: flex;
+  height: max(480px, calc(100vh - 160px));
+}
+
+.workspace__result > .pane {
+  flex: 1;
+}
+
+.workspace__tabs {
+  display: none;
+}
+
+/* Narrow screens: one part at a time, chosen with tabs (RESPONSIVE_GUIDE.md) */
+@media (max-width: 1100px) {
+  .workspace__tabs {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    gap: var(--space-4);
+    margin-top: var(--space-16);
+    padding: var(--space-4);
+    border: var(--border-line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    overflow-x: auto;
+  }
+
+  .workspace__tab {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-6);
+    padding: var(--space-6) var(--space-8);
+    border: none;
+    border-radius: var(--radius-sm);
+    background: none;
+    color: var(--muted);
+    font: inherit;
+    font-size: var(--font-small);
+    font-weight: var(--weight-medium);
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .workspace__tab[aria-selected='true'] {
+    background: var(--surface-raised);
+    color: var(--text);
+  }
+
+  .workspace__tab-badge {
+    min-width: 18px;
+    padding: 0 5px;
+    border-radius: var(--radius-pill);
+    background: var(--warning-soft);
+    color: var(--warning);
+    font-size: var(--font-caption);
+  }
+
+  .workspace__tab-badge--error {
+    background: var(--page-bg);
+    color: var(--danger);
+  }
+
+  .workspace {
+    margin-top: var(--space-8);
+  }
+
+  .workspace[data-tab] > * {
+    display: none;
+  }
+
+  .workspace__top {
+    grid-template-columns: minmax(0, 1fr);
+    height: max(440px, calc(100dvh - 140px));
+  }
+
+  .workspace[data-tab='input'] > .workspace__top,
+  .workspace[data-tab='design'] > .workspace__top {
+    display: grid;
+  }
+
+  .workspace[data-tab='input'] > .workspace__top > :nth-child(2),
+  .workspace[data-tab='design'] > .workspace__top > :nth-child(1) {
+    display: none;
+  }
+
+  .workspace[data-tab='result'] > .workspace__result {
+    display: flex;
+    height: max(440px, calc(100dvh - 140px));
+  }
+}
+
+@media (max-width: 600px) {
+  .app__main {
+    padding: var(--page-padding-mobile);
+  }
+}

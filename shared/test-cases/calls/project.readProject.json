@@ -1,0 +1,683 @@
+[
+ {
+  "args": [
+   "{\"format\":\"model2db-project\",\"version\":1,\"savedAt\":\"2026-10-29T12:00:00.000Z\",\"input\":{\"format\":\"typescript\",\"text\":\"interface Customer { id: number; email: string; status: \\\"new\\\" | \\\"vip\\\" }\\ninterface Order { id: number; customer: Customer }\",\"fileName\":\"models.ts\"},\"designs\":{\"relational\":{\"target\":\"relational\",\"models\":[{\"model\":\"Customer\",\"include\":true,\"key\":{\"value\":{\"kind\":\"field\",\"field\":\"id\"},\"status\":\"active\",\"confidence\":\"high\",\"reasons\":[{\"code\":\"keyNamed\",\"params\":{\"field\":\"id\"}}],\"options\":[{\"kind\":\"field\",\"field\":\"id\"},{\"kind\":\"field\",\"field\":\"email\"},{\"kind\":\"surrogate\",\"type\":\"integer\"},{\"kind\":\"surrogate\",\"type\":\"uuid\"}]},\"fields\":[{\"field\":\"id\",\"include\":true},{\"field\":\"email\",\"include\":true,\"unique\":{\"value\":false,\"status\":\"active\",\"confidence\":\"review\",\"reasons\":[{\"code\":\"uniqueNamed\",\"params\":{\"field\":\"email\"}}],\"options\":[true,false],\"manual\":true}},{\"field\":\"status\",\"include\":true}]},{\"model\":\"Order\",\"include\":true,\"key\":{\"value\":{\"kind\":\"field\",\"field\":\"id\"},\"status\":\"active\",\"confidence\":\"high\",\"reasons\":[{\"code\":\"keyNamed\",\"params\":{\"field\":\"id\"}}],\"options\":[{\"kind\":\"field\",\"field\":\"id\"},{\"kind\":\"surrogate\",\"type\":\"integer\"},{\"kind\":\"surrogate\",\"type\":\"uuid\"}]},\"fields\":[{\"field\":\"id\",\"include\":true},{\"field\":\"customer\",\"include\":true,\"relation\":{\"value\":\"reference\",\"status\":\"active\",\"confidence\":\"high\",\"reasons\":[{\"code\":\"targetHasKey\",\"params\":{\"model\":\"Customer\"}}],\"options\":[\"reference\",\"flatten\",\"json\"]}}]}],\"enums\":[{\"enum\":\"Status\",\"storage\":{\"value\":\"check\",\"status\":\"active\",\"confidence\":\"high\",\"reasons\":[{\"code\":\"enumCheck\"}],\"options\":[\"check\",\"native\",\"lookup\",\"text\"]}}]},\"document\":{\"target\":\"document\",\"models\":[{\"model\":\"Customer\",\"include\":true,\"key\":{\"value\":{\"kind\":\"field\",\"field\":\"id\"},\"status\":\"active\",\"confidence\":\"high\",\"reasons\":[{\"code\":\"keyNamed\",\"params\":{\"field\":\"id\"}}],\"options\":[{\"kind\":\"field\",\"field\":\"id\"},{\"kind\":\"field\",\"field\":\"email\"},{\"kind\":\"surrogate\",\"type\":\"objectId\"}]},\"fields\":[{\"field\":\"id\",\"include\":true},{\"field\":\"email\",\"include\":true,\"unique\":{\"value\":true,\"status\":\"pending\",\"confidence\":\"review\",\"reasons\":[{\"code\":\"uniqueNamed\",\"params\":{\"field\":\"email\"}}],\"options\":[true,false]}},{\"field\":\"status\",\"include\":true}]},{\"model\":\"Order\",\"include\":true,\"key\":{\"value\":{\"kind\":\"field\",\"field\":\"id\"},\"status\":\"active\",\"confidence\":\"high\",\"reasons\":[{\"code\":\"keyNamed\",\"params\":{\"field\":\"id\"}}],\"options\":[{\"kind\":\"field\",\"field\":\"id\"},{\"kind\":\"surrogate\",\"type\":\"objectId\"}]},\"fields\":[{\"field\":\"id\",\"include\":true},{\"field\":\"customer\",\"include\":true,\"relation\":{\"value\":\"embed\",\"status\":\"active\",\"confidence\":\"probable\",\"reasons\":[{\"code\":\"ownedList\",\"params\":{\"model\":\"Customer\"}}],\"options\":[\"embed\",\"reference\"]}}]}],\"enums\":[]}},\"output\":{\"output\":\"mysql\",\"naming\":{\"relational\":{\"tables\":\"singular\",\"columns\":\"snake\"},\"document\":{\"tables\":\"plural\",\"columns\":\"field\"}},\"strings\":\"varchar\",\"engine\":\"mysql\",\"migrations\":false}}"
+  ],
+  "result": {
+   "ok": true,
+   "project": {
+    "format": "model2db-project",
+    "version": 1,
+    "savedAt": "2026-10-29T12:00:00.000Z",
+    "input": {
+     "format": "typescript",
+     "text": "interface Customer { id: number; email: string; status: \"new\" | \"vip\" }\ninterface Order { id: number; customer: Customer }",
+     "fileName": "models.ts"
+    },
+    "designs": {
+     "relational": {
+      "target": "relational",
+      "models": [
+       {
+        "model": "Customer",
+        "include": true,
+        "fields": [
+         {
+          "field": "id",
+          "include": true
+         },
+         {
+          "field": "email",
+          "include": true,
+          "unique": {
+           "value": false,
+           "status": "active",
+           "confidence": "review",
+           "manual": true,
+           "reasons": [
+            {
+             "code": "uniqueNamed",
+             "params": {
+              "field": "email"
+             }
+            }
+           ],
+           "options": [
+            true,
+            false
+           ]
+          }
+         },
+         {
+          "field": "status",
+          "include": true
+         }
+        ],
+        "key": {
+         "value": {
+          "kind": "field",
+          "field": "id"
+         },
+         "status": "active",
+         "confidence": "high",
+         "reasons": [
+          {
+           "code": "keyNamed",
+           "params": {
+            "field": "id"
+           }
+          }
+         ],
+         "options": [
+          {
+           "kind": "field",
+           "field": "id"
+          },
+          {
+           "kind": "field",
+           "field": "email"
+          },
+          {
+           "kind": "surrogate",
+           "type": "integer"
+          },
+          {
+           "kind": "surrogate",
+           "type": "uuid"
+          }
+         ]
+        }
+       },
+       {
+        "model": "Order",
+        "include": true,
+        "fields": [
+         {
+          "field": "id",
+          "include": true
+         },
+         {
+          "field": "customer",
+          "include": true,
+          "relation": {
+           "value": "reference",
+           "status": "active",
+           "confidence": "high",
+           "reasons": [
+            {
+             "code": "targetHasKey",
+             "params": {
+              "model": "Customer"
+             }
+            }
+           ],
+           "options": [
+            "reference",
+            "flatten",
+            "json"
+           ]
+          }
+         }
+        ],
+        "key": {
+         "value": {
+          "kind": "field",
+          "field": "id"
+         },
+         "status": "active",
+         "confidence": "high",
+         "reasons": [
+          {
+           "code": "keyNamed",
+           "params": {
+            "field": "id"
+           }
+          }
+         ],
+         "options": [
+          {
+           "kind": "field",
+           "field": "id"
+          },
+          {
+           "kind": "surrogate",
+           "type": "integer"
+          },
+          {
+           "kind": "surrogate",
+           "type": "uuid"
+          }
+         ]
+        }
+       }
+      ],
+      "enums": [
+       {
+        "enum": "Status",
+        "storage": {
+         "value": "check",
+         "status": "active",
+         "confidence": "high",
+         "reasons": [
+          {
+           "code": "enumCheck"
+          }
+         ],
+         "options": [
+          "check",
+          "native",
+          "lookup",
+          "text"
+         ]
+        }
+       }
+      ]
+     },
+     "document": {
+      "target": "document",
+      "models": [
+       {
+        "model": "Customer",
+        "include": true,
+        "fields": [
+         {
+          "field": "id",
+          "include": true
+         },
+         {
+          "field": "email",
+          "include": true,
+          "unique": {
+           "value": true,
+           "status": "pending",
+           "confidence": "review",
+           "reasons": [
+            {
+             "code": "uniqueNamed",
+             "params": {
+              "field": "email"
+             }
+            }
+           ],
+           "options": [
+            true,
+            false
+           ]
+          }
+         },
+         {
+          "field": "status",
+          "include": true
+         }
+        ],
+        "key": {
+         "value": {
+          "kind": "field",
+          "field": "id"
+         },
+         "status": "active",
+         "confidence": "high",
+         "reasons": [
+          {
+           "code": "keyNamed",
+           "params": {
+            "field": "id"
+           }
+          }
+         ],
+         "options": [
+          {
+           "kind": "field",
+           "field": "id"
+          },
+          {
+           "kind": "field",
+           "field": "email"
+          },
+          {
+           "kind": "surrogate",
+           "type": "objectId"
+          }
+         ]
+        }
+       },
+       {
+        "model": "Order",
+        "include": true,
+        "fields": [
+         {
+          "field": "id",
+          "include": true
+         },
+         {
+          "field": "customer",
+          "include": true,
+          "relation": {
+           "value": "embed",
+           "status": "active",
+           "confidence": "probable",
+           "reasons": [
+            {
+             "code": "ownedList",
+             "params": {
+              "model": "Customer"
+             }
+            }
+           ],
+           "options": [
+            "embed",
+            "reference"
+           ]
+          }
+         }
+        ],
+        "key": {
+         "value": {
+          "kind": "field",
+          "field": "id"
+         },
+         "status": "active",
+         "confidence": "high",
+         "reasons": [
+          {
+           "code": "keyNamed",
+           "params": {
+            "field": "id"
+           }
+          }
+         ],
+         "options": [
+          {
+           "kind": "field",
+           "field": "id"
+          },
+          {
+           "kind": "surrogate",
+           "type": "objectId"
+          }
+         ]
+        }
+       }
+      ],
+      "enums": []
+     }
+    },
+    "output": {
+     "output": "mysql",
+     "naming": {
+      "relational": {
+       "tables": "singular",
+       "columns": "snake"
+      },
+      "document": {
+       "tables": "plural",
+       "columns": "field"
+      }
+     },
+     "strings": "varchar",
+     "engine": "mysql",
+     "migrations": false
+    }
+   }
+  }
+ },
+ {
+  "args": [
+   "not json"
+  ],
+  "result": {
+   "ok": false,
+   "error": "notJson"
+  }
+ },
+ {
+  "args": [
+   "{\"format\":\"mapper-project\",\"version\":1}"
+  ],
+  "result": {
+   "ok": false,
+   "error": "notProject"
+  }
+ },
+ {
+  "args": [
+   "{\"format\":\"model2db-project\",\"version\":2,\"savedAt\":\"2026-10-29T12:00:00.000Z\",\"input\":{\"format\":\"typescript\",\"text\":\"interface Customer { id: number; email: string; status: \\\"new\\\" | \\\"vip\\\" }\\ninterface Order { id: number; customer: Customer }\",\"fileName\":\"models.ts\"},\"designs\":{\"relational\":{\"target\":\"relational\",\"models\":[{\"model\":\"Customer\",\"include\":true,\"key\":{\"value\":{\"kind\":\"field\",\"field\":\"id\"},\"status\":\"active\",\"confidence\":\"high\",\"reasons\":[{\"code\":\"keyNamed\",\"params\":{\"field\":\"id\"}}],\"options\":[{\"kind\":\"field\",\"field\":\"id\"},{\"kind\":\"field\",\"field\":\"email\"},{\"kind\":\"surrogate\",\"type\":\"integer\"},{\"kind\":\"surrogate\",\"type\":\"uuid\"}]},\"fields\":[{\"field\":\"id\",\"include\":true},{\"field\":\"email\",\"include\":true,\"unique\":{\"value\":false,\"status\":\"active\",\"confidence\":\"review\",\"reasons\":[{\"code\":\"uniqueNamed\",\"params\":{\"field\":\"email\"}}],\"options\":[true,false],\"manual\":true}},{\"field\":\"status\",\"include\":true}]},{\"model\":\"Order\",\"include\":true,\"key\":{\"value\":{\"kind\":\"field\",\"field\":\"id\"},\"status\":\"active\",\"confidence\":\"high\",\"reasons\":[{\"code\":\"keyNamed\",\"params\":{\"field\":\"id\"}}],\"options\":[{\"kind\":\"field\",\"field\":\"id\"},{\"kind\":\"surrogate\",\"type\":\"integer\"},{\"kind\":\"surrogate\",\"type\":\"uuid\"}]},\"fields\":[{\"field\":\"id\",\"include\":true},{\"field\":\"customer\",\"include\":true,\"relation\":{\"value\":\"reference\",\"status\":\"active\",\"confidence\":\"high\",\"reasons\":[{\"code\":\"targetHasKey\",\"params\":{\"model\":\"Customer\"}}],\"options\":[\"reference\",\"flatten\",\"json\"]}}]}],\"enums\":[{\"enum\":\"Status\",\"storage\":{\"value\":\"check\",\"status\":\"active\",\"confidence\":\"high\",\"reasons\":[{\"code\":\"enumCheck\"}],\"options\":[\"check\",\"native\",\"lookup\",\"text\"]}}]},\"document\":{\"target\":\"document\",\"models\":[{\"model\":\"Customer\",\"include\":true,\"key\":{\"value\":{\"kind\":\"field\",\"field\":\"id\"},\"status\":\"active\",\"confidence\":\"high\",\"reasons\":[{\"code\":\"keyNamed\",\"params\":{\"field\":\"id\"}}],\"options\":[{\"kind\":\"field\",\"field\":\"id\"},{\"kind\":\"field\",\"field\":\"email\"},{\"kind\":\"surrogate\",\"type\":\"objectId\"}]},\"fields\":[{\"field\":\"id\",\"include\":true},{\"field\":\"email\",\"include\":true,\"unique\":{\"value\":true,\"status\":\"pending\",\"confidence\":\"review\",\"reasons\":[{\"code\":\"uniqueNamed\",\"params\":{\"field\":\"email\"}}],\"options\":[true,false]}},{\"field\":\"status\",\"include\":true}]},{\"model\":\"Order\",\"include\":true,\"key\":{\"value\":{\"kind\":\"field\",\"field\":\"id\"},\"status\":\"active\",\"confidence\":\"high\",\"reasons\":[{\"code\":\"keyNamed\",\"params\":{\"field\":\"id\"}}],\"options\":[{\"kind\":\"field\",\"field\":\"id\"},{\"kind\":\"surrogate\",\"type\":\"objectId\"}]},\"fields\":[{\"field\":\"id\",\"include\":true},{\"field\":\"customer\",\"include\":true,\"relation\":{\"value\":\"embed\",\"status\":\"active\",\"confidence\":\"probable\",\"reasons\":[{\"code\":\"ownedList\",\"params\":{\"model\":\"Customer\"}}],\"options\":[\"embed\",\"reference\"]}}]}],\"enums\":[]}},\"output\":{\"output\":\"mysql\",\"naming\":{\"relational\":{\"tables\":\"singular\",\"columns\":\"snake\"},\"document\":{\"tables\":\"plural\",\"columns\":\"field\"}},\"strings\":\"varchar\",\"engine\":\"mysql\",\"migrations\":false}}"
+  ],
+  "result": {
+   "ok": false,
+   "error": "newerVersion"
+  }
+ },
+ {
+  "args": [
+   "{\"format\":\"model2db-project\",\"version\":1,\"savedAt\":\"2026-10-29T12:00:00.000Z\",\"input\":{\"format\":\"typescript\",\"text\":\"interface Customer { id: number; email: string; status: \\\"new\\\" | \\\"vip\\\" }\\ninterface Order { id: number; customer: Customer }\",\"fileName\":\"models.ts\"},\"designs\":{\"relational\":{\"target\":\"relational\",\"models\":[{\"model\":\"Customer\",\"include\":true,\"key\":{\"value\":{\"kind\":\"field\",\"field\":\"id\"},\"status\":\"active\",\"confidence\":\"high\",\"reasons\":[{\"code\":\"keyNamed\",\"params\":{\"field\":\"id\"}}],\"options\":[{\"kind\":\"field\",\"field\":\"id\"},{\"kind\":\"field\",\"field\":\"email\"},{\"kind\":\"surrogate\",\"type\":\"integer\"},{\"kind\":\"surrogate\",\"type\":\"uuid\"}]},\"fields\":[{\"field\":\"id\",\"include\":true},{\"field\":\"email\",\"include\":true,\"unique\":{\"value\":false,\"status\":\"maybe\",\"confidence\":\"review\",\"reasons\":[{\"code\":\"uniqueNamed\",\"params\":{\"field\":\"email\"}}],\"options\":[true,false],\"manual\":true}},{\"field\":\"status\",\"include\":true}]},{\"model\":\"Order\",\"include\":true,\"key\":{\"value\":{\"kind\":\"field\",\"field\":\"id\"},\"status\":\"active\",\"confidence\":\"high\",\"reasons\":[{\"code\":\"keyNamed\",\"params\":{\"field\":\"id\"}}],\"options\":[{\"kind\":\"field\",\"field\":\"id\"},{\"kind\":\"surrogate\",\"type\":\"integer\"},{\"kind\":\"surrogate\",\"type\":\"uuid\"}]},\"fields\":[{\"field\":\"id\",\"include\":true},{\"field\":\"customer\",\"include\":true,\"relation\":{\"value\":\"reference\",\"status\":\"active\",\"confidence\":\"high\",\"reasons\":[{\"code\":\"targetHasKey\",\"params\":{\"model\":\"Customer\"}}],\"options\":[\"reference\",\"flatten\",\"json\"]}}]}],\"enums\":[{\"enum\":\"Status\",\"storage\":{\"value\":\"check\",\"status\":\"active\",\"confidence\":\"high\",\"reasons\":[{\"code\":\"enumCheck\"}],\"options\":[\"check\",\"native\",\"lookup\",\"text\"]}}]},\"document\":{\"target\":\"document\",\"models\":[{\"model\":\"Customer\",\"include\":true,\"key\":{\"value\":{\"kind\":\"field\",\"field\":\"id\"},\"status\":\"active\",\"confidence\":\"high\",\"reasons\":[{\"code\":\"keyNamed\",\"params\":{\"field\":\"id\"}}],\"options\":[{\"kind\":\"field\",\"field\":\"id\"},{\"kind\":\"field\",\"field\":\"email\"},{\"kind\":\"surrogate\",\"type\":\"objectId\"}]},\"fields\":[{\"field\":\"id\",\"include\":true},{\"field\":\"email\",\"include\":true,\"unique\":{\"value\":true,\"status\":\"pending\",\"confidence\":\"review\",\"reasons\":[{\"code\":\"uniqueNamed\",\"params\":{\"field\":\"email\"}}],\"options\":[true,false]}},{\"field\":\"status\",\"include\":true}]},{\"model\":\"Order\",\"include\":true,\"key\":{\"value\":{\"kind\":\"field\",\"field\":\"id\"},\"status\":\"active\",\"confidence\":\"high\",\"reasons\":[{\"code\":\"keyNamed\",\"params\":{\"field\":\"id\"}}],\"options\":[{\"kind\":\"field\",\"field\":\"id\"},{\"kind\":\"surrogate\",\"type\":\"objectId\"}]},\"fields\":[{\"field\":\"id\",\"include\":true},{\"field\":\"customer\",\"include\":true,\"relation\":{\"value\":\"embed\",\"status\":\"active\",\"confidence\":\"probable\",\"reasons\":[{\"code\":\"ownedList\",\"params\":{\"model\":\"Customer\"}}],\"options\":[\"embed\",\"reference\"]}}]}],\"enums\":[]}},\"output\":{\"output\":\"mysql\",\"naming\":{\"relational\":{\"tables\":\"singular\",\"columns\":\"snake\"},\"document\":{\"tables\":\"plural\",\"columns\":\"field\"}},\"strings\":\"varchar\",\"engine\":\"mysql\",\"migrations\":false}}"
+  ],
+  "result": {
+   "ok": false,
+   "error": "invalid",
+   "path": "$.designs.relational.models[0].fields[1].unique.status"
+  }
+ },
+ {
+  "args": [
+   "{\"format\":\"model2db-project\",\"version\":1,\"savedAt\":\"2026-10-29T12:00:00.000Z\",\"input\":{\"format\":null,\"text\":\"interface Customer { id: number; email: string; status: \\\"new\\\" | \\\"vip\\\" }\\ninterface Order { id: number; customer: Customer }\",\"fileName\":\"models.ts\",\"run\":true},\"designs\":{\"relational\":{\"target\":\"relational\",\"models\":[{\"model\":\"Customer\",\"include\":true,\"key\":{\"value\":{\"kind\":\"field\",\"field\":\"id\"},\"status\":\"active\",\"confidence\":\"high\",\"reasons\":[{\"code\":\"keyNamed\",\"params\":{\"field\":\"id\"}}],\"options\":[{\"kind\":\"field\",\"field\":\"id\"},{\"kind\":\"field\",\"field\":\"email\"},{\"kind\":\"surrogate\",\"type\":\"integer\"},{\"kind\":\"surrogate\",\"type\":\"uuid\"}]},\"fields\":[{\"field\":\"id\",\"include\":true},{\"field\":\"email\",\"include\":true,\"unique\":{\"value\":false,\"status\":\"active\",\"confidence\":\"review\",\"reasons\":[{\"code\":\"uniqueNamed\",\"params\":{\"field\":\"email\"}}],\"options\":[true,false],\"manual\":true}},{\"field\":\"status\",\"include\":true}]},{\"model\":\"Order\",\"include\":true,\"key\":{\"value\":{\"kind\":\"field\",\"field\":\"id\"},\"status\":\"active\",\"confidence\":\"high\",\"reasons\":[{\"code\":\"keyNamed\",\"params\":{\"field\":\"id\"}}],\"options\":[{\"kind\":\"field\",\"field\":\"id\"},{\"kind\":\"surrogate\",\"type\":\"integer\"},{\"kind\":\"surrogate\",\"type\":\"uuid\"}]},\"fields\":[{\"field\":\"id\",\"include\":true},{\"field\":\"customer\",\"include\":true,\"relation\":{\"value\":\"reference\",\"status\":\"active\",\"confidence\":\"high\",\"reasons\":[{\"code\":\"targetHasKey\",\"params\":{\"model\":\"Customer\"}}],\"options\":[\"reference\",\"flatten\",\"json\"]}}]}],\"enums\":[{\"enum\":\"Status\",\"storage\":{\"value\":\"check\",\"status\":\"active\",\"confidence\":\"high\",\"reasons\":[{\"code\":\"enumCheck\"}],\"options\":[\"check\",\"native\",\"lookup\",\"text\"]}}]},\"document\":{\"target\":\"document\",\"models\":[{\"model\":\"Customer\",\"include\":true,\"key\":{\"value\":{\"kind\":\"field\",\"field\":\"id\"},\"status\":\"active\",\"confidence\":\"high\",\"reasons\":[{\"code\":\"keyNamed\",\"params\":{\"field\":\"id\"}}],\"options\":[{\"kind\":\"field\",\"field\":\"id\"},{\"kind\":\"field\",\"field\":\"email\"},{\"kind\":\"surrogate\",\"type\":\"objectId\"}]},\"fields\":[{\"field\":\"id\",\"include\":true},{\"field\":\"email\",\"include\":true,\"unique\":{\"value\":true,\"status\":\"pending\",\"confidence\":\"review\",\"reasons\":[{\"code\":\"uniqueNamed\",\"params\":{\"field\":\"email\"}}],\"options\":[true,false]}},{\"field\":\"status\",\"include\":true}]},{\"model\":\"Order\",\"include\":true,\"key\":{\"value\":{\"kind\":\"field\",\"field\":\"id\"},\"status\":\"active\",\"confidence\":\"high\",\"reasons\":[{\"code\":\"keyNamed\",\"params\":{\"field\":\"id\"}}],\"options\":[{\"kind\":\"field\",\"field\":\"id\"},{\"kind\":\"surrogate\",\"type\":\"objectId\"}]},\"fields\":[{\"field\":\"id\",\"include\":true},{\"field\":\"customer\",\"include\":true,\"relation\":{\"value\":\"embed\",\"status\":\"active\",\"confidence\":\"probable\",\"reasons\":[{\"code\":\"ownedList\",\"params\":{\"model\":\"Customer\"}}],\"options\":[\"embed\",\"reference\"]}}]}],\"enums\":[]}},\"output\":{\"output\":\"mysql\",\"naming\":{\"relational\":{\"tables\":\"singular\",\"columns\":\"snake\"},\"document\":{\"tables\":\"plural\",\"columns\":\"field\"}},\"strings\":\"varchar\",\"engine\":\"mysql\",\"migrations\":false},\"script\":\"x\"}"
+  ],
+  "result": {
+   "ok": true,
+   "project": {
+    "format": "model2db-project",
+    "version": 1,
+    "savedAt": "2026-10-29T12:00:00.000Z",
+    "input": {
+     "format": null,
+     "text": "interface Customer { id: number; email: string; status: \"new\" | \"vip\" }\ninterface Order { id: number; customer: Customer }",
+     "fileName": "models.ts"
+    },
+    "designs": {
+     "relational": {
+      "target": "relational",
+      "models": [
+       {
+        "model": "Customer",
+        "include": true,
+        "fields": [
+         {
+          "field": "id",
+          "include": true
+         },
+         {
+          "field": "email",
+          "include": true,
+          "unique": {
+           "value": false,
+           "status": "active",
+           "confidence": "review",
+           "manual": true,
+           "reasons": [
+            {
+             "code": "uniqueNamed",
+             "params": {
+              "field": "email"
+             }
+            }
+           ],
+           "options": [
+            true,
+            false
+           ]
+          }
+         },
+         {
+          "field": "status",
+          "include": true
+         }
+        ],
+        "key": {
+         "value": {
+          "kind": "field",
+          "field": "id"
+         },
+         "status": "active",
+         "confidence": "high",
+         "reasons": [
+          {
+           "code": "keyNamed",
+           "params": {
+            "field": "id"
+           }
+          }
+         ],
+         "options": [
+          {
+           "kind": "field",
+           "field": "id"
+          },
+          {
+           "kind": "field",
+           "field": "email"
+          },
+          {
+           "kind": "surrogate",
+           "type": "integer"
+          },
+          {
+           "kind": "surrogate",
+           "type": "uuid"
+          }
+         ]
+        }
+       },
+       {
+        "model": "Order",
+        "include": true,
+        "fields": [
+         {
+          "field": "id",
+          "include": true
+         },
+         {
+          "field": "customer",
+          "include": true,
+          "relation": {
+           "value": "reference",
+           "status": "active",
+           "confidence": "high",
+           "reasons": [
+            {
+             "code": "targetHasKey",
+             "params": {
+              "model": "Customer"
+             }
+            }
+           ],
+           "options": [
+            "reference",
+            "flatten",
+            "json"
+           ]
+          }
+         }
+        ],
+        "key": {
+         "value": {
+          "kind": "field",
+          "field": "id"
+         },
+         "status": "active",
+         "confidence": "high",
+         "reasons": [
+          {
+           "code": "keyNamed",
+           "params": {
+            "field": "id"
+           }
+          }
+         ],
+         "options": [
+          {
+           "kind": "field",
+           "field": "id"
+          },
+          {
+           "kind": "surrogate",
+           "type": "integer"
+          },
+          {
+           "kind": "surrogate",
+           "type": "uuid"
+          }
+         ]
+        }
+       }
+      ],
+      "enums": [
+       {
+        "enum": "Status",
+        "storage": {
+         "value": "check",
+         "status": "active",
+         "confidence": "high",
+         "reasons": [
+          {
+           "code": "enumCheck"
+          }
+         ],
+         "options": [
+          "check",
+          "native",
+          "lookup",
+          "text"
+         ]
+        }
+       }
+      ]
+     },
+     "document": {
+      "target": "document",
+      "models": [
+       {
+        "model": "Customer",
+        "include": true,
+        "fields": [
+         {
+          "field": "id",
+          "include": true
+         },
+         {
+          "field": "email",
+          "include": true,
+          "unique": {
+           "value": true,
+           "status": "pending",
+           "confidence": "review",
+           "reasons": [
+            {
+             "code": "uniqueNamed",
+             "params": {
+              "field": "email"
+             }
+            }
+           ],
+           "options": [
+            true,
+            false
+           ]
+          }
+         },
+         {
+          "field": "status",
+          "include": true
+         }
+        ],
+        "key": {
+         "value": {
+          "kind": "field",
+          "field": "id"
+         },
+         "status": "active",
+         "confidence": "high",
+         "reasons": [
+          {
+           "code": "keyNamed",
+           "params": {
+            "field": "id"
+           }
+          }
+         ],
+         "options": [
+          {
+           "kind": "field",
+           "field": "id"
+          },
+          {
+           "kind": "field",
+           "field": "email"
+          },
+          {
+           "kind": "surrogate",
+           "type": "objectId"
+          }
+         ]
+        }
+       },
+       {
+        "model": "Order",
+        "include": true,
+        "fields": [
+         {
+          "field": "id",
+          "include": true
+         },
+         {
+          "field": "customer",
+          "include": true,
+          "relation": {
+           "value": "embed",
+           "status": "active",
+           "confidence": "probable",
+           "reasons": [
+            {
+             "code": "ownedList",
+             "params": {
+              "model": "Customer"
+             }
+            }
+           ],
+           "options": [
+            "embed",
+            "reference"
+           ]
+          }
+         }
+        ],
+        "key": {
+         "value": {
+          "kind": "field",
+          "field": "id"
+         },
+         "status": "active",
+         "confidence": "high",
+         "reasons": [
+          {
+           "code": "keyNamed",
+           "params": {
+            "field": "id"
+           }
+          }
+         ],
+         "options": [
+          {
+           "kind": "field",
+           "field": "id"
+          },
+          {
+           "kind": "surrogate",
+           "type": "objectId"
+          }
+         ]
+        }
+       }
+      ],
+      "enums": []
+     }
+    },
+    "output": {
+     "output": "mysql",
+     "naming": {
+      "relational": {
+       "tables": "singular",
+       "columns": "snake"
+      },
+      "document": {
+       "tables": "plural",
+       "columns": "field"
+      }
+     },
+     "strings": "varchar",
+     "engine": "mysql",
+     "migrations": false
+    }
+   }
+  }
+ }
+]

@@ -8,7 +8,7 @@ Cases that define the expected behavior of the core. The web suite (`web/src/cor
 
 | Folder | What it checks |
 |---|---|
-| `calls/<module>.<function>.json` | Arguments of a core function and the result it gives, as JSON: names, format detection and every parser, handoffs, design proposals, edits, reconciliation and model roles |
+| `calls/<module>.<function>.json` | Arguments of a core function and the result it gives, as JSON: names, format detection and every parser, handoffs, project files, design proposals, edits, reconciliation and model roles |
 | `outputs/<output>/<example>` | The files every output writes for every built-in example, with the proposed design |
 
 In the files, a missing key is `undefined` and `null` is `null`. Model roles, a `Map` on the web, are written as an object.

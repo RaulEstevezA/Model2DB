@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { inputFromHandoff } from '../app/handoff.ts'
 import type { InputState } from '../app/workspace.ts'
 import { isTrustedOrigin, readHandoff, takeIncoming } from '../core/interop/handoff.ts'
@@ -7,18 +7,12 @@ let incomingAtStart: InputState | null | undefined
 
 /** The model left in sessionStorage by another tool before the page opened. Read once per page: the
  * handoff is removed as soon as it is read. */
-function takeAtStart(): InputState | null {
+export function takeAtStart(): InputState | null {
   if (incomingAtStart === undefined) {
     const handoff = typeof sessionStorage === 'undefined' ? null : takeIncoming(sessionStorage, 'model2db')
     incomingAtStart = handoff ? inputFromHandoff(handoff) : null
   }
   return incomingAtStart
-}
-
-/** The model another tool left for this page before it opened, if any. */
-export function useInitialIncoming(): InputState | null {
-  const [initial] = useState(takeAtStart)
-  return initial
 }
 
 /** Models sent later by another tool with postMessage, from a trusted origin. */

@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from 'react'
 import type { StorageTarget } from '../core/design/types.ts'
 import { findOutput, type Output, type OutputSettings } from '../core/generate/outputs.ts'
+import type { ProjectOutput } from '../core/interop/project.ts'
 import type { Dialect, NamingOptions } from '../core/physical/types.ts'
 import { useStoredState } from './useStoredState.ts'
 
@@ -16,6 +17,9 @@ export function useOutputSettings(): {
   settings: OutputSettings
   setOutput: (id: string) => void
   setSettings: (settings: OutputSettings) => void
+  /** Every setting, for both kinds of database, as a project saves them */
+  project: ProjectOutput
+  applyProject: (project: ProjectOutput) => void
 } {
   const [outputId, setOutput] = useStoredState('model2db.output', () => 'postgresql')
   const [namings, setNamings] = useStoredState<Record<StorageTarget, NamingOptions>>('model2db.naming', () => DEFAULT_NAMING)
@@ -37,5 +41,19 @@ export function useOutputSettings(): {
     },
     [target, setNamings, setStrings, setEngine, setMigrations],
   )
-  return { output, settings, setOutput, setSettings }
+  const project = useMemo(
+    () => ({ output: output.id, naming: { ...DEFAULT_NAMING, ...namings }, strings, engine, migrations }),
+    [output.id, namings, strings, engine, migrations],
+  )
+  const applyProject = useCallback(
+    (next: ProjectOutput) => {
+      setOutput(findOutput(next.output).id)
+      setNamings(next.naming)
+      setStrings(next.strings)
+      setEngine(next.engine)
+      setMigrations(next.migrations)
+    },
+    [setOutput, setNamings, setStrings, setEngine, setMigrations],
+  )
+  return { output, settings, setOutput, setSettings, project, applyProject }
 }

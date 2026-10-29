@@ -10,6 +10,7 @@ import { describe, expect, it } from 'vitest'
 import { decide, reconcile } from './design/edit.ts'
 import { proposeDesign } from './design/propose.ts'
 import { readHandoff } from './interop/handoff.ts'
+import { readProject } from './interop/project.ts'
 import { singularize, splitWords, toCamelCase, toPascalCase, toSnakeCase } from './model/naming.ts'
 import { detectFormats, parseInput } from './parsers/registry.ts'
 import { modelRoles } from './physical/roles.ts'
@@ -30,6 +31,7 @@ const FUNCTIONS: Record<string, AnyFunction> = {
   'registry.detectFormats': detectFormats,
   'registry.parseInput': parseInput,
   'handoff.readHandoff': readHandoff,
+  'project.readProject': readProject,
   'propose.proposeDesign': proposeDesign,
   'edit.decide': decide,
   'edit.reconcile': reconcile,

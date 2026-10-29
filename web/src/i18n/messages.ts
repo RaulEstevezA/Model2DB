@@ -2,6 +2,7 @@ import type { EnumChoice, KeyChoice, Reason, RelationChoice } from '../core/desi
 import type { OutputGroup } from '../core/generate/outputs.ts'
 import type { Note } from '../core/physical/types.ts'
 import type { ModelRole } from '../core/physical/roles.ts'
+import type { ProjectError } from '../core/interop/project.ts'
 import type { ParseIssue } from '../core/parsers/types.ts'
 import type { ExampleId } from '../examples/index.ts'
 
@@ -52,6 +53,7 @@ const en = {
     'What you paste or open never leaves your browser.',
     'Code is analyzed, never run, and the original is never changed.',
     'Nothing uncertain is applied until you decide.',
+    'Nothing is saved unless you turn on “Remember in this browser”.',
   ],
   examplesLabel: 'Try an example',
   examples: {
@@ -367,6 +369,29 @@ const en = {
         return `${p(params, 'orm')} has no composite keys: rows of “${p(params, 'table')}” are created and read with their model, and changed through their owner.`
     }
   },
+  // Project
+  projectActions: 'Project',
+  saveProject: 'Save project',
+  openProject: 'Open project',
+  projectLoaded: (name: string) => `Project “${name}” opened.`,
+  projectError: (error: ProjectError, path?: string): string => {
+    switch (error) {
+      case 'notJson':
+        return 'The file is not a Model2DB project (it is not JSON).'
+      case 'notProject':
+        return 'The file is not a Model2DB project.'
+      case 'newerVersion':
+        return 'The project was saved by a newer version of Model2DB.'
+      case 'invalid':
+        return `The project is damaged${path ? ` (${path})` : ''}.`
+    }
+  },
+  remember: 'Remember in this browser',
+  rememberHint: 'Saves your model and decisions in this browser only, to continue later.',
+  clearSaved: 'Delete saved work',
+  clearSavedConfirm: 'Delete the work saved in this browser?',
+  savedCleared: 'Saved work deleted.',
+  restored: 'Your previous work was restored from this browser.',
 }
 
 export type Messages = typeof en
@@ -381,6 +406,7 @@ const es: Messages = {
     'Lo que pegas o abres no sale de tu navegador.',
     'El código se analiza, nunca se ejecuta, y el original no se modifica.',
     'Nada dudoso se aplica hasta que decides.',
+    'No se guarda nada salvo que actives «Recordar en este navegador».',
   ],
   examplesLabel: 'Prueba un ejemplo',
   examples: {
@@ -692,6 +718,29 @@ const es: Messages = {
         return `${p(params, 'orm')} no admite claves compuestas: las filas de «${p(params, 'table')}» se crean y se leen con su modelo, y se cambian a través de su propietario.`
     }
   },
+  // Proyecto
+  projectActions: 'Proyecto',
+  saveProject: 'Guardar proyecto',
+  openProject: 'Abrir proyecto',
+  projectLoaded: (name) => `Proyecto «${name}» abierto.`,
+  projectError: (error, path) => {
+    switch (error) {
+      case 'notJson':
+        return 'El archivo no es un proyecto de Model2DB (no es JSON).'
+      case 'notProject':
+        return 'El archivo no es un proyecto de Model2DB.'
+      case 'newerVersion':
+        return 'El proyecto se guardó con una versión más reciente de Model2DB.'
+      case 'invalid':
+        return `El proyecto está dañado${path ? ` (${path})` : ''}.`
+    }
+  },
+  remember: 'Recordar en este navegador',
+  rememberHint: 'Guarda tu modelo y tus decisiones solo en este navegador, para seguir más tarde.',
+  clearSaved: 'Borrar el trabajo guardado',
+  clearSavedConfirm: '¿Borrar el trabajo guardado en este navegador?',
+  savedCleared: 'Trabajo guardado borrado.',
+  restored: 'Se ha recuperado tu trabajo anterior de este navegador.',
 }
 
 export const languages = ['en', 'es'] as const

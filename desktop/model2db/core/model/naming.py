@@ -118,7 +118,6 @@ def singularize(word: str) -> str:
     return word[:-1]
 
 
-
 def unique_name(name: str, used: set[str]) -> str:
     """Returns name, or name2, name3... if it is already taken, and marks the result as taken."""
     result = name

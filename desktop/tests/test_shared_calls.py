@@ -18,6 +18,7 @@ FUNCTIONS = {
     "registry.detectFormats": "parsers.registry.detect_formats",
     "registry.parseInput": "parsers.registry.parse_input",
     "handoff.readHandoff": "interop.handoff.read_handoff",
+    "project.readProject": "interop.project.read_project",
     "propose.proposeDesign": "design.propose.propose_design",
     "edit.decide": "design.edit.decide",
     "edit.reconcile": "design.edit.reconcile",

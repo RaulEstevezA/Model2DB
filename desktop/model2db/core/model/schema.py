@@ -64,7 +64,6 @@ def all_fields(schema: ModelSchema, model: ModelDef, seen: set[str] | None = Non
     return [field for field in inherited if field["name"] not in own] + list(model["fields"])
 
 
-
 def default_root(schema: ModelSchema) -> str | None:
     """The model chosen by default: the declared root, or the model no other model refers to, or the first."""
     if schema.get("root") and find_model(schema, schema["root"]):

@@ -1,12 +1,13 @@
-# Comprueba cada cambio: tipos, lint, formato, tests y build de la versión web, y lint, formato y tests
-# de la versión de escritorio.
+# Comprueba todo el repositorio: tipos, lint, formato, tests y build de la versión web, y lint, formato y
+# tests de la versión de escritorio.
+#
+# Solo se lanza a mano (Actions → CI → Run workflow): cada push a main ya pasa lint, tests y build de la web
+# en deploy-web.yml, y el escritorio se comprueba también en release-desktop.yml antes de cada versión.
 
 name: CI
 
 on:
-  push:
-    branches: [main]
-  pull_request:
+  workflow_dispatch:
 
 jobs:
   web:

@@ -7,6 +7,7 @@ from ..model.schema import default_root
 from ..physical.document import build_document
 from ..physical.relational.schema import build_relational
 from .mongodb.mongodb import generate_mongo
+from .odm.python.mongo import BeanieOutput, MongoEngineOutput, PyMongoOutput
 from .orm.python.django import DjangoOutput
 from .orm.python.sqlalchemy import SqlAlchemyOutput
 from .orm.python.sqlmodel import SqlModelOutput
@@ -93,6 +94,9 @@ OUTPUTS: tuple[Output, ...] = (
     _output(SqlAlchemyOutput(), "relational"),
     _output(SqlModelOutput(), "relational"),
     _output(TortoiseOutput(), "relational"),
+    _output(PyMongoOutput(), "document"),
+    _output(MongoEngineOutput(), "document"),
+    _output(BeanieOutput(), "document"),
 )
 
 

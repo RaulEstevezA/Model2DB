@@ -7,11 +7,16 @@ from ..model.schema import default_root
 from ..physical.document import build_document
 from ..physical.relational.schema import build_relational
 from .mongodb.mongodb import generate_mongo
+from .odm.mongoose import MongooseOutput
 from .odm.python.mongo import BeanieOutput, MongoEngineOutput, PyMongoOutput
 from .orm.python.django import DjangoOutput
 from .orm.python.sqlalchemy import SqlAlchemyOutput
 from .orm.python.sqlmodel import SqlModelOutput
 from .orm.python.tortoise import TortoiseOutput
+from .orm.typescript.drizzle import DrizzleOutput
+from .orm.typescript.prisma import PrismaOutput
+from .orm.typescript.sequelize import SequelizeOutput
+from .orm.typescript.typeorm import TypeOrmOutput
 from .sql.sql import DIALECT_NAMES, generate_sql
 from .types import WriteContext, file_base, generated_file
 
@@ -94,9 +99,14 @@ OUTPUTS: tuple[Output, ...] = (
     _output(SqlAlchemyOutput(), "relational"),
     _output(SqlModelOutput(), "relational"),
     _output(TortoiseOutput(), "relational"),
+    _output(PrismaOutput(), "relational"),
+    _output(TypeOrmOutput(), "relational"),
+    _output(SequelizeOutput(), "relational"),
+    _output(DrizzleOutput(), "relational"),
     _output(PyMongoOutput(), "document"),
     _output(MongoEngineOutput(), "document"),
     _output(BeanieOutput(), "document"),
+    _output(MongooseOutput(), "document"),
 )
 
 

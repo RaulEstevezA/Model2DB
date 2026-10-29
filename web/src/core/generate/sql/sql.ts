@@ -39,6 +39,16 @@ const ORACLE_RESERVED = new Set(
   ).split(' '),
 )
 
+// MySQL and MariaDB also reserve some usual table and column names (`lines`, `keys`, `groups`)
+const MYSQL_RESERVED = new Set(
+  (
+    'accessible call change condition database databases delayed describe div dual each enclosed escaped exit explain ' +
+    'groups high_priority infile keys kill lead lag leave lines load lock long loop low_priority mod modifies optimize ' +
+    'outfile purge release rename repeat replace require restrict return revoke rlike separator show signal spatial ' +
+    'sql ssl starting terminated trigger undo unlock unsigned usage use utc_date utc_time zerofill'
+  ).split(' '),
+)
+
 const simpleName = /^[a-z_][a-z0-9_]*$/
 
 function enumOf(type: ColumnType, enums: PhysicalEnum[]): PhysicalEnum | undefined {
@@ -110,7 +120,7 @@ const RULES: Record<Exclude<Dialect, 'mariadb'>, DialectRules> = {
     multiRowInsert: true,
   },
   mysql: {
-    quote: (name) => (simpleName.test(name) && !RESERVED.has(name) ? name : `\`${name.replace(/`/g, '``')}\``),
+    quote: (name) => (simpleName.test(name) && !RESERVED.has(name) && !MYSQL_RESERVED.has(name) ? name : `\`${name.replace(/`/g, '``')}\``),
     type: (type, enums) => {
       switch (type.kind) {
         case 'raw':
@@ -360,7 +370,9 @@ export function generateSql(schema: RelationalSchema, dialect: Dialect, options:
       // Default and identity before NOT NULL: Oracle requires that order and the others accept it
       if (column.generated === 'identity' && rules.identity) parts.push(rules.identity)
       if (column.generated === 'uuid' && rules.uuidDefault) parts.push(rules.uuidDefault)
-      if (column.generated === 'now') parts.push('DEFAULT CURRENT_TIMESTAMP')
+      // MySQL wants the default of a DATETIME(6) with the same precision
+      if (column.generated === 'now')
+        parts.push(dialect === 'mysql' || dialect === 'mariadb' ? 'DEFAULT CURRENT_TIMESTAMP(6)' : 'DEFAULT CURRENT_TIMESTAMP')
       if (column.defaultValue !== undefined) {
         const value = literal(column.defaultValue, column, rules, schema.enums)
         if (value !== null) parts.push(`DEFAULT ${value}`)

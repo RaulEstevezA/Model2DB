@@ -24,7 +24,7 @@ CREATE TABLE invoices (
 );
 CREATE INDEX ix_invoices_customer_id ON invoices (customer_id);
 
-CREATE TABLE lines (
+CREATE TABLE `lines` (
   id BIGINT AUTO_INCREMENT NOT NULL,
   description VARCHAR(255) NOT NULL,
   qty INT NOT NULL,
@@ -34,7 +34,7 @@ CREATE TABLE lines (
   CONSTRAINT pk_lines PRIMARY KEY (id),
   CONSTRAINT fk_lines_invoice_id FOREIGN KEY (invoice_id) REFERENCES invoices (invoice_id) ON DELETE CASCADE
 );
-CREATE INDEX ix_lines_invoice_id ON lines (invoice_id);
+CREATE INDEX ix_lines_invoice_id ON `lines` (invoice_id);
 
 CREATE TABLE invoice_labels (
   invoice_id INT NOT NULL,

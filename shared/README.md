@@ -4,12 +4,13 @@ Language-neutral resources used by both the web (TypeScript) and desktop (Python
 
 ## test-cases/
 
-Cases that define the expected behavior of the core. The web suite (`web/src/core/shared.test.ts` and `web/src/core/generate/test/generate.test.ts`) and the desktop suite (`desktop/tests/`) read the same files, so if one version behaves differently, its tests fail.
+Cases that define the expected behavior of the core. The web suite (`web/src/core/shared.test.ts`, `web/src/core/generate/test/generate.test.ts` and `variants.test.ts`) and the desktop suite (`desktop/tests/`) read the same files, so if one version behaves differently, its tests fail.
 
 | Folder | What it checks |
 |---|---|
 | `calls/<module>.<function>.json` | Arguments of a core function and the result it gives, as JSON: names, format detection and every parser, handoffs, project files, design proposals, edits, reconciliation and model roles |
 | `outputs/<output>/<example>` | The files every output writes for every built-in example, with the proposed design |
+| `variants/<variant>.json` | An example, the decisions made on its proposal, the settings (engine, names, texts, migrations) and the files every output writes: every engine, native and lookup enums, arrays, UUID keys, other names, decided documents |
 
 In the files, a missing key is `undefined` and `null` is `null`. Model roles, a `Map` on the web, are written as an object.
 
@@ -19,7 +20,7 @@ When the web version changes on purpose, write the results again from what it do
 
 ```bash
 cd web
-UPDATE_SHARED=1 npx vitest run src/core/shared.test.ts
+UPDATE_SHARED=1 npx vitest run src/core/shared.test.ts src/core/generate/test/variants.test.ts
 npx vitest run src/core/generate -u
 ```
 

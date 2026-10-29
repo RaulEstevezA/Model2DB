@@ -361,6 +361,8 @@ const en = {
         return `${p(params, 'orm')} stores “${p(params, 'enum')}” with an enum type of the database, not with a CHECK constraint.`
       case 'enumNeedsCast':
         return `${p(params, 'orm')} sends “${p(params, 'enum')}” as text, and PostgreSQL does not cast it to its enum type: choose a CHECK constraint, or Hibernate.`
+      case 'compositeKeyReadOnly':
+        return `${p(params, 'orm')} has no composite keys: rows of “${p(params, 'table')}” are created and read with their model, and changed through their owner.`
     }
   },
 }
@@ -682,6 +684,8 @@ const es: Messages = {
         return `${p(params, 'orm')} guarda «${p(params, 'enum')}» con un tipo enumerado de la base de datos, no con una restricción CHECK.`
       case 'enumNeedsCast':
         return `${p(params, 'orm')} envía «${p(params, 'enum')}» como texto, y PostgreSQL no lo convierte a su tipo enumerado: elige una restricción CHECK, o Hibernate.`
+      case 'compositeKeyReadOnly':
+        return `${p(params, 'orm')} no admite claves compuestas: las filas de «${p(params, 'table')}» se crean y se leen con su modelo, y se cambian a través de su propietario.`
     }
   },
 }

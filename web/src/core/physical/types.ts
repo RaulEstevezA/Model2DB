@@ -103,6 +103,8 @@ export type NoteCode =
   | 'ormEnumType'
   /** Written by an output: values of a PostgreSQL enum type need a cast the ORM cannot write */
   | 'enumNeedsCast'
+  /** Written by an output: the ORM has no composite keys, so it creates and reads those rows but does not update them */
+  | 'compositeKeyReadOnly'
 
 export interface RelationalSchema {
   kind: 'relational'

@@ -5,7 +5,7 @@ CREATE TABLE users (
   id NVARCHAR(255) NOT NULL,
   email NVARCHAR(255) NOT NULL,
   name NVARCHAR(255),
-  created_at DATETIMEOFFSET NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  created_at DATETIMEOFFSET DEFAULT CURRENT_TIMESTAMP NOT NULL,
   profile_bio NVARCHAR(255),
   profile_website NVARCHAR(255),
   CONSTRAINT pk_users PRIMARY KEY (id),
@@ -13,10 +13,10 @@ CREATE TABLE users (
 );
 
 CREATE TABLE posts (
-  id INT NOT NULL IDENTITY(1, 1),
+  id INT IDENTITY(1, 1) NOT NULL,
   title NVARCHAR(200) NOT NULL,
   body NVARCHAR(255) NOT NULL,
-  published BIT NOT NULL DEFAULT 0,
+  published BIT DEFAULT 0 NOT NULL,
   author_id NVARCHAR(255) NOT NULL,
   CONSTRAINT pk_posts PRIMARY KEY (id),
   CONSTRAINT fk_posts_author_id FOREIGN KEY (author_id) REFERENCES users (id)
@@ -24,7 +24,7 @@ CREATE TABLE posts (
 CREATE INDEX ix_posts_author_id ON posts (author_id);
 
 CREATE TABLE comments (
-  id BIGINT NOT NULL IDENTITY(1, 1),
+  id BIGINT IDENTITY(1, 1) NOT NULL,
   text NVARCHAR(255) NOT NULL,
   written_at DATETIMEOFFSET NOT NULL,
   rating INT,

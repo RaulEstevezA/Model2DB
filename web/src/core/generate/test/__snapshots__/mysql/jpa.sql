@@ -2,7 +2,7 @@
 -- Review it before running it: nothing here has been run.
 
 CREATE TABLE authors (
-  id BIGINT NOT NULL AUTO_INCREMENT,
+  id BIGINT AUTO_INCREMENT NOT NULL,
   name VARCHAR(120) NOT NULL,
   email VARCHAR(255) NOT NULL,
   CONSTRAINT pk_authors PRIMARY KEY (id),
@@ -10,7 +10,7 @@ CREATE TABLE authors (
 );
 
 CREATE TABLE books (
-  id BIGINT NOT NULL AUTO_INCREMENT,
+  id BIGINT AUTO_INCREMENT NOT NULL,
   isbn VARCHAR(13) NOT NULL,
   title VARCHAR(255) NOT NULL,
   price DECIMAL(8, 2) NOT NULL,

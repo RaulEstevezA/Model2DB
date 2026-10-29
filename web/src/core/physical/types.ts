@@ -126,13 +126,13 @@ export interface NamingOptions {
   columns: ColumnNaming
 }
 
-export type Dialect = 'postgresql' | 'mysql' | 'sqlite' | 'sqlserver'
+export type Dialect = 'postgresql' | 'mysql' | 'mariadb' | 'sqlite' | 'sqlserver' | 'oracle'
 
 export interface BuildOptions {
   naming: NamingOptions
   dialect: Dialect
   /** Type of a text whose input declares no length: `auto` is TEXT in PostgreSQL and SQLite, where it costs
-   * nothing, and VARCHAR(255) in MySQL and SQL Server, where unbounded text cannot be indexed */
+   * nothing, and VARCHAR(255) in the others, where unbounded text cannot be indexed */
   strings: 'auto' | 'varchar' | 'text'
 }
 

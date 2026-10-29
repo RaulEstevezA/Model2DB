@@ -71,6 +71,11 @@ describe('names', () => {
     expect(generate(schema, design, findOutput('postgresql'), settings).content).toContain('"order" DOUBLE PRECISION NOT NULL')
     expect(generate(schema, design, findOutput('mysql'), settings).content).toContain('`group` VARCHAR(255) NOT NULL')
     expect(generate(schema, design, findOutput('sqlserver'), settings).content).toContain('[order] FLOAT NOT NULL')
+    // Oracle also reserves usual field names
+    const oracle = schemaOf('interface Level { id: number; level: number; comment: string }', 'typescript')
+    expect(generate(oracle, proposeDesign(oracle, 'relational'), findOutput('oracle'), settings).content).toContain(
+      '"level" BINARY_DOUBLE NOT NULL',
+    )
   })
 
   it('follows the naming chosen for tables and columns', () => {

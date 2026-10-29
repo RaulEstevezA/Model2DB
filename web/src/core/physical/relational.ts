@@ -93,7 +93,7 @@ export function buildRelational(schema: ModelSchema, design: Design, options: Bu
     const result: ColumnType = { kind: 'primitive', name: type.name, ...(type.bits ? { bits: type.bits } : {}) }
     if (type.name === 'string') {
       const varchar =
-        options.strings === 'varchar' || (options.strings === 'auto' && (options.dialect === 'mysql' || options.dialect === 'sqlserver'))
+        options.strings === 'varchar' || (options.strings === 'auto' && options.dialect !== 'postgresql' && options.dialect !== 'sqlite')
       const length = declaredLength(field) ?? (varchar ? DEFAULT_LENGTH : undefined)
       if (length) result.length = length
     }
@@ -420,7 +420,7 @@ export function buildRelational(schema: ModelSchema, design: Design, options: Bu
     if (!definition) continue
     const values = definition.values.map((value) => value.value ?? value.name)
     let storage = design.enums.find((item) => item.enum === name)?.storage.value ?? 'check'
-    if (storage === 'native' && (options.dialect === 'sqlite' || options.dialect === 'sqlserver')) {
+    if (storage === 'native' && (options.dialect === 'sqlite' || options.dialect === 'sqlserver' || options.dialect === 'oracle')) {
       notes.push({ code: 'nativeEnumAsCheck', params: { enum: name } })
       storage = 'check'
     }

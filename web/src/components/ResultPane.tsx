@@ -1,6 +1,6 @@
 import type { LanguageSupport } from '@codemirror/language'
 import { useEffect, useState } from 'react'
-import { OUTPUTS, type Generated, type Output, type OutputSettings } from '../core/generate/outputs.ts'
+import { OUTPUTS, type Generated, type Output, type OutputGroup, type OutputSettings } from '../core/generate/outputs.ts'
 import type { ColumnNaming, TableNaming } from '../core/physical/types.ts'
 import { useI18n } from '../i18n/useI18n.ts'
 import { downloadBlob } from '../utils/download.ts'
@@ -12,6 +12,7 @@ import './ResultPane.css'
 const TABLE_NAMINGS: TableNaming[] = ['plural', 'singular', 'model']
 const COLUMN_NAMINGS: ColumnNaming[] = ['snake', 'field']
 const STRINGS: OutputSettings['strings'][] = ['auto', 'varchar', 'text']
+const OUTPUT_GROUPS: OutputGroup[] = ['relational', 'document']
 
 interface ResultPaneProps {
   output: Output
@@ -72,10 +73,14 @@ export function ResultPane({ output, settings, generated, onOutputChange, onSett
         <label className="result-pane__database">
           <span className="visually-hidden">{t.databaseLabel}</span>
           <select className="select" value={output.id} onChange={(event) => onOutputChange(event.target.value)}>
-            {OUTPUTS.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.label}
-              </option>
+            {OUTPUT_GROUPS.map((group) => (
+              <optgroup key={group} label={t.outputGroups[group]}>
+                {OUTPUTS.filter((item) => item.group === group).map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.label}
+                  </option>
+                ))}
+              </optgroup>
             ))}
           </select>
         </label>

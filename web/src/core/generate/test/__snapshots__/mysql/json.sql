@@ -25,7 +25,7 @@ CREATE TABLE invoices (
 CREATE INDEX ix_invoices_customer_id ON invoices (customer_id);
 
 CREATE TABLE lines (
-  id BIGINT NOT NULL AUTO_INCREMENT,
+  id BIGINT AUTO_INCREMENT NOT NULL,
   description VARCHAR(255) NOT NULL,
   qty INT NOT NULL,
   unit_price DOUBLE NOT NULL,

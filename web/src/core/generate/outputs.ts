@@ -10,9 +10,13 @@ import { generateMongo } from './mongodb.ts'
 /** Every database Model2DB writes for, in the order the selector shows them. */
 export type OutputId = Dialect | 'mongodb'
 
+/** Groups of the database selector */
+export type OutputGroup = 'relational' | 'document'
+
 export interface Output {
   id: OutputId
   label: string
+  group: OutputGroup
   target: 'relational' | 'document'
   /** Highlighting used by the result editor (utils/editorLanguages.ts) */
   editorLanguage: string
@@ -20,11 +24,15 @@ export interface Output {
 }
 
 export const OUTPUTS: readonly Output[] = [
-  { id: 'postgresql', label: DIALECT_NAMES.postgresql, target: 'relational', editorLanguage: 'sql', extension: '.sql' },
-  { id: 'mysql', label: DIALECT_NAMES.mysql, target: 'relational', editorLanguage: 'sql', extension: '.sql' },
-  { id: 'sqlite', label: DIALECT_NAMES.sqlite, target: 'relational', editorLanguage: 'sql', extension: '.sql' },
-  { id: 'sqlserver', label: DIALECT_NAMES.sqlserver, target: 'relational', editorLanguage: 'sql', extension: '.sql' },
-  { id: 'mongodb', label: 'MongoDB', target: 'document', editorLanguage: 'javascript', extension: '.js' },
+  ...(['postgresql', 'mysql', 'mariadb', 'sqlite', 'sqlserver', 'oracle'] as const).map((id): Output => ({
+    id,
+    label: DIALECT_NAMES[id],
+    group: 'relational',
+    target: 'relational',
+    editorLanguage: 'sql',
+    extension: '.sql',
+  })),
+  { id: 'mongodb', label: 'MongoDB', group: 'document', target: 'document', editorLanguage: 'javascript', extension: '.js' },
 ]
 
 export function findOutput(id: string): Output {

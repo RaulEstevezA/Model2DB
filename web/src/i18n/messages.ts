@@ -1,4 +1,5 @@
 import type { EnumChoice, KeyChoice, Reason, RelationChoice } from '../core/design/types.ts'
+import type { OutputGroup } from '../core/generate/outputs.ts'
 import type { Note } from '../core/physical/types.ts'
 import type { ModelRole } from '../core/physical/roles.ts'
 import type { ParseIssue } from '../core/parsers/types.ts'
@@ -44,7 +45,7 @@ const JSON_DETAIL_ES: Record<string, string> = {
 const en = {
   tagline: 'Turn a data model into a database design you review before any code is written',
   introDescription:
-    'Paste or open your models (classes, DTOs, JSON, schemas) or receive them from Mapper. Model2DB proposes tables, keys, relations, embedded documents and indexes, explains each proposal and waits for you where it is not sure. Then copy the schema for PostgreSQL, MySQL, SQLite, SQL Server or MongoDB.',
+    'Paste or open your models (classes, DTOs, JSON, schemas) or receive them from Mapper. Model2DB proposes tables, keys, relations, embedded documents and indexes, explains each proposal and waits for you where it is not sure. Then copy the schema for PostgreSQL, MySQL, MariaDB, SQLite, SQL Server, Oracle or MongoDB.',
   privacyShort: 'Processed locally',
   privacyTitle: 'Your models stay with you',
   privacyPoints: [
@@ -308,6 +309,7 @@ const en = {
   // Result
   resultTitle: 'Result',
   databaseLabel: 'Database',
+  outputGroups: { relational: 'Relational SQL', document: 'Documents' } satisfies Record<OutputGroup, string>,
   tablesNaming: 'Table names',
   collectionsNaming: 'Collection names',
   tablesNamingOption: { plural: 'Plural (order_lines)', singular: 'Singular (order_line)', model: 'As the model (OrderLine)' },
@@ -348,7 +350,7 @@ export type Messages = typeof en
 const es: Messages = {
   tagline: 'Convierte un modelo de datos en un diseño de base de datos que revisas antes de generar código',
   introDescription:
-    'Pega o abre tus modelos (clases, DTOs, JSON, esquemas) o recíbelos de Mapper. Model2DB propone tablas, claves, relaciones, documentos embebidos e índices, explica cada propuesta y te espera donde no está seguro. Después copia el esquema para PostgreSQL, MySQL, SQLite, SQL Server o MongoDB.',
+    'Pega o abre tus modelos (clases, DTOs, JSON, esquemas) o recíbelos de Mapper. Model2DB propone tablas, claves, relaciones, documentos embebidos e índices, explica cada propuesta y te espera donde no está seguro. Después copia el esquema para PostgreSQL, MySQL, MariaDB, SQLite, SQL Server, Oracle o MongoDB.',
   privacyShort: 'Procesado en local',
   privacyTitle: 'Tus modelos no salen de aquí',
   privacyPoints: [
@@ -608,6 +610,7 @@ const es: Messages = {
 
   resultTitle: 'Resultado',
   databaseLabel: 'Base de datos',
+  outputGroups: { relational: 'SQL relacional', document: 'Documentos' },
   tablesNaming: 'Nombres de tabla',
   collectionsNaming: 'Nombres de colección',
   tablesNamingOption: { plural: 'Plural (order_lines)', singular: 'Singular (order_line)', model: 'Como el modelo (OrderLine)' },

@@ -353,6 +353,8 @@ const en = {
         return `“${p(params, 'model')}” contains itself: the inner copy is stored as a plain object.`
       case 'renamedReserved':
         return `“${p(params, 'name')}” is a reserved word and is quoted.`
+      case 'textKeyLength':
+        return `“${p(params, 'column')}” is part of a key or an index, and this engine cannot index text without a length: it is VARCHAR(${p(params, 'length')}).`
       case 'compositeKeyAsId':
         return `${p(params, 'orm')} has no composite primary keys: “${p(params, 'table')}” gets an id column, and ${p(params, 'columns')} stay unique together.`
       case 'enumCheckedInCode':
@@ -676,6 +678,8 @@ const es: Messages = {
         return `«${p(params, 'model')}» se contiene a sí mismo: la copia interior se guarda como un objeto sin validar.`
       case 'renamedReserved':
         return `«${p(params, 'name')}» es una palabra reservada y va entre comillas.`
+      case 'textKeyLength':
+        return `«${p(params, 'column')}» forma parte de una clave o un índice, y este motor no indexa texto sin longitud: es VARCHAR(${p(params, 'length')}).`
       case 'compositeKeyAsId':
         return `${p(params, 'orm')} no admite claves primarias compuestas: «${p(params, 'table')}» recibe una columna id, y ${p(params, 'columns')} siguen siendo únicas juntas.`
       case 'enumCheckedInCode':

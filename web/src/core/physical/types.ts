@@ -95,6 +95,8 @@ export type NoteCode =
   | 'inheritedFields'
   | 'cycleEmbedded'
   | 'renamedReserved'
+  /** A text without a length is part of a key or an index: the engine needs one */
+  | 'textKeyLength'
   /** Written by an output: the ORM has no composite primary keys, so the table gets an `id` */
   | 'compositeKeyAsId'
   /** Written by an output: the ORM checks enum values in the application, not in the database */

@@ -5,6 +5,7 @@ import { DEFAULT_PRECISION, RelationalBuild } from './relational/build.ts'
 import { buildEnums, constrainEnumColumns } from './relational/enums.ts'
 import { addRelations } from './relational/relations.ts'
 import { addEntityTables, addKeys, addScalarColumns, addScalarForeignKeys } from './relational/tables.ts'
+import { boundIndexedTexts } from './relational/textKeys.ts'
 import type { BuildOptions, RelationalSchema } from './types.ts'
 
 export { fieldColumn, storesNull } from './relational/names.ts'
@@ -20,6 +21,7 @@ export function buildRelational(schema: ModelSchema, design: Design, options: Bu
   const { enums, lookups } = buildEnums(build)
   const tables = [...lookups, ...[...build.entities.values()].map((entity) => entity.table), ...build.extraTables]
   constrainEnumColumns(tables, enums, lookups)
+  boundIndexedTexts(build, tables)
   if (build.decimals.length > 0)
     build.notes.push({
       code: 'defaultPrecision',

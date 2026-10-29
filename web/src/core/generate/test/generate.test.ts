@@ -72,6 +72,19 @@ describe('models that refer to each other', () => {
   })
 })
 
+describe('texts in keys and indexes', () => {
+  it('get a length where the engine cannot index unbounded text', () => {
+    const schema = schemaOf('class User { @Id id: string; @Column({ unique: true }) email: string; bio: string }', 'typescript')
+    const design = proposeDesign(schema, 'relational')
+    const unbounded = { ...settings, strings: 'text' as const }
+    const mysql = generate(schema, design, findOutput('mysql'), unbounded)
+    expect(text(mysql)).toContain('email VARCHAR(255) NOT NULL')
+    expect(text(mysql)).toContain('bio TEXT NOT NULL')
+    expect(mysql.physical.notes.map((note) => note.code)).toContain('textKeyLength')
+    expect(text(generate(schema, design, findOutput('postgresql'), unbounded))).toContain('email TEXT NOT NULL')
+  })
+})
+
 describe('names', () => {
   const schema = schemaOf('interface User { id: number; order: number; group: string }', 'typescript')
 

@@ -9,6 +9,7 @@ import { sqlalchemyOutput } from './orm/python/sqlalchemy.ts'
 import { sqlmodelOutput } from './orm/python/sqlmodel.ts'
 import { tortoiseOutput } from './orm/python/tortoise.ts'
 import { prismaOutput } from './orm/typescript/prisma.ts'
+import { typeormOutput } from './orm/typescript/typeorm.ts'
 import { DIALECT_NAMES, generateSql } from './sql/sql.ts'
 import {
   fileBase,
@@ -94,6 +95,7 @@ export const OUTPUTS: readonly Output[] = [
   relational(sqlmodelOutput),
   relational(tortoiseOutput),
   relational(prismaOutput),
+  relational(typeormOutput),
 ]
 
 export function findOutput(id: string): Output {

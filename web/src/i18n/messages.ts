@@ -357,6 +357,8 @@ const en = {
         return `${p(params, 'orm')} has no composite primary keys: “${p(params, 'table')}” gets an id column, and ${p(params, 'columns')} stay unique together.`
       case 'enumCheckedInCode':
         return `${p(params, 'orm')} checks the values of “${p(params, 'enum')}” in the application: the database does not restrict them.`
+      case 'ormEnumType':
+        return `${p(params, 'orm')} stores “${p(params, 'enum')}” with an enum type of the database, not with a CHECK constraint.`
     }
   },
 }
@@ -674,6 +676,8 @@ const es: Messages = {
         return `${p(params, 'orm')} no admite claves primarias compuestas: «${p(params, 'table')}» recibe una columna id, y ${p(params, 'columns')} siguen siendo únicas juntas.`
       case 'enumCheckedInCode':
         return `${p(params, 'orm')} comprueba los valores de «${p(params, 'enum')}» en la aplicación: la base de datos no los restringe.`
+      case 'ormEnumType':
+        return `${p(params, 'orm')} guarda «${p(params, 'enum')}» con un tipo enumerado de la base de datos, no con una restricción CHECK.`
     }
   },
 }

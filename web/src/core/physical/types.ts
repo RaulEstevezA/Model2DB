@@ -99,6 +99,8 @@ export type NoteCode =
   | 'compositeKeyAsId'
   /** Written by an output: the ORM checks enum values in the application, not in the database */
   | 'enumCheckedInCode'
+  /** Written by an output: the ORM stores an enum with an enum type of its own instead of a CHECK */
+  | 'ormEnumType'
 
 export interface RelationalSchema {
   kind: 'relational'

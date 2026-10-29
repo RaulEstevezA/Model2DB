@@ -1,0 +1,6445 @@
+[
+ {
+  "args": [
+   {
+    "target": "relational",
+    "models": [
+     {
+      "model": "Customer",
+      "include": true,
+      "key": {
+       "value": {
+        "kind": "field",
+        "field": "id"
+       },
+       "status": "active",
+       "confidence": "high",
+       "reasons": [
+        {
+         "code": "keyNamed",
+         "params": {
+          "field": "id"
+         }
+        }
+       ],
+       "options": [
+        {
+         "kind": "field",
+         "field": "id"
+        },
+        {
+         "kind": "field",
+         "field": "email"
+        },
+        {
+         "kind": "field",
+         "field": "fullName"
+        },
+        {
+         "kind": "field",
+         "field": "phone"
+        },
+        {
+         "kind": "surrogate",
+         "type": "integer"
+        },
+        {
+         "kind": "surrogate",
+         "type": "uuid"
+        }
+       ]
+      },
+      "fields": [
+       {
+        "field": "id",
+        "include": true
+       },
+       {
+        "field": "email",
+        "include": true,
+        "unique": {
+         "value": true,
+         "status": "pending",
+         "confidence": "review",
+         "reasons": [
+          {
+           "code": "uniqueNamed",
+           "params": {
+            "field": "email"
+           }
+          }
+         ],
+         "options": [
+          true,
+          false
+         ]
+        }
+       },
+       {
+        "field": "fullName",
+        "include": true
+       },
+       {
+        "field": "phone",
+        "include": true
+       },
+       {
+        "field": "shippingAddress",
+        "include": true,
+        "relation": {
+         "value": "json",
+         "status": "active",
+         "confidence": "probable",
+         "reasons": [
+          {
+           "code": "valueObject",
+           "params": {
+            "model": "Address"
+           }
+          }
+         ],
+         "options": [
+          "reference",
+          "flatten",
+          "json"
+         ],
+         "manual": true
+        }
+       },
+       {
+        "field": "createdAt",
+        "include": true
+       }
+      ]
+     },
+     {
+      "model": "Address",
+      "include": true,
+      "key": {
+       "value": {
+        "kind": "surrogate",
+        "type": "integer"
+       },
+       "status": "active",
+       "confidence": "probable",
+       "reasons": [
+        {
+         "code": "keyMissing"
+        }
+       ],
+       "options": [
+        {
+         "kind": "field",
+         "field": "street"
+        },
+        {
+         "kind": "field",
+         "field": "city"
+        },
+        {
+         "kind": "field",
+         "field": "postalCode"
+        },
+        {
+         "kind": "field",
+         "field": "country"
+        },
+        {
+         "kind": "surrogate",
+         "type": "integer"
+        },
+        {
+         "kind": "surrogate",
+         "type": "uuid"
+        }
+       ]
+      },
+      "fields": [
+       {
+        "field": "street",
+        "include": true
+       },
+       {
+        "field": "city",
+        "include": true
+       },
+       {
+        "field": "postalCode",
+        "include": true
+       },
+       {
+        "field": "country",
+        "include": true
+       }
+      ]
+     },
+     {
+      "model": "Order",
+      "include": true,
+      "key": {
+       "value": {
+        "kind": "field",
+        "field": "id"
+       },
+       "status": "active",
+       "confidence": "high",
+       "reasons": [
+        {
+         "code": "keyNamed",
+         "params": {
+          "field": "id"
+         }
+        }
+       ],
+       "options": [
+        {
+         "kind": "field",
+         "field": "id"
+        },
+        {
+         "kind": "surrogate",
+         "type": "integer"
+        },
+        {
+         "kind": "surrogate",
+         "type": "uuid"
+        }
+       ]
+      },
+      "fields": [
+       {
+        "field": "id",
+        "include": true
+       },
+       {
+        "field": "customer",
+        "include": true,
+        "relation": {
+         "value": "reference",
+         "status": "active",
+         "confidence": "high",
+         "reasons": [
+          {
+           "code": "targetHasKey",
+           "params": {
+            "model": "Customer"
+           }
+          }
+         ],
+         "options": [
+          "reference",
+          "flatten",
+          "json"
+         ]
+        }
+       },
+       {
+        "field": "status",
+        "include": true
+       },
+       {
+        "field": "lines",
+        "include": true,
+        "relation": {
+         "value": "child",
+         "status": "active",
+         "confidence": "high",
+         "reasons": [
+          {
+           "code": "ownedList",
+           "params": {
+            "model": "OrderLine"
+           }
+          }
+         ],
+         "options": [
+          "child",
+          "join",
+          "json"
+         ]
+        }
+       },
+       {
+        "field": "couponCode",
+        "include": true
+       },
+       {
+        "field": "tags",
+        "include": true,
+        "relation": {
+         "value": "child",
+         "status": "active",
+         "confidence": "probable",
+         "reasons": [
+          {
+           "code": "primitiveList"
+          }
+         ],
+         "options": [
+          "child",
+          "array",
+          "json"
+         ]
+        }
+       },
+       {
+        "field": "placedAt",
+        "include": true
+       }
+      ]
+     },
+     {
+      "model": "OrderLine",
+      "include": true,
+      "key": {
+       "value": {
+        "kind": "surrogate",
+        "type": "integer"
+       },
+       "status": "active",
+       "confidence": "probable",
+       "reasons": [
+        {
+         "code": "keyMissing"
+        }
+       ],
+       "options": [
+        {
+         "kind": "field",
+         "field": "quantity"
+        },
+        {
+         "kind": "field",
+         "field": "unitPrice"
+        },
+        {
+         "kind": "surrogate",
+         "type": "integer"
+        },
+        {
+         "kind": "surrogate",
+         "type": "uuid"
+        }
+       ]
+      },
+      "fields": [
+       {
+        "field": "product",
+        "include": true,
+        "relation": {
+         "value": "reference",
+         "status": "active",
+         "confidence": "high",
+         "reasons": [
+          {
+           "code": "targetHasKey",
+           "params": {
+            "model": "Product"
+           }
+          }
+         ],
+         "options": [
+          "reference",
+          "json"
+         ]
+        }
+       },
+       {
+        "field": "quantity",
+        "include": true
+       },
+       {
+        "field": "unitPrice",
+        "include": true
+       }
+      ]
+     },
+     {
+      "model": "Product",
+      "include": true,
+      "key": {
+       "value": {
+        "kind": "field",
+        "field": "id"
+       },
+       "status": "active",
+       "confidence": "high",
+       "reasons": [
+        {
+         "code": "keyNamed",
+         "params": {
+          "field": "id"
+         }
+        }
+       ],
+       "options": [
+        {
+         "kind": "field",
+         "field": "id"
+        },
+        {
+         "kind": "field",
+         "field": "sku"
+        },
+        {
+         "kind": "field",
+         "field": "name"
+        },
+        {
+         "kind": "field",
+         "field": "price"
+        },
+        {
+         "kind": "surrogate",
+         "type": "integer"
+        },
+        {
+         "kind": "surrogate",
+         "type": "uuid"
+        }
+       ]
+      },
+      "fields": [
+       {
+        "field": "id",
+        "include": true
+       },
+       {
+        "field": "sku",
+        "include": true,
+        "unique": {
+         "value": true,
+         "status": "pending",
+         "confidence": "review",
+         "reasons": [
+          {
+           "code": "uniqueNamed",
+           "params": {
+            "field": "sku"
+           }
+          }
+         ],
+         "options": [
+          true,
+          false
+         ]
+        }
+       },
+       {
+        "field": "name",
+        "include": true
+       },
+       {
+        "field": "price",
+        "include": true
+       },
+       {
+        "field": "categories",
+        "include": true,
+        "relation": {
+         "value": "join",
+         "status": "active",
+         "confidence": "high",
+         "reasons": [
+          {
+           "code": "bothSidesLists",
+           "params": {
+            "model": "Category",
+            "field": "products"
+           }
+          }
+         ],
+         "options": [
+          "child",
+          "join",
+          "json"
+         ]
+        }
+       },
+       {
+        "field": "attributes",
+        "include": true,
+        "relation": {
+         "value": "json",
+         "status": "active",
+         "confidence": "high",
+         "reasons": [
+          {
+           "code": "mapOfValues"
+          }
+         ],
+         "options": [
+          "json",
+          "child"
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "model": "Category",
+      "include": true,
+      "key": {
+       "value": {
+        "kind": "field",
+        "field": "id"
+       },
+       "status": "active",
+       "confidence": "high",
+       "reasons": [
+        {
+         "code": "keyNamed",
+         "params": {
+          "field": "id"
+         }
+        }
+       ],
+       "options": [
+        {
+         "kind": "field",
+         "field": "id"
+        },
+        {
+         "kind": "field",
+         "field": "name"
+        },
+        {
+         "kind": "surrogate",
+         "type": "integer"
+        },
+        {
+         "kind": "surrogate",
+         "type": "uuid"
+        }
+       ]
+      },
+      "fields": [
+       {
+        "field": "id",
+        "include": true
+       },
+       {
+        "field": "name",
+        "include": true
+       },
+       {
+        "field": "products",
+        "include": true,
+        "relation": {
+         "value": "join",
+         "status": "active",
+         "confidence": "high",
+         "reasons": [
+          {
+           "code": "bothSidesLists",
+           "params": {
+            "model": "Product",
+            "field": "categories"
+           }
+          }
+         ],
+         "options": [
+          "child",
+          "join",
+          "json"
+         ]
+        }
+       }
+      ]
+     }
+    ],
+    "enums": [
+     {
+      "enum": "OrderStatus",
+      "storage": {
+       "value": "check",
+       "status": "active",
+       "confidence": "high",
+       "reasons": [
+        {
+         "code": "enumCheck"
+        }
+       ],
+       "options": [
+        "check",
+        "native",
+        "lookup",
+        "text"
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "format": "model-schema",
+    "version": 1,
+    "origin": {
+     "format": "typescript",
+     "language": "typescript"
+    },
+    "models": [
+     {
+      "name": "Customer",
+      "kind": "interface",
+      "fields": [
+       {
+        "name": "id",
+        "type": {
+         "kind": "primitive",
+         "name": "float"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "number"
+       },
+       {
+        "name": "email",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "string"
+       },
+       {
+        "name": "fullName",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "string"
+       },
+       {
+        "name": "phone",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": true,
+        "originalType": "string"
+       },
+       {
+        "name": "shippingAddress",
+        "type": {
+         "kind": "model",
+         "name": "Address"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "Address"
+       },
+       {
+        "name": "createdAt",
+        "type": {
+         "kind": "primitive",
+         "name": "datetime"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "Date"
+       }
+      ],
+      "description": "An online shop: customers, orders, products and categories"
+     },
+     {
+      "name": "Address",
+      "kind": "interface",
+      "fields": [
+       {
+        "name": "street",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "string"
+       },
+       {
+        "name": "city",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "string"
+       },
+       {
+        "name": "postalCode",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "string"
+       },
+       {
+        "name": "country",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "string"
+       }
+      ]
+     },
+     {
+      "name": "Order",
+      "kind": "interface",
+      "fields": [
+       {
+        "name": "id",
+        "type": {
+         "kind": "primitive",
+         "name": "float"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "number"
+       },
+       {
+        "name": "customer",
+        "type": {
+         "kind": "model",
+         "name": "Customer"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "Customer"
+       },
+       {
+        "name": "status",
+        "type": {
+         "kind": "enum",
+         "name": "OrderStatus"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "OrderStatus"
+       },
+       {
+        "name": "lines",
+        "type": {
+         "kind": "array",
+         "items": {
+          "kind": "model",
+          "name": "OrderLine"
+         }
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "OrderLine[]"
+       },
+       {
+        "name": "couponCode",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": true,
+        "optional": false,
+        "originalType": "string | null"
+       },
+       {
+        "name": "tags",
+        "type": {
+         "kind": "array",
+         "items": {
+          "kind": "primitive",
+          "name": "string"
+         }
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "string[]"
+       },
+       {
+        "name": "placedAt",
+        "type": {
+         "kind": "primitive",
+         "name": "datetime"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "Date"
+       }
+      ]
+     },
+     {
+      "name": "OrderLine",
+      "kind": "interface",
+      "fields": [
+       {
+        "name": "product",
+        "type": {
+         "kind": "model",
+         "name": "Product"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "Product"
+       },
+       {
+        "name": "quantity",
+        "type": {
+         "kind": "primitive",
+         "name": "float"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "number"
+       },
+       {
+        "name": "unitPrice",
+        "type": {
+         "kind": "primitive",
+         "name": "float"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "number"
+       }
+      ]
+     },
+     {
+      "name": "Product",
+      "kind": "interface",
+      "fields": [
+       {
+        "name": "id",
+        "type": {
+         "kind": "primitive",
+         "name": "float"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "number"
+       },
+       {
+        "name": "sku",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "string"
+       },
+       {
+        "name": "name",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "string"
+       },
+       {
+        "name": "price",
+        "type": {
+         "kind": "primitive",
+         "name": "float"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "number"
+       },
+       {
+        "name": "categories",
+        "type": {
+         "kind": "array",
+         "items": {
+          "kind": "model",
+          "name": "Category"
+         }
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "Category[]"
+       },
+       {
+        "name": "attributes",
+        "type": {
+         "kind": "map",
+         "key": {
+          "kind": "primitive",
+          "name": "string"
+         },
+         "value": {
+          "kind": "primitive",
+          "name": "string"
+         }
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "Record<string, string>"
+       }
+      ]
+     },
+     {
+      "name": "Category",
+      "kind": "interface",
+      "fields": [
+       {
+        "name": "id",
+        "type": {
+         "kind": "primitive",
+         "name": "float"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "number"
+       },
+       {
+        "name": "name",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "string"
+       },
+       {
+        "name": "products",
+        "type": {
+         "kind": "array",
+         "items": {
+          "kind": "model",
+          "name": "Product"
+         }
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "Product[]"
+       }
+      ]
+     }
+    ],
+    "enums": [
+     {
+      "name": "OrderStatus",
+      "values": [
+       {
+        "name": "Draft",
+        "value": "draft"
+       },
+       {
+        "name": "Paid",
+        "value": "paid"
+       },
+       {
+        "name": "Shipped",
+        "value": "shipped"
+       },
+       {
+        "name": "Cancelled",
+        "value": "cancelled"
+       }
+      ]
+     }
+    ]
+   },
+   "relational"
+  ],
+  "result": {
+   "target": "relational",
+   "models": [
+    {
+     "model": "Customer",
+     "include": true,
+     "key": {
+      "value": {
+       "kind": "field",
+       "field": "id"
+      },
+      "status": "active",
+      "confidence": "high",
+      "reasons": [
+       {
+        "code": "keyNamed",
+        "params": {
+         "field": "id"
+        }
+       }
+      ],
+      "options": [
+       {
+        "kind": "field",
+        "field": "id"
+       },
+       {
+        "kind": "field",
+        "field": "email"
+       },
+       {
+        "kind": "field",
+        "field": "fullName"
+       },
+       {
+        "kind": "field",
+        "field": "phone"
+       },
+       {
+        "kind": "surrogate",
+        "type": "integer"
+       },
+       {
+        "kind": "surrogate",
+        "type": "uuid"
+       }
+      ]
+     },
+     "fields": [
+      {
+       "field": "id",
+       "include": true
+      },
+      {
+       "field": "email",
+       "include": true,
+       "unique": {
+        "value": true,
+        "status": "pending",
+        "confidence": "review",
+        "reasons": [
+         {
+          "code": "uniqueNamed",
+          "params": {
+           "field": "email"
+          }
+         }
+        ],
+        "options": [
+         true,
+         false
+        ]
+       }
+      },
+      {
+       "field": "fullName",
+       "include": true
+      },
+      {
+       "field": "phone",
+       "include": true
+      },
+      {
+       "field": "shippingAddress",
+       "include": true,
+       "relation": {
+        "value": "json",
+        "status": "active",
+        "confidence": "probable",
+        "reasons": [
+         {
+          "code": "valueObject",
+          "params": {
+           "model": "Address"
+          }
+         }
+        ],
+        "options": [
+         "reference",
+         "flatten",
+         "json"
+        ],
+        "manual": true
+       }
+      },
+      {
+       "field": "createdAt",
+       "include": true
+      }
+     ]
+    },
+    {
+     "model": "Address",
+     "include": true,
+     "key": {
+      "value": {
+       "kind": "surrogate",
+       "type": "integer"
+      },
+      "status": "active",
+      "confidence": "probable",
+      "reasons": [
+       {
+        "code": "keyMissing"
+       }
+      ],
+      "options": [
+       {
+        "kind": "field",
+        "field": "street"
+       },
+       {
+        "kind": "field",
+        "field": "city"
+       },
+       {
+        "kind": "field",
+        "field": "postalCode"
+       },
+       {
+        "kind": "field",
+        "field": "country"
+       },
+       {
+        "kind": "surrogate",
+        "type": "integer"
+       },
+       {
+        "kind": "surrogate",
+        "type": "uuid"
+       }
+      ]
+     },
+     "fields": [
+      {
+       "field": "street",
+       "include": true
+      },
+      {
+       "field": "city",
+       "include": true
+      },
+      {
+       "field": "postalCode",
+       "include": true
+      },
+      {
+       "field": "country",
+       "include": true
+      }
+     ]
+    },
+    {
+     "model": "Order",
+     "include": true,
+     "key": {
+      "value": {
+       "kind": "field",
+       "field": "id"
+      },
+      "status": "active",
+      "confidence": "high",
+      "reasons": [
+       {
+        "code": "keyNamed",
+        "params": {
+         "field": "id"
+        }
+       }
+      ],
+      "options": [
+       {
+        "kind": "field",
+        "field": "id"
+       },
+       {
+        "kind": "surrogate",
+        "type": "integer"
+       },
+       {
+        "kind": "surrogate",
+        "type": "uuid"
+       }
+      ]
+     },
+     "fields": [
+      {
+       "field": "id",
+       "include": true
+      },
+      {
+       "field": "customer",
+       "include": true,
+       "relation": {
+        "value": "reference",
+        "status": "active",
+        "confidence": "high",
+        "reasons": [
+         {
+          "code": "targetHasKey",
+          "params": {
+           "model": "Customer"
+          }
+         }
+        ],
+        "options": [
+         "reference",
+         "flatten",
+         "json"
+        ]
+       }
+      },
+      {
+       "field": "status",
+       "include": true
+      },
+      {
+       "field": "lines",
+       "include": true,
+       "relation": {
+        "value": "child",
+        "status": "active",
+        "confidence": "high",
+        "reasons": [
+         {
+          "code": "ownedList",
+          "params": {
+           "model": "OrderLine"
+          }
+         }
+        ],
+        "options": [
+         "child",
+         "join",
+         "json"
+        ]
+       }
+      },
+      {
+       "field": "couponCode",
+       "include": true
+      },
+      {
+       "field": "tags",
+       "include": true,
+       "relation": {
+        "value": "child",
+        "status": "active",
+        "confidence": "probable",
+        "reasons": [
+         {
+          "code": "primitiveList"
+         }
+        ],
+        "options": [
+         "child",
+         "array",
+         "json"
+        ]
+       }
+      },
+      {
+       "field": "placedAt",
+       "include": true
+      }
+     ]
+    },
+    {
+     "model": "OrderLine",
+     "include": true,
+     "key": {
+      "value": {
+       "kind": "surrogate",
+       "type": "integer"
+      },
+      "status": "active",
+      "confidence": "probable",
+      "reasons": [
+       {
+        "code": "keyMissing"
+       }
+      ],
+      "options": [
+       {
+        "kind": "field",
+        "field": "quantity"
+       },
+       {
+        "kind": "field",
+        "field": "unitPrice"
+       },
+       {
+        "kind": "surrogate",
+        "type": "integer"
+       },
+       {
+        "kind": "surrogate",
+        "type": "uuid"
+       }
+      ]
+     },
+     "fields": [
+      {
+       "field": "product",
+       "include": true,
+       "relation": {
+        "value": "reference",
+        "status": "active",
+        "confidence": "high",
+        "reasons": [
+         {
+          "code": "targetHasKey",
+          "params": {
+           "model": "Product"
+          }
+         }
+        ],
+        "options": [
+         "reference",
+         "json"
+        ]
+       }
+      },
+      {
+       "field": "quantity",
+       "include": true
+      },
+      {
+       "field": "unitPrice",
+       "include": true
+      }
+     ]
+    },
+    {
+     "model": "Product",
+     "include": true,
+     "key": {
+      "value": {
+       "kind": "field",
+       "field": "id"
+      },
+      "status": "active",
+      "confidence": "high",
+      "reasons": [
+       {
+        "code": "keyNamed",
+        "params": {
+         "field": "id"
+        }
+       }
+      ],
+      "options": [
+       {
+        "kind": "field",
+        "field": "id"
+       },
+       {
+        "kind": "field",
+        "field": "sku"
+       },
+       {
+        "kind": "field",
+        "field": "name"
+       },
+       {
+        "kind": "field",
+        "field": "price"
+       },
+       {
+        "kind": "surrogate",
+        "type": "integer"
+       },
+       {
+        "kind": "surrogate",
+        "type": "uuid"
+       }
+      ]
+     },
+     "fields": [
+      {
+       "field": "id",
+       "include": true
+      },
+      {
+       "field": "sku",
+       "include": true,
+       "unique": {
+        "value": true,
+        "status": "pending",
+        "confidence": "review",
+        "reasons": [
+         {
+          "code": "uniqueNamed",
+          "params": {
+           "field": "sku"
+          }
+         }
+        ],
+        "options": [
+         true,
+         false
+        ]
+       }
+      },
+      {
+       "field": "name",
+       "include": true
+      },
+      {
+       "field": "price",
+       "include": true
+      },
+      {
+       "field": "categories",
+       "include": true,
+       "relation": {
+        "value": "join",
+        "status": "active",
+        "confidence": "high",
+        "reasons": [
+         {
+          "code": "bothSidesLists",
+          "params": {
+           "model": "Category",
+           "field": "products"
+          }
+         }
+        ],
+        "options": [
+         "child",
+         "join",
+         "json"
+        ]
+       }
+      },
+      {
+       "field": "attributes",
+       "include": true,
+       "relation": {
+        "value": "json",
+        "status": "active",
+        "confidence": "high",
+        "reasons": [
+         {
+          "code": "mapOfValues"
+         }
+        ],
+        "options": [
+         "json",
+         "child"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "model": "Category",
+     "include": true,
+     "key": {
+      "value": {
+       "kind": "field",
+       "field": "id"
+      },
+      "status": "active",
+      "confidence": "high",
+      "reasons": [
+       {
+        "code": "keyNamed",
+        "params": {
+         "field": "id"
+        }
+       }
+      ],
+      "options": [
+       {
+        "kind": "field",
+        "field": "id"
+       },
+       {
+        "kind": "field",
+        "field": "name"
+       },
+       {
+        "kind": "surrogate",
+        "type": "integer"
+       },
+       {
+        "kind": "surrogate",
+        "type": "uuid"
+       }
+      ]
+     },
+     "fields": [
+      {
+       "field": "id",
+       "include": true
+      },
+      {
+       "field": "name",
+       "include": true
+      },
+      {
+       "field": "products",
+       "include": true,
+       "relation": {
+        "value": "join",
+        "status": "active",
+        "confidence": "high",
+        "reasons": [
+         {
+          "code": "bothSidesLists",
+          "params": {
+           "model": "Product",
+           "field": "categories"
+          }
+         }
+        ],
+        "options": [
+         "child",
+         "join",
+         "json"
+        ]
+       }
+      }
+     ]
+    }
+   ],
+   "enums": [
+    {
+     "enum": "OrderStatus",
+     "storage": {
+      "value": "check",
+      "status": "active",
+      "confidence": "high",
+      "reasons": [
+       {
+        "code": "enumCheck"
+       }
+      ],
+      "options": [
+       "check",
+       "native",
+       "lookup",
+       "text"
+      ]
+     }
+    }
+   ]
+  }
+ },
+ {
+  "args": [
+   {
+    "target": "document",
+    "models": [
+     {
+      "model": "Customer",
+      "include": true,
+      "key": {
+       "value": {
+        "kind": "field",
+        "field": "id"
+       },
+       "status": "active",
+       "confidence": "high",
+       "reasons": [
+        {
+         "code": "keyNamed",
+         "params": {
+          "field": "id"
+         }
+        }
+       ],
+       "options": [
+        {
+         "kind": "field",
+         "field": "id"
+        },
+        {
+         "kind": "field",
+         "field": "email"
+        },
+        {
+         "kind": "field",
+         "field": "fullName"
+        },
+        {
+         "kind": "field",
+         "field": "phone"
+        },
+        {
+         "kind": "surrogate",
+         "type": "objectId"
+        }
+       ]
+      },
+      "fields": [
+       {
+        "field": "id",
+        "include": true
+       },
+       {
+        "field": "email",
+        "include": true,
+        "unique": {
+         "value": true,
+         "status": "pending",
+         "confidence": "review",
+         "reasons": [
+          {
+           "code": "uniqueNamed",
+           "params": {
+            "field": "email"
+           }
+          }
+         ],
+         "options": [
+          true,
+          false
+         ]
+        }
+       },
+       {
+        "field": "fullName",
+        "include": true
+       },
+       {
+        "field": "phone",
+        "include": true
+       },
+       {
+        "field": "shippingAddress",
+        "include": true,
+        "relation": {
+         "value": "reference",
+         "status": "active",
+         "confidence": "high",
+         "reasons": [
+          {
+           "code": "valueObject",
+           "params": {
+            "model": "Address"
+           }
+          }
+         ],
+         "options": [
+          "embed",
+          "reference"
+         ],
+         "manual": true
+        }
+       },
+       {
+        "field": "createdAt",
+        "include": true
+       }
+      ]
+     },
+     {
+      "model": "Address",
+      "include": true,
+      "key": {
+       "value": {
+        "kind": "surrogate",
+        "type": "objectId"
+       },
+       "status": "active",
+       "confidence": "exact",
+       "reasons": [
+        {
+         "code": "keyMongo"
+        }
+       ],
+       "options": [
+        {
+         "kind": "field",
+         "field": "street"
+        },
+        {
+         "kind": "field",
+         "field": "city"
+        },
+        {
+         "kind": "field",
+         "field": "postalCode"
+        },
+        {
+         "kind": "field",
+         "field": "country"
+        },
+        {
+         "kind": "surrogate",
+         "type": "objectId"
+        }
+       ]
+      },
+      "fields": [
+       {
+        "field": "street",
+        "include": true
+       },
+       {
+        "field": "city",
+        "include": true
+       },
+       {
+        "field": "postalCode",
+        "include": true
+       },
+       {
+        "field": "country",
+        "include": true
+       }
+      ]
+     },
+     {
+      "model": "Order",
+      "include": true,
+      "key": {
+       "value": {
+        "kind": "field",
+        "field": "id"
+       },
+       "status": "active",
+       "confidence": "high",
+       "reasons": [
+        {
+         "code": "keyNamed",
+         "params": {
+          "field": "id"
+         }
+        }
+       ],
+       "options": [
+        {
+         "kind": "field",
+         "field": "id"
+        },
+        {
+         "kind": "surrogate",
+         "type": "objectId"
+        }
+       ]
+      },
+      "fields": [
+       {
+        "field": "id",
+        "include": true
+       },
+       {
+        "field": "customer",
+        "include": true,
+        "relation": {
+         "value": "embed",
+         "status": "active",
+         "confidence": "probable",
+         "reasons": [
+          {
+           "code": "ownedList",
+           "params": {
+            "model": "Customer"
+           }
+          }
+         ],
+         "options": [
+          "embed",
+          "reference"
+         ]
+        }
+       },
+       {
+        "field": "status",
+        "include": true
+       },
+       {
+        "field": "lines",
+        "include": true,
+        "relation": {
+         "value": "embed",
+         "status": "active",
+         "confidence": "high",
+         "reasons": [
+          {
+           "code": "valueObject",
+           "params": {
+            "model": "OrderLine"
+           }
+          }
+         ],
+         "options": [
+          "embed",
+          "reference"
+         ]
+        }
+       },
+       {
+        "field": "couponCode",
+        "include": true
+       },
+       {
+        "field": "tags",
+        "include": true,
+        "relation": {
+         "value": "embed",
+         "status": "active",
+         "confidence": "exact",
+         "reasons": [
+          {
+           "code": "primitiveList"
+          }
+         ],
+         "options": [
+          "embed"
+         ]
+        }
+       },
+       {
+        "field": "placedAt",
+        "include": true
+       }
+      ]
+     },
+     {
+      "model": "OrderLine",
+      "include": true,
+      "key": {
+       "value": {
+        "kind": "surrogate",
+        "type": "objectId"
+       },
+       "status": "active",
+       "confidence": "exact",
+       "reasons": [
+        {
+         "code": "keyMongo"
+        }
+       ],
+       "options": [
+        {
+         "kind": "field",
+         "field": "quantity"
+        },
+        {
+         "kind": "field",
+         "field": "unitPrice"
+        },
+        {
+         "kind": "surrogate",
+         "type": "objectId"
+        }
+       ]
+      },
+      "fields": [
+       {
+        "field": "product",
+        "include": true,
+        "relation": {
+         "value": "reference",
+         "status": "pending",
+         "confidence": "review",
+         "reasons": [
+          {
+           "code": "sharedTarget",
+           "params": {
+            "model": "Product",
+            "users": "Category"
+           }
+          }
+         ],
+         "options": [
+          "embed",
+          "reference"
+         ]
+        }
+       },
+       {
+        "field": "quantity",
+        "include": true
+       },
+       {
+        "field": "unitPrice",
+        "include": true
+       }
+      ]
+     },
+     {
+      "model": "Product",
+      "include": true,
+      "key": {
+       "value": {
+        "kind": "field",
+        "field": "id"
+       },
+       "status": "active",
+       "confidence": "high",
+       "reasons": [
+        {
+         "code": "keyNamed",
+         "params": {
+          "field": "id"
+         }
+        }
+       ],
+       "options": [
+        {
+         "kind": "field",
+         "field": "id"
+        },
+        {
+         "kind": "field",
+         "field": "sku"
+        },
+        {
+         "kind": "field",
+         "field": "name"
+        },
+        {
+         "kind": "field",
+         "field": "price"
+        },
+        {
+         "kind": "surrogate",
+         "type": "objectId"
+        }
+       ]
+      },
+      "fields": [
+       {
+        "field": "id",
+        "include": true
+       },
+       {
+        "field": "sku",
+        "include": true,
+        "unique": {
+         "value": true,
+         "status": "pending",
+         "confidence": "review",
+         "reasons": [
+          {
+           "code": "uniqueNamed",
+           "params": {
+            "field": "sku"
+           }
+          }
+         ],
+         "options": [
+          true,
+          false
+         ]
+        }
+       },
+       {
+        "field": "name",
+        "include": true
+       },
+       {
+        "field": "price",
+        "include": true
+       },
+       {
+        "field": "categories",
+        "include": true,
+        "relation": {
+         "value": "reference",
+         "status": "active",
+         "confidence": "high",
+         "reasons": [
+          {
+           "code": "recursiveEmbed",
+           "params": {
+            "model": "Category"
+           }
+          }
+         ],
+         "options": [
+          "embed",
+          "reference"
+         ]
+        }
+       },
+       {
+        "field": "attributes",
+        "include": true,
+        "relation": {
+         "value": "embed",
+         "status": "active",
+         "confidence": "exact",
+         "reasons": [
+          {
+           "code": "mapOfValues"
+          }
+         ],
+         "options": [
+          "embed"
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "model": "Category",
+      "include": true,
+      "key": {
+       "value": {
+        "kind": "field",
+        "field": "id"
+       },
+       "status": "active",
+       "confidence": "high",
+       "reasons": [
+        {
+         "code": "keyNamed",
+         "params": {
+          "field": "id"
+         }
+        }
+       ],
+       "options": [
+        {
+         "kind": "field",
+         "field": "id"
+        },
+        {
+         "kind": "field",
+         "field": "name"
+        },
+        {
+         "kind": "surrogate",
+         "type": "objectId"
+        }
+       ]
+      },
+      "fields": [
+       {
+        "field": "id",
+        "include": true
+       },
+       {
+        "field": "name",
+        "include": true
+       },
+       {
+        "field": "products",
+        "include": true,
+        "relation": {
+         "value": "reference",
+         "status": "active",
+         "confidence": "high",
+         "reasons": [
+          {
+           "code": "recursiveEmbed",
+           "params": {
+            "model": "Product"
+           }
+          }
+         ],
+         "options": [
+          "embed",
+          "reference"
+         ]
+        }
+       }
+      ]
+     }
+    ],
+    "enums": []
+   },
+   {
+    "format": "model-schema",
+    "version": 1,
+    "origin": {
+     "format": "typescript",
+     "language": "typescript"
+    },
+    "models": [
+     {
+      "name": "Customer",
+      "kind": "interface",
+      "fields": [
+       {
+        "name": "id",
+        "type": {
+         "kind": "primitive",
+         "name": "float"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "number"
+       },
+       {
+        "name": "email",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "string"
+       },
+       {
+        "name": "fullName",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "string"
+       },
+       {
+        "name": "phone",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": true,
+        "originalType": "string"
+       },
+       {
+        "name": "shippingAddress",
+        "type": {
+         "kind": "model",
+         "name": "Address"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "Address"
+       },
+       {
+        "name": "createdAt",
+        "type": {
+         "kind": "primitive",
+         "name": "datetime"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "Date"
+       }
+      ],
+      "description": "An online shop: customers, orders, products and categories"
+     },
+     {
+      "name": "Address",
+      "kind": "interface",
+      "fields": [
+       {
+        "name": "street",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "string"
+       },
+       {
+        "name": "city",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "string"
+       },
+       {
+        "name": "postalCode",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "string"
+       },
+       {
+        "name": "country",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "string"
+       }
+      ]
+     },
+     {
+      "name": "Order",
+      "kind": "interface",
+      "fields": [
+       {
+        "name": "id",
+        "type": {
+         "kind": "primitive",
+         "name": "float"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "number"
+       },
+       {
+        "name": "customer",
+        "type": {
+         "kind": "model",
+         "name": "Customer"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "Customer"
+       },
+       {
+        "name": "status",
+        "type": {
+         "kind": "enum",
+         "name": "OrderStatus"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "OrderStatus"
+       },
+       {
+        "name": "lines",
+        "type": {
+         "kind": "array",
+         "items": {
+          "kind": "model",
+          "name": "OrderLine"
+         }
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "OrderLine[]"
+       },
+       {
+        "name": "couponCode",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": true,
+        "optional": false,
+        "originalType": "string | null"
+       },
+       {
+        "name": "tags",
+        "type": {
+         "kind": "array",
+         "items": {
+          "kind": "primitive",
+          "name": "string"
+         }
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "string[]"
+       },
+       {
+        "name": "placedAt",
+        "type": {
+         "kind": "primitive",
+         "name": "datetime"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "Date"
+       }
+      ]
+     },
+     {
+      "name": "OrderLine",
+      "kind": "interface",
+      "fields": [
+       {
+        "name": "product",
+        "type": {
+         "kind": "model",
+         "name": "Product"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "Product"
+       },
+       {
+        "name": "quantity",
+        "type": {
+         "kind": "primitive",
+         "name": "float"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "number"
+       },
+       {
+        "name": "unitPrice",
+        "type": {
+         "kind": "primitive",
+         "name": "float"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "number"
+       }
+      ]
+     },
+     {
+      "name": "Product",
+      "kind": "interface",
+      "fields": [
+       {
+        "name": "id",
+        "type": {
+         "kind": "primitive",
+         "name": "float"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "number"
+       },
+       {
+        "name": "sku",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "string"
+       },
+       {
+        "name": "name",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "string"
+       },
+       {
+        "name": "price",
+        "type": {
+         "kind": "primitive",
+         "name": "float"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "number"
+       },
+       {
+        "name": "categories",
+        "type": {
+         "kind": "array",
+         "items": {
+          "kind": "model",
+          "name": "Category"
+         }
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "Category[]"
+       },
+       {
+        "name": "attributes",
+        "type": {
+         "kind": "map",
+         "key": {
+          "kind": "primitive",
+          "name": "string"
+         },
+         "value": {
+          "kind": "primitive",
+          "name": "string"
+         }
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "Record<string, string>"
+       }
+      ]
+     },
+     {
+      "name": "Category",
+      "kind": "interface",
+      "fields": [
+       {
+        "name": "id",
+        "type": {
+         "kind": "primitive",
+         "name": "float"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "number"
+       },
+       {
+        "name": "name",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "string"
+       },
+       {
+        "name": "products",
+        "type": {
+         "kind": "array",
+         "items": {
+          "kind": "model",
+          "name": "Product"
+         }
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "Product[]"
+       }
+      ]
+     }
+    ],
+    "enums": [
+     {
+      "name": "OrderStatus",
+      "values": [
+       {
+        "name": "Draft",
+        "value": "draft"
+       },
+       {
+        "name": "Paid",
+        "value": "paid"
+       },
+       {
+        "name": "Shipped",
+        "value": "shipped"
+       },
+       {
+        "name": "Cancelled",
+        "value": "cancelled"
+       }
+      ]
+     }
+    ]
+   },
+   "document"
+  ],
+  "result": {
+   "target": "document",
+   "models": [
+    {
+     "model": "Customer",
+     "include": true,
+     "key": {
+      "value": {
+       "kind": "field",
+       "field": "id"
+      },
+      "status": "active",
+      "confidence": "high",
+      "reasons": [
+       {
+        "code": "keyNamed",
+        "params": {
+         "field": "id"
+        }
+       }
+      ],
+      "options": [
+       {
+        "kind": "field",
+        "field": "id"
+       },
+       {
+        "kind": "field",
+        "field": "email"
+       },
+       {
+        "kind": "field",
+        "field": "fullName"
+       },
+       {
+        "kind": "field",
+        "field": "phone"
+       },
+       {
+        "kind": "surrogate",
+        "type": "objectId"
+       }
+      ]
+     },
+     "fields": [
+      {
+       "field": "id",
+       "include": true
+      },
+      {
+       "field": "email",
+       "include": true,
+       "unique": {
+        "value": true,
+        "status": "pending",
+        "confidence": "review",
+        "reasons": [
+         {
+          "code": "uniqueNamed",
+          "params": {
+           "field": "email"
+          }
+         }
+        ],
+        "options": [
+         true,
+         false
+        ]
+       }
+      },
+      {
+       "field": "fullName",
+       "include": true
+      },
+      {
+       "field": "phone",
+       "include": true
+      },
+      {
+       "field": "shippingAddress",
+       "include": true,
+       "relation": {
+        "value": "reference",
+        "status": "active",
+        "confidence": "high",
+        "reasons": [
+         {
+          "code": "valueObject",
+          "params": {
+           "model": "Address"
+          }
+         }
+        ],
+        "options": [
+         "embed",
+         "reference"
+        ],
+        "manual": true
+       }
+      },
+      {
+       "field": "createdAt",
+       "include": true
+      }
+     ]
+    },
+    {
+     "model": "Address",
+     "include": true,
+     "key": {
+      "value": {
+       "kind": "surrogate",
+       "type": "objectId"
+      },
+      "status": "active",
+      "confidence": "exact",
+      "reasons": [
+       {
+        "code": "keyMongo"
+       }
+      ],
+      "options": [
+       {
+        "kind": "field",
+        "field": "street"
+       },
+       {
+        "kind": "field",
+        "field": "city"
+       },
+       {
+        "kind": "field",
+        "field": "postalCode"
+       },
+       {
+        "kind": "field",
+        "field": "country"
+       },
+       {
+        "kind": "surrogate",
+        "type": "objectId"
+       }
+      ]
+     },
+     "fields": [
+      {
+       "field": "street",
+       "include": true
+      },
+      {
+       "field": "city",
+       "include": true
+      },
+      {
+       "field": "postalCode",
+       "include": true
+      },
+      {
+       "field": "country",
+       "include": true
+      }
+     ]
+    },
+    {
+     "model": "Order",
+     "include": true,
+     "key": {
+      "value": {
+       "kind": "field",
+       "field": "id"
+      },
+      "status": "active",
+      "confidence": "high",
+      "reasons": [
+       {
+        "code": "keyNamed",
+        "params": {
+         "field": "id"
+        }
+       }
+      ],
+      "options": [
+       {
+        "kind": "field",
+        "field": "id"
+       },
+       {
+        "kind": "surrogate",
+        "type": "objectId"
+       }
+      ]
+     },
+     "fields": [
+      {
+       "field": "id",
+       "include": true
+      },
+      {
+       "field": "customer",
+       "include": true,
+       "relation": {
+        "value": "embed",
+        "status": "active",
+        "confidence": "probable",
+        "reasons": [
+         {
+          "code": "ownedList",
+          "params": {
+           "model": "Customer"
+          }
+         }
+        ],
+        "options": [
+         "embed",
+         "reference"
+        ]
+       }
+      },
+      {
+       "field": "status",
+       "include": true
+      },
+      {
+       "field": "lines",
+       "include": true,
+       "relation": {
+        "value": "embed",
+        "status": "active",
+        "confidence": "high",
+        "reasons": [
+         {
+          "code": "valueObject",
+          "params": {
+           "model": "OrderLine"
+          }
+         }
+        ],
+        "options": [
+         "embed",
+         "reference"
+        ]
+       }
+      },
+      {
+       "field": "couponCode",
+       "include": true
+      },
+      {
+       "field": "tags",
+       "include": true,
+       "relation": {
+        "value": "embed",
+        "status": "active",
+        "confidence": "exact",
+        "reasons": [
+         {
+          "code": "primitiveList"
+         }
+        ],
+        "options": [
+         "embed"
+        ]
+       }
+      },
+      {
+       "field": "placedAt",
+       "include": true
+      }
+     ]
+    },
+    {
+     "model": "OrderLine",
+     "include": true,
+     "key": {
+      "value": {
+       "kind": "surrogate",
+       "type": "objectId"
+      },
+      "status": "active",
+      "confidence": "exact",
+      "reasons": [
+       {
+        "code": "keyMongo"
+       }
+      ],
+      "options": [
+       {
+        "kind": "field",
+        "field": "quantity"
+       },
+       {
+        "kind": "field",
+        "field": "unitPrice"
+       },
+       {
+        "kind": "surrogate",
+        "type": "objectId"
+       }
+      ]
+     },
+     "fields": [
+      {
+       "field": "product",
+       "include": true,
+       "relation": {
+        "value": "reference",
+        "status": "pending",
+        "confidence": "review",
+        "reasons": [
+         {
+          "code": "sharedTarget",
+          "params": {
+           "model": "Product",
+           "users": "Category"
+          }
+         }
+        ],
+        "options": [
+         "embed",
+         "reference"
+        ]
+       }
+      },
+      {
+       "field": "quantity",
+       "include": true
+      },
+      {
+       "field": "unitPrice",
+       "include": true
+      }
+     ]
+    },
+    {
+     "model": "Product",
+     "include": true,
+     "key": {
+      "value": {
+       "kind": "field",
+       "field": "id"
+      },
+      "status": "active",
+      "confidence": "high",
+      "reasons": [
+       {
+        "code": "keyNamed",
+        "params": {
+         "field": "id"
+        }
+       }
+      ],
+      "options": [
+       {
+        "kind": "field",
+        "field": "id"
+       },
+       {
+        "kind": "field",
+        "field": "sku"
+       },
+       {
+        "kind": "field",
+        "field": "name"
+       },
+       {
+        "kind": "field",
+        "field": "price"
+       },
+       {
+        "kind": "surrogate",
+        "type": "objectId"
+       }
+      ]
+     },
+     "fields": [
+      {
+       "field": "id",
+       "include": true
+      },
+      {
+       "field": "sku",
+       "include": true,
+       "unique": {
+        "value": true,
+        "status": "pending",
+        "confidence": "review",
+        "reasons": [
+         {
+          "code": "uniqueNamed",
+          "params": {
+           "field": "sku"
+          }
+         }
+        ],
+        "options": [
+         true,
+         false
+        ]
+       }
+      },
+      {
+       "field": "name",
+       "include": true
+      },
+      {
+       "field": "price",
+       "include": true
+      },
+      {
+       "field": "categories",
+       "include": true,
+       "relation": {
+        "value": "reference",
+        "status": "active",
+        "confidence": "high",
+        "reasons": [
+         {
+          "code": "recursiveEmbed",
+          "params": {
+           "model": "Category"
+          }
+         }
+        ],
+        "options": [
+         "embed",
+         "reference"
+        ]
+       }
+      },
+      {
+       "field": "attributes",
+       "include": true,
+       "relation": {
+        "value": "embed",
+        "status": "active",
+        "confidence": "exact",
+        "reasons": [
+         {
+          "code": "mapOfValues"
+         }
+        ],
+        "options": [
+         "embed"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "model": "Category",
+     "include": true,
+     "key": {
+      "value": {
+       "kind": "field",
+       "field": "id"
+      },
+      "status": "active",
+      "confidence": "high",
+      "reasons": [
+       {
+        "code": "keyNamed",
+        "params": {
+         "field": "id"
+        }
+       }
+      ],
+      "options": [
+       {
+        "kind": "field",
+        "field": "id"
+       },
+       {
+        "kind": "field",
+        "field": "name"
+       },
+       {
+        "kind": "surrogate",
+        "type": "objectId"
+       }
+      ]
+     },
+     "fields": [
+      {
+       "field": "id",
+       "include": true
+      },
+      {
+       "field": "name",
+       "include": true
+      },
+      {
+       "field": "products",
+       "include": true,
+       "relation": {
+        "value": "reference",
+        "status": "active",
+        "confidence": "high",
+        "reasons": [
+         {
+          "code": "recursiveEmbed",
+          "params": {
+           "model": "Product"
+          }
+         }
+        ],
+        "options": [
+         "embed",
+         "reference"
+        ]
+       }
+      }
+     ]
+    }
+   ],
+   "enums": []
+  }
+ },
+ {
+  "args": [
+   {
+    "target": "relational",
+    "models": [
+     {
+      "model": "Author",
+      "include": true,
+      "key": {
+       "value": {
+        "kind": "field",
+        "field": "id"
+       },
+       "status": "active",
+       "confidence": "exact",
+       "reasons": [
+        {
+         "code": "keyDeclared",
+         "params": {
+          "field": "id"
+         }
+        }
+       ],
+       "options": [
+        {
+         "kind": "field",
+         "field": "id"
+        },
+        {
+         "kind": "field",
+         "field": "name"
+        },
+        {
+         "kind": "field",
+         "field": "email"
+        },
+        {
+         "kind": "surrogate",
+         "type": "integer"
+        },
+        {
+         "kind": "surrogate",
+         "type": "uuid"
+        }
+       ]
+      },
+      "fields": [
+       {
+        "field": "id",
+        "include": true
+       },
+       {
+        "field": "name",
+        "include": true
+       },
+       {
+        "field": "email",
+        "include": true,
+        "unique": {
+         "value": true,
+         "status": "active",
+         "confidence": "exact",
+         "reasons": [
+          {
+           "code": "uniqueDeclared"
+          }
+         ],
+         "options": [
+          true,
+          false
+         ]
+        }
+       },
+       {
+        "field": "books",
+        "include": true,
+        "relation": {
+         "value": "json",
+         "status": "active",
+         "confidence": "exact",
+         "reasons": [
+          {
+           "code": "relationDeclared"
+          }
+         ],
+         "options": [
+          "child",
+          "join",
+          "json"
+         ],
+         "manual": true
+        }
+       }
+      ]
+     },
+     {
+      "model": "Book",
+      "include": true,
+      "key": {
+       "value": {
+        "kind": "field",
+        "field": "id"
+       },
+       "status": "active",
+       "confidence": "exact",
+       "reasons": [
+        {
+         "code": "keyDeclared",
+         "params": {
+          "field": "id"
+         }
+        }
+       ],
+       "options": [
+        {
+         "kind": "field",
+         "field": "id"
+        },
+        {
+         "kind": "field",
+         "field": "isbn"
+        },
+        {
+         "kind": "field",
+         "field": "title"
+        },
+        {
+         "kind": "surrogate",
+         "type": "integer"
+        },
+        {
+         "kind": "surrogate",
+         "type": "uuid"
+        }
+       ]
+      },
+      "fields": [
+       {
+        "field": "id",
+        "include": true
+       },
+       {
+        "field": "isbn",
+        "include": true,
+        "unique": {
+         "value": true,
+         "status": "active",
+         "confidence": "exact",
+         "reasons": [
+          {
+           "code": "uniqueDeclared"
+          }
+         ],
+         "options": [
+          true,
+          false
+         ]
+        }
+       },
+       {
+        "field": "title",
+        "include": true
+       },
+       {
+        "field": "author",
+        "include": true,
+        "relation": {
+         "value": "reference",
+         "status": "active",
+         "confidence": "exact",
+         "reasons": [
+          {
+           "code": "relationDeclared"
+          }
+         ],
+         "options": [
+          "reference",
+          "json"
+         ]
+        }
+       },
+       {
+        "field": "price",
+        "include": true
+       },
+       {
+        "field": "publishedOn",
+        "include": true
+       },
+       {
+        "field": "genre",
+        "include": true
+       },
+       {
+        "field": "shelf",
+        "include": true,
+        "relation": {
+         "value": "flatten",
+         "status": "active",
+         "confidence": "exact",
+         "reasons": [
+          {
+           "code": "relationDeclared"
+          }
+         ],
+         "options": [
+          "reference",
+          "flatten",
+          "json"
+         ]
+        }
+       },
+       {
+        "field": "tags",
+        "include": true,
+        "relation": {
+         "value": "join",
+         "status": "active",
+         "confidence": "exact",
+         "reasons": [
+          {
+           "code": "relationDeclared"
+          }
+         ],
+         "options": [
+          "child",
+          "join",
+          "json"
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "model": "Shelf",
+      "include": true,
+      "key": {
+       "value": {
+        "kind": "surrogate",
+        "type": "integer"
+       },
+       "status": "active",
+       "confidence": "probable",
+       "reasons": [
+        {
+         "code": "keyMissing"
+        }
+       ],
+       "options": [
+        {
+         "kind": "field",
+         "field": "room"
+        },
+        {
+         "kind": "surrogate",
+         "type": "integer"
+        },
+        {
+         "kind": "surrogate",
+         "type": "uuid"
+        }
+       ]
+      },
+      "fields": [
+       {
+        "field": "room",
+        "include": true
+       },
+       {
+        "field": "row",
+        "include": true
+       }
+      ]
+     },
+     {
+      "model": "Tag",
+      "include": true,
+      "key": {
+       "value": {
+        "kind": "field",
+        "field": "code"
+       },
+       "status": "active",
+       "confidence": "exact",
+       "reasons": [
+        {
+         "code": "keyDeclared",
+         "params": {
+          "field": "code"
+         }
+        }
+       ],
+       "options": [
+        {
+         "kind": "field",
+         "field": "code"
+        },
+        {
+         "kind": "field",
+         "field": "label"
+        },
+        {
+         "kind": "surrogate",
+         "type": "integer"
+        },
+        {
+         "kind": "surrogate",
+         "type": "uuid"
+        }
+       ]
+      },
+      "fields": [
+       {
+        "field": "code",
+        "include": true
+       },
+       {
+        "field": "label",
+        "include": true
+       }
+      ]
+     }
+    ],
+    "enums": [
+     {
+      "enum": "Genre",
+      "storage": {
+       "value": "check",
+       "status": "active",
+       "confidence": "high",
+       "reasons": [
+        {
+         "code": "enumCheck"
+        }
+       ],
+       "options": [
+        "check",
+        "native",
+        "lookup",
+        "text"
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "format": "model-schema",
+    "version": 1,
+    "origin": {
+     "format": "java",
+     "language": "java",
+     "framework": "jpa"
+    },
+    "models": [
+     {
+      "name": "Author",
+      "kind": "entity",
+      "fields": [
+       {
+        "name": "id",
+        "type": {
+         "kind": "primitive",
+         "name": "integer",
+         "bits": 64
+        },
+        "nullable": true,
+        "optional": false,
+        "originalType": "Long",
+        "annotations": [
+         {
+          "name": "Id"
+         },
+         {
+          "name": "GeneratedValue"
+         }
+        ],
+        "generated": true
+       },
+       {
+        "name": "name",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "String",
+        "annotations": [
+         {
+          "name": "Column",
+          "args": "nullable = false, length = 120"
+         }
+        ]
+       },
+       {
+        "name": "email",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "String",
+        "annotations": [
+         {
+          "name": "Column",
+          "args": "unique = true"
+         }
+        ]
+       },
+       {
+        "name": "books",
+        "type": {
+         "kind": "array",
+         "items": {
+          "kind": "model",
+          "name": "Book"
+         }
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "List<Book>",
+        "annotations": [
+         {
+          "name": "OneToMany",
+          "args": "mappedBy = \"author\""
+         }
+        ]
+       }
+      ],
+      "namespace": "com.example.library",
+      "framework": "jpa",
+      "construction": "properties",
+      "annotations": [
+       {
+        "name": "Entity"
+       }
+      ],
+      "metadata": {
+       "accessors": "getters"
+      }
+     },
+     {
+      "name": "Book",
+      "kind": "entity",
+      "fields": [
+       {
+        "name": "id",
+        "type": {
+         "kind": "primitive",
+         "name": "integer",
+         "bits": 64
+        },
+        "nullable": true,
+        "optional": false,
+        "originalType": "Long",
+        "annotations": [
+         {
+          "name": "Id"
+         },
+         {
+          "name": "GeneratedValue"
+         }
+        ],
+        "generated": true
+       },
+       {
+        "name": "isbn",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "String",
+        "annotations": [
+         {
+          "name": "Column",
+          "args": "nullable = false, unique = true, length = 13"
+         }
+        ]
+       },
+       {
+        "name": "title",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "String",
+        "annotations": [
+         {
+          "name": "Column",
+          "args": "nullable = false"
+         }
+        ]
+       },
+       {
+        "name": "author",
+        "type": {
+         "kind": "model",
+         "name": "Author"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "Author",
+        "annotations": [
+         {
+          "name": "ManyToOne"
+         }
+        ]
+       },
+       {
+        "name": "price",
+        "type": {
+         "kind": "primitive",
+         "name": "decimal"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "BigDecimal",
+        "annotations": [
+         {
+          "name": "Column",
+          "args": "precision = 8, scale = 2"
+         }
+        ]
+       },
+       {
+        "name": "publishedOn",
+        "type": {
+         "kind": "primitive",
+         "name": "date"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "LocalDate"
+       },
+       {
+        "name": "genre",
+        "type": {
+         "kind": "enum",
+         "name": "Genre"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "Genre",
+        "annotations": [
+         {
+          "name": "Enumerated",
+          "args": "EnumType.STRING"
+         }
+        ]
+       },
+       {
+        "name": "shelf",
+        "type": {
+         "kind": "model",
+         "name": "Shelf"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "Shelf",
+        "annotations": [
+         {
+          "name": "Embedded"
+         }
+        ]
+       },
+       {
+        "name": "tags",
+        "type": {
+         "kind": "array",
+         "items": {
+          "kind": "model",
+          "name": "Tag"
+         }
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "List<Tag>",
+        "annotations": [
+         {
+          "name": "ManyToMany"
+         }
+        ]
+       }
+      ],
+      "namespace": "com.example.library",
+      "framework": "jpa",
+      "construction": "properties",
+      "annotations": [
+       {
+        "name": "Entity"
+       }
+      ],
+      "metadata": {
+       "accessors": "getters"
+      }
+     },
+     {
+      "name": "Shelf",
+      "kind": "entity",
+      "fields": [
+       {
+        "name": "room",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "String"
+       },
+       {
+        "name": "row",
+        "type": {
+         "kind": "primitive",
+         "name": "integer",
+         "bits": 32
+        },
+        "nullable": true,
+        "optional": false,
+        "originalType": "Integer"
+       }
+      ],
+      "namespace": "com.example.library",
+      "framework": "jpa",
+      "construction": "properties",
+      "annotations": [
+       {
+        "name": "Embeddable"
+       }
+      ],
+      "metadata": {
+       "accessors": "getters"
+      }
+     },
+     {
+      "name": "Tag",
+      "kind": "entity",
+      "fields": [
+       {
+        "name": "code",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "String",
+        "annotations": [
+         {
+          "name": "Id"
+         }
+        ]
+       },
+       {
+        "name": "label",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "String"
+       }
+      ],
+      "namespace": "com.example.library",
+      "framework": "jpa",
+      "construction": "properties",
+      "annotations": [
+       {
+        "name": "Entity"
+       }
+      ],
+      "metadata": {
+       "accessors": "getters"
+      }
+     }
+    ],
+    "enums": [
+     {
+      "name": "Genre",
+      "values": [
+       {
+        "name": "FICTION"
+       },
+       {
+        "name": "ESSAY"
+       },
+       {
+        "name": "POETRY"
+       },
+       {
+        "name": "SCIENCE"
+       }
+      ],
+      "namespace": "com.example.library"
+     }
+    ]
+   },
+   "relational"
+  ],
+  "result": {
+   "target": "relational",
+   "models": [
+    {
+     "model": "Author",
+     "include": true,
+     "key": {
+      "value": {
+       "kind": "field",
+       "field": "id"
+      },
+      "status": "active",
+      "confidence": "exact",
+      "reasons": [
+       {
+        "code": "keyDeclared",
+        "params": {
+         "field": "id"
+        }
+       }
+      ],
+      "options": [
+       {
+        "kind": "field",
+        "field": "id"
+       },
+       {
+        "kind": "field",
+        "field": "name"
+       },
+       {
+        "kind": "field",
+        "field": "email"
+       },
+       {
+        "kind": "surrogate",
+        "type": "integer"
+       },
+       {
+        "kind": "surrogate",
+        "type": "uuid"
+       }
+      ]
+     },
+     "fields": [
+      {
+       "field": "id",
+       "include": true
+      },
+      {
+       "field": "name",
+       "include": true
+      },
+      {
+       "field": "email",
+       "include": true,
+       "unique": {
+        "value": true,
+        "status": "active",
+        "confidence": "exact",
+        "reasons": [
+         {
+          "code": "uniqueDeclared"
+         }
+        ],
+        "options": [
+         true,
+         false
+        ]
+       }
+      },
+      {
+       "field": "books",
+       "include": true,
+       "relation": {
+        "value": "json",
+        "status": "active",
+        "confidence": "exact",
+        "reasons": [
+         {
+          "code": "relationDeclared"
+         }
+        ],
+        "options": [
+         "child",
+         "join",
+         "json"
+        ],
+        "manual": true
+       }
+      }
+     ]
+    },
+    {
+     "model": "Book",
+     "include": true,
+     "key": {
+      "value": {
+       "kind": "field",
+       "field": "id"
+      },
+      "status": "active",
+      "confidence": "exact",
+      "reasons": [
+       {
+        "code": "keyDeclared",
+        "params": {
+         "field": "id"
+        }
+       }
+      ],
+      "options": [
+       {
+        "kind": "field",
+        "field": "id"
+       },
+       {
+        "kind": "field",
+        "field": "isbn"
+       },
+       {
+        "kind": "field",
+        "field": "title"
+       },
+       {
+        "kind": "surrogate",
+        "type": "integer"
+       },
+       {
+        "kind": "surrogate",
+        "type": "uuid"
+       }
+      ]
+     },
+     "fields": [
+      {
+       "field": "id",
+       "include": true
+      },
+      {
+       "field": "isbn",
+       "include": true,
+       "unique": {
+        "value": true,
+        "status": "active",
+        "confidence": "exact",
+        "reasons": [
+         {
+          "code": "uniqueDeclared"
+         }
+        ],
+        "options": [
+         true,
+         false
+        ]
+       }
+      },
+      {
+       "field": "title",
+       "include": true
+      },
+      {
+       "field": "author",
+       "include": true,
+       "relation": {
+        "value": "reference",
+        "status": "active",
+        "confidence": "exact",
+        "reasons": [
+         {
+          "code": "relationDeclared"
+         }
+        ],
+        "options": [
+         "reference",
+         "json"
+        ]
+       }
+      },
+      {
+       "field": "price",
+       "include": true
+      },
+      {
+       "field": "publishedOn",
+       "include": true
+      },
+      {
+       "field": "genre",
+       "include": true
+      },
+      {
+       "field": "shelf",
+       "include": true,
+       "relation": {
+        "value": "flatten",
+        "status": "active",
+        "confidence": "exact",
+        "reasons": [
+         {
+          "code": "relationDeclared"
+         }
+        ],
+        "options": [
+         "reference",
+         "flatten",
+         "json"
+        ]
+       }
+      },
+      {
+       "field": "tags",
+       "include": true,
+       "relation": {
+        "value": "join",
+        "status": "active",
+        "confidence": "exact",
+        "reasons": [
+         {
+          "code": "relationDeclared"
+         }
+        ],
+        "options": [
+         "child",
+         "join",
+         "json"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "model": "Shelf",
+     "include": true,
+     "key": {
+      "value": {
+       "kind": "surrogate",
+       "type": "integer"
+      },
+      "status": "active",
+      "confidence": "probable",
+      "reasons": [
+       {
+        "code": "keyMissing"
+       }
+      ],
+      "options": [
+       {
+        "kind": "field",
+        "field": "room"
+       },
+       {
+        "kind": "surrogate",
+        "type": "integer"
+       },
+       {
+        "kind": "surrogate",
+        "type": "uuid"
+       }
+      ]
+     },
+     "fields": [
+      {
+       "field": "room",
+       "include": true
+      },
+      {
+       "field": "row",
+       "include": true
+      }
+     ]
+    },
+    {
+     "model": "Tag",
+     "include": true,
+     "key": {
+      "value": {
+       "kind": "field",
+       "field": "code"
+      },
+      "status": "active",
+      "confidence": "exact",
+      "reasons": [
+       {
+        "code": "keyDeclared",
+        "params": {
+         "field": "code"
+        }
+       }
+      ],
+      "options": [
+       {
+        "kind": "field",
+        "field": "code"
+       },
+       {
+        "kind": "field",
+        "field": "label"
+       },
+       {
+        "kind": "surrogate",
+        "type": "integer"
+       },
+       {
+        "kind": "surrogate",
+        "type": "uuid"
+       }
+      ]
+     },
+     "fields": [
+      {
+       "field": "code",
+       "include": true
+      },
+      {
+       "field": "label",
+       "include": true
+      }
+     ]
+    }
+   ],
+   "enums": [
+    {
+     "enum": "Genre",
+     "storage": {
+      "value": "check",
+      "status": "active",
+      "confidence": "high",
+      "reasons": [
+       {
+        "code": "enumCheck"
+       }
+      ],
+      "options": [
+       "check",
+       "native",
+       "lookup",
+       "text"
+      ]
+     }
+    }
+   ]
+  }
+ },
+ {
+  "args": [
+   {
+    "target": "document",
+    "models": [
+     {
+      "model": "Author",
+      "include": true,
+      "key": {
+       "value": {
+        "kind": "field",
+        "field": "id"
+       },
+       "status": "active",
+       "confidence": "exact",
+       "reasons": [
+        {
+         "code": "keyDeclared",
+         "params": {
+          "field": "id"
+         }
+        }
+       ],
+       "options": [
+        {
+         "kind": "field",
+         "field": "id"
+        },
+        {
+         "kind": "field",
+         "field": "name"
+        },
+        {
+         "kind": "field",
+         "field": "email"
+        },
+        {
+         "kind": "surrogate",
+         "type": "objectId"
+        }
+       ]
+      },
+      "fields": [
+       {
+        "field": "id",
+        "include": true
+       },
+       {
+        "field": "name",
+        "include": true
+       },
+       {
+        "field": "email",
+        "include": true,
+        "unique": {
+         "value": true,
+         "status": "active",
+         "confidence": "exact",
+         "reasons": [
+          {
+           "code": "uniqueDeclared"
+          }
+         ],
+         "options": [
+          true,
+          false
+         ]
+        }
+       },
+       {
+        "field": "books",
+        "include": true,
+        "relation": {
+         "value": "reference",
+         "status": "active",
+         "confidence": "high",
+         "reasons": [
+          {
+           "code": "recursiveEmbed",
+           "params": {
+            "model": "Book"
+           }
+          }
+         ],
+         "options": [
+          "embed",
+          "reference"
+         ],
+         "manual": true
+        }
+       }
+      ]
+     },
+     {
+      "model": "Book",
+      "include": true,
+      "key": {
+       "value": {
+        "kind": "field",
+        "field": "id"
+       },
+       "status": "active",
+       "confidence": "exact",
+       "reasons": [
+        {
+         "code": "keyDeclared",
+         "params": {
+          "field": "id"
+         }
+        }
+       ],
+       "options": [
+        {
+         "kind": "field",
+         "field": "id"
+        },
+        {
+         "kind": "field",
+         "field": "isbn"
+        },
+        {
+         "kind": "field",
+         "field": "title"
+        },
+        {
+         "kind": "surrogate",
+         "type": "objectId"
+        }
+       ]
+      },
+      "fields": [
+       {
+        "field": "id",
+        "include": true
+       },
+       {
+        "field": "isbn",
+        "include": true,
+        "unique": {
+         "value": true,
+         "status": "active",
+         "confidence": "exact",
+         "reasons": [
+          {
+           "code": "uniqueDeclared"
+          }
+         ],
+         "options": [
+          true,
+          false
+         ]
+        }
+       },
+       {
+        "field": "title",
+        "include": true
+       },
+       {
+        "field": "author",
+        "include": true,
+        "relation": {
+         "value": "reference",
+         "status": "active",
+         "confidence": "high",
+         "reasons": [
+          {
+           "code": "recursiveEmbed",
+           "params": {
+            "model": "Author"
+           }
+          }
+         ],
+         "options": [
+          "embed",
+          "reference"
+         ]
+        }
+       },
+       {
+        "field": "price",
+        "include": true
+       },
+       {
+        "field": "publishedOn",
+        "include": true
+       },
+       {
+        "field": "genre",
+        "include": true
+       },
+       {
+        "field": "shelf",
+        "include": true,
+        "relation": {
+         "value": "embed",
+         "status": "active",
+         "confidence": "exact",
+         "reasons": [
+          {
+           "code": "relationDeclared"
+          }
+         ],
+         "options": [
+          "embed",
+          "reference"
+         ]
+        }
+       },
+       {
+        "field": "tags",
+        "include": true,
+        "relation": {
+         "value": "embed",
+         "status": "active",
+         "confidence": "probable",
+         "reasons": [
+          {
+           "code": "unboundedList",
+           "params": {
+            "model": "Tag"
+           }
+          }
+         ],
+         "options": [
+          "embed",
+          "reference"
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "model": "Shelf",
+      "include": true,
+      "key": {
+       "value": {
+        "kind": "surrogate",
+        "type": "objectId"
+       },
+       "status": "active",
+       "confidence": "exact",
+       "reasons": [
+        {
+         "code": "keyMongo"
+        }
+       ],
+       "options": [
+        {
+         "kind": "field",
+         "field": "room"
+        },
+        {
+         "kind": "surrogate",
+         "type": "objectId"
+        }
+       ]
+      },
+      "fields": [
+       {
+        "field": "room",
+        "include": true
+       },
+       {
+        "field": "row",
+        "include": true
+       }
+      ]
+     },
+     {
+      "model": "Tag",
+      "include": true,
+      "key": {
+       "value": {
+        "kind": "field",
+        "field": "code"
+       },
+       "status": "active",
+       "confidence": "exact",
+       "reasons": [
+        {
+         "code": "keyDeclared",
+         "params": {
+          "field": "code"
+         }
+        }
+       ],
+       "options": [
+        {
+         "kind": "field",
+         "field": "code"
+        },
+        {
+         "kind": "field",
+         "field": "label"
+        },
+        {
+         "kind": "surrogate",
+         "type": "objectId"
+        }
+       ]
+      },
+      "fields": [
+       {
+        "field": "code",
+        "include": true
+       },
+       {
+        "field": "label",
+        "include": true
+       }
+      ]
+     }
+    ],
+    "enums": []
+   },
+   {
+    "format": "model-schema",
+    "version": 1,
+    "origin": {
+     "format": "java",
+     "language": "java",
+     "framework": "jpa"
+    },
+    "models": [
+     {
+      "name": "Author",
+      "kind": "entity",
+      "fields": [
+       {
+        "name": "id",
+        "type": {
+         "kind": "primitive",
+         "name": "integer",
+         "bits": 64
+        },
+        "nullable": true,
+        "optional": false,
+        "originalType": "Long",
+        "annotations": [
+         {
+          "name": "Id"
+         },
+         {
+          "name": "GeneratedValue"
+         }
+        ],
+        "generated": true
+       },
+       {
+        "name": "name",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "String",
+        "annotations": [
+         {
+          "name": "Column",
+          "args": "nullable = false, length = 120"
+         }
+        ]
+       },
+       {
+        "name": "email",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "String",
+        "annotations": [
+         {
+          "name": "Column",
+          "args": "unique = true"
+         }
+        ]
+       },
+       {
+        "name": "books",
+        "type": {
+         "kind": "array",
+         "items": {
+          "kind": "model",
+          "name": "Book"
+         }
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "List<Book>",
+        "annotations": [
+         {
+          "name": "OneToMany",
+          "args": "mappedBy = \"author\""
+         }
+        ]
+       }
+      ],
+      "namespace": "com.example.library",
+      "framework": "jpa",
+      "construction": "properties",
+      "annotations": [
+       {
+        "name": "Entity"
+       }
+      ],
+      "metadata": {
+       "accessors": "getters"
+      }
+     },
+     {
+      "name": "Book",
+      "kind": "entity",
+      "fields": [
+       {
+        "name": "id",
+        "type": {
+         "kind": "primitive",
+         "name": "integer",
+         "bits": 64
+        },
+        "nullable": true,
+        "optional": false,
+        "originalType": "Long",
+        "annotations": [
+         {
+          "name": "Id"
+         },
+         {
+          "name": "GeneratedValue"
+         }
+        ],
+        "generated": true
+       },
+       {
+        "name": "isbn",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "String",
+        "annotations": [
+         {
+          "name": "Column",
+          "args": "nullable = false, unique = true, length = 13"
+         }
+        ]
+       },
+       {
+        "name": "title",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "String",
+        "annotations": [
+         {
+          "name": "Column",
+          "args": "nullable = false"
+         }
+        ]
+       },
+       {
+        "name": "author",
+        "type": {
+         "kind": "model",
+         "name": "Author"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "Author",
+        "annotations": [
+         {
+          "name": "ManyToOne"
+         }
+        ]
+       },
+       {
+        "name": "price",
+        "type": {
+         "kind": "primitive",
+         "name": "decimal"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "BigDecimal",
+        "annotations": [
+         {
+          "name": "Column",
+          "args": "precision = 8, scale = 2"
+         }
+        ]
+       },
+       {
+        "name": "publishedOn",
+        "type": {
+         "kind": "primitive",
+         "name": "date"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "LocalDate"
+       },
+       {
+        "name": "genre",
+        "type": {
+         "kind": "enum",
+         "name": "Genre"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "Genre",
+        "annotations": [
+         {
+          "name": "Enumerated",
+          "args": "EnumType.STRING"
+         }
+        ]
+       },
+       {
+        "name": "shelf",
+        "type": {
+         "kind": "model",
+         "name": "Shelf"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "Shelf",
+        "annotations": [
+         {
+          "name": "Embedded"
+         }
+        ]
+       },
+       {
+        "name": "tags",
+        "type": {
+         "kind": "array",
+         "items": {
+          "kind": "model",
+          "name": "Tag"
+         }
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "List<Tag>",
+        "annotations": [
+         {
+          "name": "ManyToMany"
+         }
+        ]
+       }
+      ],
+      "namespace": "com.example.library",
+      "framework": "jpa",
+      "construction": "properties",
+      "annotations": [
+       {
+        "name": "Entity"
+       }
+      ],
+      "metadata": {
+       "accessors": "getters"
+      }
+     },
+     {
+      "name": "Shelf",
+      "kind": "entity",
+      "fields": [
+       {
+        "name": "room",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "String"
+       },
+       {
+        "name": "row",
+        "type": {
+         "kind": "primitive",
+         "name": "integer",
+         "bits": 32
+        },
+        "nullable": true,
+        "optional": false,
+        "originalType": "Integer"
+       }
+      ],
+      "namespace": "com.example.library",
+      "framework": "jpa",
+      "construction": "properties",
+      "annotations": [
+       {
+        "name": "Embeddable"
+       }
+      ],
+      "metadata": {
+       "accessors": "getters"
+      }
+     },
+     {
+      "name": "Tag",
+      "kind": "entity",
+      "fields": [
+       {
+        "name": "code",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "String",
+        "annotations": [
+         {
+          "name": "Id"
+         }
+        ]
+       },
+       {
+        "name": "label",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "String"
+       }
+      ],
+      "namespace": "com.example.library",
+      "framework": "jpa",
+      "construction": "properties",
+      "annotations": [
+       {
+        "name": "Entity"
+       }
+      ],
+      "metadata": {
+       "accessors": "getters"
+      }
+     }
+    ],
+    "enums": [
+     {
+      "name": "Genre",
+      "values": [
+       {
+        "name": "FICTION"
+       },
+       {
+        "name": "ESSAY"
+       },
+       {
+        "name": "POETRY"
+       },
+       {
+        "name": "SCIENCE"
+       }
+      ],
+      "namespace": "com.example.library"
+     }
+    ]
+   },
+   "document"
+  ],
+  "result": {
+   "target": "document",
+   "models": [
+    {
+     "model": "Author",
+     "include": true,
+     "key": {
+      "value": {
+       "kind": "field",
+       "field": "id"
+      },
+      "status": "active",
+      "confidence": "exact",
+      "reasons": [
+       {
+        "code": "keyDeclared",
+        "params": {
+         "field": "id"
+        }
+       }
+      ],
+      "options": [
+       {
+        "kind": "field",
+        "field": "id"
+       },
+       {
+        "kind": "field",
+        "field": "name"
+       },
+       {
+        "kind": "field",
+        "field": "email"
+       },
+       {
+        "kind": "surrogate",
+        "type": "objectId"
+       }
+      ]
+     },
+     "fields": [
+      {
+       "field": "id",
+       "include": true
+      },
+      {
+       "field": "name",
+       "include": true
+      },
+      {
+       "field": "email",
+       "include": true,
+       "unique": {
+        "value": true,
+        "status": "active",
+        "confidence": "exact",
+        "reasons": [
+         {
+          "code": "uniqueDeclared"
+         }
+        ],
+        "options": [
+         true,
+         false
+        ]
+       }
+      },
+      {
+       "field": "books",
+       "include": true,
+       "relation": {
+        "value": "reference",
+        "status": "active",
+        "confidence": "high",
+        "reasons": [
+         {
+          "code": "recursiveEmbed",
+          "params": {
+           "model": "Book"
+          }
+         }
+        ],
+        "options": [
+         "embed",
+         "reference"
+        ],
+        "manual": true
+       }
+      }
+     ]
+    },
+    {
+     "model": "Book",
+     "include": true,
+     "key": {
+      "value": {
+       "kind": "field",
+       "field": "id"
+      },
+      "status": "active",
+      "confidence": "exact",
+      "reasons": [
+       {
+        "code": "keyDeclared",
+        "params": {
+         "field": "id"
+        }
+       }
+      ],
+      "options": [
+       {
+        "kind": "field",
+        "field": "id"
+       },
+       {
+        "kind": "field",
+        "field": "isbn"
+       },
+       {
+        "kind": "field",
+        "field": "title"
+       },
+       {
+        "kind": "surrogate",
+        "type": "objectId"
+       }
+      ]
+     },
+     "fields": [
+      {
+       "field": "id",
+       "include": true
+      },
+      {
+       "field": "isbn",
+       "include": true,
+       "unique": {
+        "value": true,
+        "status": "active",
+        "confidence": "exact",
+        "reasons": [
+         {
+          "code": "uniqueDeclared"
+         }
+        ],
+        "options": [
+         true,
+         false
+        ]
+       }
+      },
+      {
+       "field": "title",
+       "include": true
+      },
+      {
+       "field": "author",
+       "include": true,
+       "relation": {
+        "value": "reference",
+        "status": "active",
+        "confidence": "high",
+        "reasons": [
+         {
+          "code": "recursiveEmbed",
+          "params": {
+           "model": "Author"
+          }
+         }
+        ],
+        "options": [
+         "embed",
+         "reference"
+        ]
+       }
+      },
+      {
+       "field": "price",
+       "include": true
+      },
+      {
+       "field": "publishedOn",
+       "include": true
+      },
+      {
+       "field": "genre",
+       "include": true
+      },
+      {
+       "field": "shelf",
+       "include": true,
+       "relation": {
+        "value": "embed",
+        "status": "active",
+        "confidence": "exact",
+        "reasons": [
+         {
+          "code": "relationDeclared"
+         }
+        ],
+        "options": [
+         "embed",
+         "reference"
+        ]
+       }
+      },
+      {
+       "field": "tags",
+       "include": true,
+       "relation": {
+        "value": "embed",
+        "status": "active",
+        "confidence": "probable",
+        "reasons": [
+         {
+          "code": "unboundedList",
+          "params": {
+           "model": "Tag"
+          }
+         }
+        ],
+        "options": [
+         "embed",
+         "reference"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "model": "Shelf",
+     "include": true,
+     "key": {
+      "value": {
+       "kind": "surrogate",
+       "type": "objectId"
+      },
+      "status": "active",
+      "confidence": "exact",
+      "reasons": [
+       {
+        "code": "keyMongo"
+       }
+      ],
+      "options": [
+       {
+        "kind": "field",
+        "field": "room"
+       },
+       {
+        "kind": "surrogate",
+        "type": "objectId"
+       }
+      ]
+     },
+     "fields": [
+      {
+       "field": "room",
+       "include": true
+      },
+      {
+       "field": "row",
+       "include": true
+      }
+     ]
+    },
+    {
+     "model": "Tag",
+     "include": true,
+     "key": {
+      "value": {
+       "kind": "field",
+       "field": "code"
+      },
+      "status": "active",
+      "confidence": "exact",
+      "reasons": [
+       {
+        "code": "keyDeclared",
+        "params": {
+         "field": "code"
+        }
+       }
+      ],
+      "options": [
+       {
+        "kind": "field",
+        "field": "code"
+       },
+       {
+        "kind": "field",
+        "field": "label"
+       },
+       {
+        "kind": "surrogate",
+        "type": "objectId"
+       }
+      ]
+     },
+     "fields": [
+      {
+       "field": "code",
+       "include": true
+      },
+      {
+       "field": "label",
+       "include": true
+      }
+     ]
+    }
+   ],
+   "enums": []
+  }
+ },
+ {
+  "args": [
+   {
+    "target": "relational",
+    "models": [
+     {
+      "model": "Customer",
+      "include": true,
+      "key": {
+       "value": {
+        "kind": "field",
+        "field": "id"
+       },
+       "status": "active",
+       "confidence": "high",
+       "reasons": [
+        {
+         "code": "keyNamed",
+         "params": {
+          "field": "id"
+         }
+        }
+       ],
+       "options": [
+        {
+         "kind": "field",
+         "field": "id"
+        },
+        {
+         "kind": "field",
+         "field": "email"
+        },
+        {
+         "kind": "field",
+         "field": "fullName"
+        },
+        {
+         "kind": "field",
+         "field": "phone"
+        },
+        {
+         "kind": "surrogate",
+         "type": "integer"
+        },
+        {
+         "kind": "surrogate",
+         "type": "uuid"
+        }
+       ]
+      },
+      "fields": [
+       {
+        "field": "id",
+        "include": true
+       },
+       {
+        "field": "email",
+        "include": true,
+        "unique": {
+         "value": true,
+         "status": "pending",
+         "confidence": "review",
+         "reasons": [
+          {
+           "code": "uniqueNamed",
+           "params": {
+            "field": "email"
+           }
+          }
+         ],
+         "options": [
+          true,
+          false
+         ]
+        }
+       },
+       {
+        "field": "fullName",
+        "include": true
+       },
+       {
+        "field": "phone",
+        "include": true
+       },
+       {
+        "field": "shippingAddress",
+        "include": true,
+        "relation": {
+         "value": "flatten",
+         "status": "active",
+         "confidence": "probable",
+         "reasons": [
+          {
+           "code": "valueObject",
+           "params": {
+            "model": "Address"
+           }
+          }
+         ],
+         "options": [
+          "reference",
+          "flatten",
+          "json"
+         ]
+        }
+       },
+       {
+        "field": "createdAt",
+        "include": true
+       }
+      ]
+     },
+     {
+      "model": "Address",
+      "include": true,
+      "key": {
+       "value": {
+        "kind": "surrogate",
+        "type": "integer"
+       },
+       "status": "active",
+       "confidence": "probable",
+       "reasons": [
+        {
+         "code": "keyMissing"
+        }
+       ],
+       "options": [
+        {
+         "kind": "field",
+         "field": "street"
+        },
+        {
+         "kind": "field",
+         "field": "city"
+        },
+        {
+         "kind": "field",
+         "field": "postalCode"
+        },
+        {
+         "kind": "field",
+         "field": "country"
+        },
+        {
+         "kind": "surrogate",
+         "type": "integer"
+        },
+        {
+         "kind": "surrogate",
+         "type": "uuid"
+        }
+       ]
+      },
+      "fields": [
+       {
+        "field": "street",
+        "include": true
+       },
+       {
+        "field": "city",
+        "include": true
+       },
+       {
+        "field": "postalCode",
+        "include": true
+       },
+       {
+        "field": "country",
+        "include": true
+       }
+      ]
+     },
+     {
+      "model": "Order",
+      "include": true,
+      "key": {
+       "value": {
+        "kind": "field",
+        "field": "id"
+       },
+       "status": "active",
+       "confidence": "high",
+       "reasons": [
+        {
+         "code": "keyNamed",
+         "params": {
+          "field": "id"
+         }
+        }
+       ],
+       "options": [
+        {
+         "kind": "field",
+         "field": "id"
+        },
+        {
+         "kind": "surrogate",
+         "type": "integer"
+        },
+        {
+         "kind": "surrogate",
+         "type": "uuid"
+        }
+       ]
+      },
+      "fields": [
+       {
+        "field": "id",
+        "include": true
+       },
+       {
+        "field": "customer",
+        "include": true,
+        "relation": {
+         "value": "reference",
+         "status": "active",
+         "confidence": "high",
+         "reasons": [
+          {
+           "code": "targetHasKey",
+           "params": {
+            "model": "Customer"
+           }
+          }
+         ],
+         "options": [
+          "reference",
+          "flatten",
+          "json"
+         ]
+        }
+       },
+       {
+        "field": "status",
+        "include": true
+       },
+       {
+        "field": "lines",
+        "include": true,
+        "relation": {
+         "value": "child",
+         "status": "active",
+         "confidence": "high",
+         "reasons": [
+          {
+           "code": "ownedList",
+           "params": {
+            "model": "OrderLine"
+           }
+          }
+         ],
+         "options": [
+          "child",
+          "join",
+          "json"
+         ]
+        }
+       },
+       {
+        "field": "couponCode",
+        "include": true
+       },
+       {
+        "field": "tags",
+        "include": true,
+        "relation": {
+         "value": "child",
+         "status": "active",
+         "confidence": "probable",
+         "reasons": [
+          {
+           "code": "primitiveList"
+          }
+         ],
+         "options": [
+          "child",
+          "array",
+          "json"
+         ]
+        }
+       },
+       {
+        "field": "placedAt",
+        "include": true
+       }
+      ]
+     },
+     {
+      "model": "OrderLine",
+      "include": true,
+      "key": {
+       "value": {
+        "kind": "surrogate",
+        "type": "integer"
+       },
+       "status": "active",
+       "confidence": "probable",
+       "reasons": [
+        {
+         "code": "keyMissing"
+        }
+       ],
+       "options": [
+        {
+         "kind": "field",
+         "field": "quantity"
+        },
+        {
+         "kind": "field",
+         "field": "unitPrice"
+        },
+        {
+         "kind": "surrogate",
+         "type": "integer"
+        },
+        {
+         "kind": "surrogate",
+         "type": "uuid"
+        }
+       ]
+      },
+      "fields": [
+       {
+        "field": "product",
+        "include": true,
+        "relation": {
+         "value": "reference",
+         "status": "active",
+         "confidence": "high",
+         "reasons": [
+          {
+           "code": "targetHasKey",
+           "params": {
+            "model": "Product"
+           }
+          }
+         ],
+         "options": [
+          "reference",
+          "json"
+         ]
+        }
+       },
+       {
+        "field": "quantity",
+        "include": true
+       },
+       {
+        "field": "unitPrice",
+        "include": true
+       }
+      ]
+     },
+     {
+      "model": "Product",
+      "include": true,
+      "key": {
+       "value": {
+        "kind": "field",
+        "field": "id"
+       },
+       "status": "active",
+       "confidence": "high",
+       "reasons": [
+        {
+         "code": "keyNamed",
+         "params": {
+          "field": "id"
+         }
+        }
+       ],
+       "options": [
+        {
+         "kind": "field",
+         "field": "id"
+        },
+        {
+         "kind": "field",
+         "field": "sku"
+        },
+        {
+         "kind": "field",
+         "field": "name"
+        },
+        {
+         "kind": "field",
+         "field": "price"
+        },
+        {
+         "kind": "surrogate",
+         "type": "integer"
+        },
+        {
+         "kind": "surrogate",
+         "type": "uuid"
+        }
+       ]
+      },
+      "fields": [
+       {
+        "field": "id",
+        "include": true
+       },
+       {
+        "field": "sku",
+        "include": true,
+        "unique": {
+         "value": true,
+         "status": "pending",
+         "confidence": "review",
+         "reasons": [
+          {
+           "code": "uniqueNamed",
+           "params": {
+            "field": "sku"
+           }
+          }
+         ],
+         "options": [
+          true,
+          false
+         ]
+        }
+       },
+       {
+        "field": "name",
+        "include": true
+       },
+       {
+        "field": "price",
+        "include": true
+       },
+       {
+        "field": "categories",
+        "include": true,
+        "relation": {
+         "value": "join",
+         "status": "active",
+         "confidence": "high",
+         "reasons": [
+          {
+           "code": "bothSidesLists",
+           "params": {
+            "model": "Category",
+            "field": "products"
+           }
+          }
+         ],
+         "options": [
+          "child",
+          "join",
+          "json"
+         ]
+        }
+       },
+       {
+        "field": "attributes",
+        "include": true,
+        "relation": {
+         "value": "json",
+         "status": "active",
+         "confidence": "high",
+         "reasons": [
+          {
+           "code": "mapOfValues"
+          }
+         ],
+         "options": [
+          "json",
+          "child"
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "model": "Category",
+      "include": true,
+      "key": {
+       "value": {
+        "kind": "field",
+        "field": "id"
+       },
+       "status": "active",
+       "confidence": "high",
+       "reasons": [
+        {
+         "code": "keyNamed",
+         "params": {
+          "field": "id"
+         }
+        }
+       ],
+       "options": [
+        {
+         "kind": "field",
+         "field": "id"
+        },
+        {
+         "kind": "field",
+         "field": "name"
+        },
+        {
+         "kind": "surrogate",
+         "type": "integer"
+        },
+        {
+         "kind": "surrogate",
+         "type": "uuid"
+        }
+       ]
+      },
+      "fields": [
+       {
+        "field": "id",
+        "include": true
+       },
+       {
+        "field": "name",
+        "include": true
+       },
+       {
+        "field": "products",
+        "include": true,
+        "relation": {
+         "value": "join",
+         "status": "active",
+         "confidence": "high",
+         "reasons": [
+          {
+           "code": "bothSidesLists",
+           "params": {
+            "model": "Product",
+            "field": "categories"
+           }
+          }
+         ],
+         "options": [
+          "child",
+          "join",
+          "json"
+         ]
+        }
+       }
+      ]
+     }
+    ],
+    "enums": [
+     {
+      "enum": "OrderStatus",
+      "storage": {
+       "value": "check",
+       "status": "active",
+       "confidence": "high",
+       "reasons": [
+        {
+         "code": "enumCheck"
+        }
+       ],
+       "options": [
+        "check",
+        "native",
+        "lookup",
+        "text"
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "format": "model-schema",
+    "version": 1,
+    "origin": {
+     "format": "typescript",
+     "language": "typescript"
+    },
+    "models": [
+     {
+      "name": "Customer",
+      "kind": "interface",
+      "fields": [
+       {
+        "name": "id",
+        "type": {
+         "kind": "primitive",
+         "name": "float"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "number"
+       },
+       {
+        "name": "email",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "string"
+       },
+       {
+        "name": "fullName",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "string"
+       },
+       {
+        "name": "phone",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": true,
+        "originalType": "string"
+       },
+       {
+        "name": "shippingAddress",
+        "type": {
+         "kind": "model",
+         "name": "Address"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "Address"
+       },
+       {
+        "name": "createdAt",
+        "type": {
+         "kind": "primitive",
+         "name": "datetime"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "Date"
+       }
+      ],
+      "description": "An online shop: customers, orders, products and categories"
+     },
+     {
+      "name": "Address",
+      "kind": "interface",
+      "fields": [
+       {
+        "name": "street",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "string"
+       },
+       {
+        "name": "city",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "string"
+       },
+       {
+        "name": "postalCode",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "string"
+       },
+       {
+        "name": "country",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "string"
+       }
+      ]
+     },
+     {
+      "name": "Order",
+      "kind": "interface",
+      "fields": [
+       {
+        "name": "id",
+        "type": {
+         "kind": "primitive",
+         "name": "float"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "number"
+       },
+       {
+        "name": "customer",
+        "type": {
+         "kind": "model",
+         "name": "Customer"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "Customer"
+       },
+       {
+        "name": "status",
+        "type": {
+         "kind": "enum",
+         "name": "OrderStatus"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "OrderStatus"
+       },
+       {
+        "name": "lines",
+        "type": {
+         "kind": "array",
+         "items": {
+          "kind": "model",
+          "name": "OrderLine"
+         }
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "OrderLine[]"
+       },
+       {
+        "name": "couponCode",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": true,
+        "optional": false,
+        "originalType": "string | null"
+       },
+       {
+        "name": "tags",
+        "type": {
+         "kind": "array",
+         "items": {
+          "kind": "primitive",
+          "name": "string"
+         }
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "string[]"
+       },
+       {
+        "name": "placedAt",
+        "type": {
+         "kind": "primitive",
+         "name": "datetime"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "Date"
+       }
+      ]
+     },
+     {
+      "name": "OrderLine",
+      "kind": "interface",
+      "fields": [
+       {
+        "name": "product",
+        "type": {
+         "kind": "model",
+         "name": "Product"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "Product"
+       },
+       {
+        "name": "quantity",
+        "type": {
+         "kind": "primitive",
+         "name": "float"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "number"
+       },
+       {
+        "name": "unitPrice",
+        "type": {
+         "kind": "primitive",
+         "name": "float"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "number"
+       }
+      ]
+     },
+     {
+      "name": "Product",
+      "kind": "interface",
+      "fields": [
+       {
+        "name": "id",
+        "type": {
+         "kind": "primitive",
+         "name": "float"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "number"
+       },
+       {
+        "name": "sku",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "string"
+       },
+       {
+        "name": "name",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "string"
+       },
+       {
+        "name": "price",
+        "type": {
+         "kind": "primitive",
+         "name": "float"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "number"
+       },
+       {
+        "name": "categories",
+        "type": {
+         "kind": "array",
+         "items": {
+          "kind": "model",
+          "name": "Category"
+         }
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "Category[]"
+       },
+       {
+        "name": "attributes",
+        "type": {
+         "kind": "map",
+         "key": {
+          "kind": "primitive",
+          "name": "string"
+         },
+         "value": {
+          "kind": "primitive",
+          "name": "string"
+         }
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "Record<string, string>"
+       }
+      ]
+     },
+     {
+      "name": "Category",
+      "kind": "interface",
+      "fields": [
+       {
+        "name": "id",
+        "type": {
+         "kind": "primitive",
+         "name": "float"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "number"
+       },
+       {
+        "name": "name",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "string"
+       },
+       {
+        "name": "products",
+        "type": {
+         "kind": "array",
+         "items": {
+          "kind": "model",
+          "name": "Product"
+         }
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "Product[]"
+       }
+      ]
+     }
+    ],
+    "enums": [
+     {
+      "name": "OrderStatus",
+      "values": [
+       {
+        "name": "Draft",
+        "value": "draft"
+       },
+       {
+        "name": "Paid",
+        "value": "paid"
+       },
+       {
+        "name": "Shipped",
+        "value": "shipped"
+       },
+       {
+        "name": "Cancelled",
+        "value": "cancelled"
+       }
+      ]
+     }
+    ]
+   },
+   "document"
+  ],
+  "result": {
+   "target": "document",
+   "models": [
+    {
+     "model": "Customer",
+     "include": true,
+     "key": {
+      "value": {
+       "kind": "field",
+       "field": "id"
+      },
+      "status": "active",
+      "confidence": "high",
+      "reasons": [
+       {
+        "code": "keyNamed",
+        "params": {
+         "field": "id"
+        }
+       }
+      ],
+      "options": [
+       {
+        "kind": "field",
+        "field": "id"
+       },
+       {
+        "kind": "field",
+        "field": "email"
+       },
+       {
+        "kind": "field",
+        "field": "fullName"
+       },
+       {
+        "kind": "field",
+        "field": "phone"
+       },
+       {
+        "kind": "surrogate",
+        "type": "objectId"
+       }
+      ]
+     },
+     "fields": [
+      {
+       "field": "id",
+       "include": true
+      },
+      {
+       "field": "email",
+       "include": true,
+       "unique": {
+        "value": true,
+        "status": "pending",
+        "confidence": "review",
+        "reasons": [
+         {
+          "code": "uniqueNamed",
+          "params": {
+           "field": "email"
+          }
+         }
+        ],
+        "options": [
+         true,
+         false
+        ]
+       }
+      },
+      {
+       "field": "fullName",
+       "include": true
+      },
+      {
+       "field": "phone",
+       "include": true
+      },
+      {
+       "field": "shippingAddress",
+       "include": true,
+       "relation": {
+        "value": "embed",
+        "status": "active",
+        "confidence": "high",
+        "reasons": [
+         {
+          "code": "valueObject",
+          "params": {
+           "model": "Address"
+          }
+         }
+        ],
+        "options": [
+         "embed",
+         "reference"
+        ]
+       }
+      },
+      {
+       "field": "createdAt",
+       "include": true
+      }
+     ]
+    },
+    {
+     "model": "Address",
+     "include": true,
+     "key": {
+      "value": {
+       "kind": "surrogate",
+       "type": "objectId"
+      },
+      "status": "active",
+      "confidence": "exact",
+      "reasons": [
+       {
+        "code": "keyMongo"
+       }
+      ],
+      "options": [
+       {
+        "kind": "field",
+        "field": "street"
+       },
+       {
+        "kind": "field",
+        "field": "city"
+       },
+       {
+        "kind": "field",
+        "field": "postalCode"
+       },
+       {
+        "kind": "field",
+        "field": "country"
+       },
+       {
+        "kind": "surrogate",
+        "type": "objectId"
+       }
+      ]
+     },
+     "fields": [
+      {
+       "field": "street",
+       "include": true
+      },
+      {
+       "field": "city",
+       "include": true
+      },
+      {
+       "field": "postalCode",
+       "include": true
+      },
+      {
+       "field": "country",
+       "include": true
+      }
+     ]
+    },
+    {
+     "model": "Order",
+     "include": true,
+     "key": {
+      "value": {
+       "kind": "field",
+       "field": "id"
+      },
+      "status": "active",
+      "confidence": "high",
+      "reasons": [
+       {
+        "code": "keyNamed",
+        "params": {
+         "field": "id"
+        }
+       }
+      ],
+      "options": [
+       {
+        "kind": "field",
+        "field": "id"
+       },
+       {
+        "kind": "surrogate",
+        "type": "objectId"
+       }
+      ]
+     },
+     "fields": [
+      {
+       "field": "id",
+       "include": true
+      },
+      {
+       "field": "customer",
+       "include": true,
+       "relation": {
+        "value": "embed",
+        "status": "active",
+        "confidence": "probable",
+        "reasons": [
+         {
+          "code": "ownedList",
+          "params": {
+           "model": "Customer"
+          }
+         }
+        ],
+        "options": [
+         "embed",
+         "reference"
+        ]
+       }
+      },
+      {
+       "field": "status",
+       "include": true
+      },
+      {
+       "field": "lines",
+       "include": true,
+       "relation": {
+        "value": "embed",
+        "status": "active",
+        "confidence": "high",
+        "reasons": [
+         {
+          "code": "valueObject",
+          "params": {
+           "model": "OrderLine"
+          }
+         }
+        ],
+        "options": [
+         "embed",
+         "reference"
+        ]
+       }
+      },
+      {
+       "field": "couponCode",
+       "include": true
+      },
+      {
+       "field": "tags",
+       "include": true,
+       "relation": {
+        "value": "embed",
+        "status": "active",
+        "confidence": "exact",
+        "reasons": [
+         {
+          "code": "primitiveList"
+         }
+        ],
+        "options": [
+         "embed"
+        ]
+       }
+      },
+      {
+       "field": "placedAt",
+       "include": true
+      }
+     ]
+    },
+    {
+     "model": "OrderLine",
+     "include": true,
+     "key": {
+      "value": {
+       "kind": "surrogate",
+       "type": "objectId"
+      },
+      "status": "active",
+      "confidence": "exact",
+      "reasons": [
+       {
+        "code": "keyMongo"
+       }
+      ],
+      "options": [
+       {
+        "kind": "field",
+        "field": "quantity"
+       },
+       {
+        "kind": "field",
+        "field": "unitPrice"
+       },
+       {
+        "kind": "surrogate",
+        "type": "objectId"
+       }
+      ]
+     },
+     "fields": [
+      {
+       "field": "product",
+       "include": true,
+       "relation": {
+        "value": "reference",
+        "status": "pending",
+        "confidence": "review",
+        "reasons": [
+         {
+          "code": "sharedTarget",
+          "params": {
+           "model": "Product",
+           "users": "Category"
+          }
+         }
+        ],
+        "options": [
+         "embed",
+         "reference"
+        ]
+       }
+      },
+      {
+       "field": "quantity",
+       "include": true
+      },
+      {
+       "field": "unitPrice",
+       "include": true
+      }
+     ]
+    },
+    {
+     "model": "Product",
+     "include": true,
+     "key": {
+      "value": {
+       "kind": "field",
+       "field": "id"
+      },
+      "status": "active",
+      "confidence": "high",
+      "reasons": [
+       {
+        "code": "keyNamed",
+        "params": {
+         "field": "id"
+        }
+       }
+      ],
+      "options": [
+       {
+        "kind": "field",
+        "field": "id"
+       },
+       {
+        "kind": "field",
+        "field": "sku"
+       },
+       {
+        "kind": "field",
+        "field": "name"
+       },
+       {
+        "kind": "field",
+        "field": "price"
+       },
+       {
+        "kind": "surrogate",
+        "type": "objectId"
+       }
+      ]
+     },
+     "fields": [
+      {
+       "field": "id",
+       "include": true
+      },
+      {
+       "field": "sku",
+       "include": true,
+       "unique": {
+        "value": true,
+        "status": "pending",
+        "confidence": "review",
+        "reasons": [
+         {
+          "code": "uniqueNamed",
+          "params": {
+           "field": "sku"
+          }
+         }
+        ],
+        "options": [
+         true,
+         false
+        ]
+       }
+      },
+      {
+       "field": "name",
+       "include": true
+      },
+      {
+       "field": "price",
+       "include": true
+      },
+      {
+       "field": "categories",
+       "include": true,
+       "relation": {
+        "value": "reference",
+        "status": "active",
+        "confidence": "high",
+        "reasons": [
+         {
+          "code": "recursiveEmbed",
+          "params": {
+           "model": "Category"
+          }
+         }
+        ],
+        "options": [
+         "embed",
+         "reference"
+        ]
+       }
+      },
+      {
+       "field": "attributes",
+       "include": true,
+       "relation": {
+        "value": "embed",
+        "status": "active",
+        "confidence": "exact",
+        "reasons": [
+         {
+          "code": "mapOfValues"
+         }
+        ],
+        "options": [
+         "embed"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "model": "Category",
+     "include": true,
+     "key": {
+      "value": {
+       "kind": "field",
+       "field": "id"
+      },
+      "status": "active",
+      "confidence": "high",
+      "reasons": [
+       {
+        "code": "keyNamed",
+        "params": {
+         "field": "id"
+        }
+       }
+      ],
+      "options": [
+       {
+        "kind": "field",
+        "field": "id"
+       },
+       {
+        "kind": "field",
+        "field": "name"
+       },
+       {
+        "kind": "surrogate",
+        "type": "objectId"
+       }
+      ]
+     },
+     "fields": [
+      {
+       "field": "id",
+       "include": true
+      },
+      {
+       "field": "name",
+       "include": true
+      },
+      {
+       "field": "products",
+       "include": true,
+       "relation": {
+        "value": "reference",
+        "status": "active",
+        "confidence": "high",
+        "reasons": [
+         {
+          "code": "recursiveEmbed",
+          "params": {
+           "model": "Product"
+          }
+         }
+        ],
+        "options": [
+         "embed",
+         "reference"
+        ]
+       }
+      }
+     ]
+    }
+   ],
+   "enums": []
+  }
+ }
+]

@@ -1,3 +1,4 @@
+import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { EXAMPLES } from '../../../examples/index.ts'
 import { decide } from '../../design/edit.ts'
@@ -5,6 +6,9 @@ import { proposeDesign } from '../../design/propose.ts'
 import { modelRoles } from '../../physical/roles.ts'
 import { schemaOf } from '../../test/helpers.ts'
 import { OUTPUTS, findOutput, generate, type OutputSettings } from '../outputs.ts'
+
+// Shared with the desktop version, which must write the same files (shared/README.md)
+const OUTPUTS_CASES = resolve(process.cwd(), '../shared/test-cases/outputs')
 
 const settings: OutputSettings = { naming: { tables: 'plural', columns: 'snake' }, strings: 'auto', engine: 'postgresql', migrations: true }
 const text = (generated: { files: { content: string }[] }) => generated.files.map((file) => file.content).join('\n')
@@ -18,7 +22,7 @@ describe('every example in every database', () => {
         for (const file of generated.files) {
           const extension = file.name.slice(file.name.lastIndexOf('.'))
           const name = generated.files.length === 1 ? `${example.id}${extension}` : `${example.id}/${file.name}`
-          await expect(file.content).toMatchFileSnapshot(`__snapshots__/${output.id}/${name}`)
+          await expect(file.content).toMatchFileSnapshot(resolve(OUTPUTS_CASES, output.id, name))
         }
       })
     }

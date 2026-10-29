@@ -369,7 +369,7 @@ export function buildRelational(schema: ModelSchema, design: Design, options: Bu
       },
     )
     table.primaryKey = [ownerColumn, position]
-    foreignKey(table, ownerColumn, owner, 'cascade')
+    foreignKey(table, ownerColumn, owner, 'cascade', { inverse: field.name })
     extraTables.push(table)
   }
 
@@ -393,7 +393,7 @@ export function buildRelational(schema: ModelSchema, design: Design, options: Bu
       },
     )
     table.primaryKey = [ownerColumn, key]
-    foreignKey(table, ownerColumn, owner, 'cascade')
+    foreignKey(table, ownerColumn, owner, 'cascade', { inverse: field.name })
     extraTables.push(table)
   }
 

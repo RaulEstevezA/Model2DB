@@ -335,7 +335,7 @@ function literal(value: Literal, column: Column, rules: DialectRules, enums: Phy
 
 /** Tables in an order where each one comes after the tables it refers to; references that close a cycle
  * are returned apart, to be added once every table exists. */
-function order(tables: Table[]): { tables: Table[]; deferred: Map<string, ForeignKey[]> } {
+export function orderTables(tables: Table[]): { tables: Table[]; deferred: Map<string, ForeignKey[]> } {
   const byName = new Map(tables.map((table) => [table.name, table]))
   const done = new Set<string>()
   const visiting = new Set<string>()
@@ -376,7 +376,7 @@ export function generateSql(schema: RelationalSchema, dialect: Dialect, options:
     out.push('', `CREATE TYPE ${q(item.sqlName)} AS ENUM (${stringList(item.values.map(String))});`)
   }
 
-  const { tables, deferred } = order(schema.tables)
+  const { tables, deferred } = orderTables(schema.tables)
   const later: string[] = []
   for (const table of tables) {
     const lines: string[] = []

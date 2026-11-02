@@ -1,6 +1,8 @@
 # Model2DB
 
-Model2DB convierte un modelo de datos en un diseño de base de datos que revisas antes de escribir código, y después escribe ese código: el esquema SQL, las colecciones de MongoDB o los modelos de tu ORM con su migración. Todo ocurre en tu lado, en el navegador: lo que pegas o abres no se envía a ningún sitio, y el código se analiza, nunca se ejecuta.
+Model2DB convierte un modelo de datos en un diseño de base de datos que revisas antes de escribir código, y después escribe ese código: el esquema SQL o su migración, las colecciones, claves o tablas de una base de datos NoSQL, o los modelos de tu ORM con su migración. Todo ocurre en tu lado, en el navegador: lo que pegas o abres no se envía a ningún sitio, y el código se analiza, nunca se ejecuta.
+
+**Pruébala online:** [raulesteveza.github.io/tools/Model2DB](https://raulesteveza.github.io/tools/Model2DB/)
 
 ```text
 Pegar o abrir los modelos  →  Revisar el diseño propuesto  →  Elegir la base de datos o el ORM  →  Copiar el esquema
@@ -9,10 +11,10 @@ Pegar o abrir los modelos  →  Revisar el diseño propuesto  →  Elegir la bas
 ## Qué hace
 
 1. **Lee los modelos** en cualquier formato admitido, o los recibe de Mapper. Detecta el formato y lo que la entrada ya dice sobre la persistencia: `@Id`, `@ManyToOne`, `@Column(length = 80)`, `unique=True`, `[MaxLength]`, `@relation`, `@db.VarChar`… Un dato declarado se toma tal cual.
-2. **Propone un diseño** para una base de datos relacional o para MongoDB:
-   - qué modelos tienen tabla o colección propia y cuáles solo viven dentro de otros;
-   - la clave primaria: un campo que lo parece, o una clave nueva que rellena la base de datos (entero, UUID u ObjectId);
-   - cómo se guarda cada campo que contiene otro modelo: clave foránea, columnas en la misma tabla (`address_city`), tabla hija, tabla intermedia, columna JSON o array, documento embebido o referencia;
+2. **Propone un diseño** para uno de cuatro tipos de base de datos: relacional (los motores SQL), de documentos (MongoDB, Couchbase), clave-valor (Redis) o de columnas anchas (Cassandra, ScyllaDB):
+   - qué modelos tienen tabla, colección o claves propias y cuáles solo viven dentro de otros;
+   - la clave primaria: un campo que lo parece, o una clave nueva (entero, UUID u ObjectId);
+   - cómo se guarda cada campo que contiene otro modelo: clave foránea, columnas en la misma tabla (`address_city`), tabla hija, tabla intermedia, columna JSON o array, documento embebido o referencia, conjunto de claves de Redis, tipo definido por el usuario o tabla particionada por la clave del propietario;
    - listas y mapas de valores simples, enums (CHECK, tipo nativo o tabla de consulta), columnas únicas e índices.
 3. **Dice cuánto de seguro está y por qué.** Cada propuesta tiene una confianza (Exacta, Alta, Probable, Revisar, Conflicto) y una razón en palabras sencillas: «“id” tiene nombre de identificador», «“Address” no tiene clave: es un valor que pertenece a este modelo».
 4. **Nunca decide una ambigüedad.** «¿`email` es único?» o «¿qué campo identifica un producto si ninguno se llama `id`?» te esperan, en una lista al principio del diseño. Mientras no decides, el resultado deja un `TODO` donde va la decisión.
@@ -24,7 +26,11 @@ Pegar o abrir los modelos  →  Revisar el diseño propuesto  →  Elegir la bas
 | Grupo | Salidas | Migración |
 |---|---|---|
 | SQL | PostgreSQL, MySQL, MariaDB, SQLite, SQL Server, Oracle Database | El propio script |
+| | Flyway, Liquibase (el script de cualquiera de los seis motores) | Flyway y Liquibase (con rollback) |
 | Documentos | MongoDB (script de `mongosh`: colecciones con validadores `$jsonSchema` e índices) | |
+| | Couchbase (SQL++: colecciones e índices) | |
+| Clave-valor | Redis (las claves descritas y los índices de búsqueda para `redis-cli`) | |
+| Columnas anchas | Cassandra, ScyllaDB (CQL: keyspace, tipos definidos por el usuario, tablas e índices) | |
 | Python | Django ORM, SQLAlchemy, SQLModel, Tortoise ORM | Django y Alembic |
 | | PyMongo, MongoEngine, Beanie | |
 | TypeScript / JavaScript | Prisma, TypeORM, Sequelize, Drizzle ORM | TypeORM y Sequelize |
@@ -34,9 +40,9 @@ Pegar o abrir los modelos  →  Revisar el diseño propuesto  →  Elegir la bas
 | C# | Entity Framework Core (entidades y `DbContext`) | |
 | PHP | Laravel Eloquent, Doctrine ORM | Laravel y Doctrine Migrations |
 
-Un ORM escribe para el motor de base de datos que elijas (los tipos, las migraciones y la conexión dependen de él). Las demás opciones son los nombres de tabla (plural, singular o como el modelo), los de columna (`snake_case` o como el campo) y el tipo de los textos sin longitud.
+Un ORM, Flyway y Liquibase escriben para el motor de base de datos que elijas (los tipos, las migraciones y la conexión dependen de él). Las demás opciones son los nombres de tabla (plural, singular o como el modelo), los de columna (`snake_case` o como el campo) y el tipo de los textos sin longitud.
 
-Cada salida se ha comprobado con la herramienta real: el SQL y el script de MongoDB se ejecutan en servidores reales, los modelos de Python y TypeScript se cargan en sus librerías y crean su esquema, las migraciones se aplican, las clases de Java, C# y PHP compilan o se validan contra Hibernate, Spring Data, EF Core y Doctrine, y Prisma valida su esquema en cada motor que admite.
+Cada salida se ha comprobado con la herramienta real: el SQL, las migraciones de Flyway y Liquibase, y los scripts de MongoDB, Couchbase, Redis, Cassandra y ScyllaDB se ejecutan en servidores reales, los modelos de Python y TypeScript se cargan en sus librerías y crean su esquema, las migraciones se aplican, las clases de Java, C# y PHP compilan o se validan contra Hibernate, Spring Data, EF Core y Doctrine, y Prisma valida su esquema en cada motor que admite.
 
 ## Entradas
 
@@ -50,8 +56,8 @@ Los parsers son los de Mapper: Model2DB lee todo lo que lee Mapper y todo lo que
 
 ## Trabajar con otras herramientas
 
-- **Desde Mapper:** el modelo de destino de un mapeo se abre en Model2DB tal cual, listo para diseñar su base de datos.
-- **Proyectos:** «Guardar proyecto» descarga el modelo, tus decisiones para los dos tipos de base de datos y los ajustes de la salida; «Abrir proyecto» continúa más tarde. «Recordar en este navegador» guarda el trabajo solo ahí, hasta que lo borres.
+- **Desde Mapper:** «Abrir en Model2DB» abre el modelo de destino de un mapeo en Model2DB tal cual, listo para diseñar su base de datos. En la versión de escritorio, Mapper lo exporta como archivo, que **Abrir** lee.
+- **Proyectos:** «Guardar proyecto» descarga el modelo, tus decisiones para cada tipo de base de datos y los ajustes de la salida; «Abrir proyecto» continúa más tarde. «Recordar en este navegador» guarda el trabajo solo ahí, hasta que lo borres.
 
 Los formatos están documentados en [docs/interoperability.md](docs/interoperability.md) (en inglés).
 
@@ -62,7 +68,7 @@ Los formatos están documentados en [docs/interoperability.md](docs/interoperabi
 | Tecnología | React + TypeScript + Vite | Python + PySide6 |
 | Se ejecuta en | El navegador | Aplicación instalable (Windows, macOS, Linux) |
 | Documentación | Este README y [docs/](./docs) | [desktop/README_es.md](./desktop/README_es.md) |
-| Estado | Aún sin publicar | Completa; aún sin versiones empaquetadas: [ejecútala desde el código](./desktop/README_es.md#ejecutar-en-local) |
+| Estado | Publicada: [raulesteveza.github.io/tools/Model2DB](https://raulesteveza.github.io/tools/Model2DB/) | [Descargar](./desktop/README_es.md#descarga) (compilada y comprobada en macOS) |
 
 ## Comportamiento compartido
 

@@ -1,6 +1,8 @@
 # Model2DB
 
-Model2DB turns a data model into a database design you review before any code is written, and then writes that code: the SQL schema, the MongoDB collections, or the models of your ORM with their migration. Everything happens on your side, in the browser: what you paste or open is never sent anywhere, and code is analyzed, never run.
+Model2DB turns a data model into a database design you review before any code is written, and then writes that code: the SQL schema or its migration, the collections, keys or tables of a NoSQL database, or the models of your ORM with their migration. Everything happens on your side, in the browser: what you paste or open is never sent anywhere, and code is analyzed, never run.
+
+**Try it online:** [raulesteveza.github.io/tools/Model2DB](https://raulesteveza.github.io/tools/Model2DB/)
 
 ```text
 Paste or open the models  →  Review the proposed design  →  Choose the database or ORM  →  Copy the schema
@@ -9,10 +11,10 @@ Paste or open the models  →  Review the proposed design  →  Choose the datab
 ## What it does
 
 1. **Reads the models** in any supported format, or receives them from Mapper. It detects the format and what the input already says about persistence: `@Id`, `@ManyToOne`, `@Column(length = 80)`, `unique=True`, `[MaxLength]`, `@relation`, `@db.VarChar`… A declared fact is taken as it is.
-2. **Proposes a design** for a relational database or for MongoDB:
-   - which models get their own table or collection, and which only live inside others;
-   - the primary key: a field that looks like one, or a new key the database fills (integer, UUID or ObjectId);
-   - how each field holding another model is stored: a foreign key, columns in the same table (`address_city`), a child table, a join table, a JSON or array column, an embedded document or a reference;
+2. **Proposes a design** for one of four kinds of database: relational (the SQL engines), documents (MongoDB, Couchbase), key-value (Redis) or wide-column (Cassandra, ScyllaDB):
+   - which models get their own table, collection or keys, and which only live inside others;
+   - the primary key: a field that looks like one, or a new key (integer, UUID or ObjectId);
+   - how each field holding another model is stored: a foreign key, columns in the same table (`address_city`), a child table, a join table, a JSON or array column, an embedded document or a reference, a Redis set of keys, a user-defined type or a table partitioned by the owner's key;
    - lists and maps of plain values, enums (CHECK, native type or lookup table), unique columns and indexes.
 3. **Says how sure it is and why.** Every proposal has a confidence (exact, high, likely, review, conflict) and a reason in plain words: "“id” is named like an identifier", "“Address” has no key: it is a value that belongs to this model".
 4. **Never decides an ambiguity.** "Is `email` unique?" or "which field identifies a product when none is called `id`?" wait for you, listed at the top of the design. Until you decide, the result leaves a `TODO` where the decision goes.
@@ -24,7 +26,11 @@ Paste or open the models  →  Review the proposed design  →  Choose the datab
 | Group | Outputs | Migration |
 |---|---|---|
 | SQL | PostgreSQL, MySQL, MariaDB, SQLite, SQL Server, Oracle Database | The script itself |
+| | Flyway, Liquibase (the script of any of the six engines) | Flyway and Liquibase (with rollback) |
 | Documents | MongoDB (`mongosh` script: collections with `$jsonSchema` validators and indexes) | |
+| | Couchbase (SQL++: collections and indexes) | |
+| Key-value | Redis (the keys described, and the search indexes for `redis-cli`) | |
+| Wide-column | Cassandra, ScyllaDB (CQL: keyspace, user-defined types, tables and indexes) | |
 | Python | Django ORM, SQLAlchemy, SQLModel, Tortoise ORM | Django and Alembic |
 | | PyMongo, MongoEngine, Beanie | |
 | TypeScript / JavaScript | Prisma, TypeORM, Sequelize, Drizzle ORM | TypeORM and Sequelize |
@@ -34,9 +40,9 @@ Paste or open the models  →  Review the proposed design  →  Choose the datab
 | C# | Entity Framework Core (entities and `DbContext`) | |
 | PHP | Laravel Eloquent, Doctrine ORM | Laravel and Doctrine Migrations |
 
-An ORM writes for the database engine you choose (types, migrations and connection settings depend on it). The other options are the table names (plural, singular or as the model), the column names (`snake_case` or as the field) and the type of texts without a length.
+An ORM, Flyway and Liquibase write for the database engine you choose (types, migrations and connection settings depend on it). The other options are the table names (plural, singular or as the model), the column names (`snake_case` or as the field) and the type of texts without a length.
 
-Each output was checked with the real tool: the SQL and the MongoDB script run on real servers, the Python and TypeScript models load in their libraries and create their schema, the migrations apply, the Java, C# and PHP classes compile or validate against Hibernate, Spring Data, EF Core and Doctrine, and Prisma validates its schema on every engine it supports.
+Each output was checked with the real tool: the SQL, the Flyway and Liquibase migrations, and the MongoDB, Couchbase, Redis, Cassandra and ScyllaDB scripts run on real servers, the Python and TypeScript models load in their libraries and create their schema, the migrations apply, the Java, C# and PHP classes compile or validate against Hibernate, Spring Data, EF Core and Doctrine, and Prisma validates its schema on every engine it supports.
 
 ## Inputs
 
@@ -50,8 +56,8 @@ The parsers are the same as Mapper's: Model2DB reads everything Mapper reads and
 
 ## Work with other tools
 
-- **From Mapper:** the target model of a mapping opens in Model2DB as it is, ready to design its database.
-- **Projects:** "Save project" downloads the model, your decisions for both kinds of database and the output settings; "Open project" continues later. "Remember in this browser" keeps the work there only, until you delete it.
+- **From Mapper:** "Open in Model2DB" opens the target model of a mapping in Model2DB as it is, ready to design its database. In the desktop version, Mapper exports it as a file, which **Open** reads.
+- **Projects:** "Save project" downloads the model, your decisions for each kind of database and the output settings; "Open project" continues later. "Remember in this browser" keeps the work there only, until you delete it.
 
 The formats are documented in [docs/interoperability.md](docs/interoperability.md).
 
@@ -62,7 +68,7 @@ The formats are documented in [docs/interoperability.md](docs/interoperability.m
 | Technology | React + TypeScript + Vite | Python + PySide6 |
 | Runs in | The browser | Installable application (Windows, macOS, Linux) |
 | Documentation | This README and [docs/](./docs) | [desktop/README_en.md](./desktop/README_en.md) |
-| Status | Not published yet | Complete; no packaged releases yet: [run it from source](./desktop/README_en.md#run-locally) |
+| Status | Published: [raulesteveza.github.io/tools/Model2DB](https://raulesteveza.github.io/tools/Model2DB/) | [Download](./desktop/README_en.md#download) (built and checked on macOS) |
 
 ## Shared behavior
 

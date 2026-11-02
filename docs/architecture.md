@@ -18,7 +18,7 @@ Every stage has a language-neutral input and output, so a new input format, a ne
 | Proposal | `ModelSchema` + kind of database | `Design` with confidence | `web/src/core/design/propose.ts` |
 | Editing | `Design` + a user action | a new `Design` | `web/src/core/design/edit.ts` |
 | Reconciling | previous `Design` + new `ModelSchema` | a fresh proposal that keeps the user's decisions | `edit.ts` (`reconcile`) |
-| Physical schema | `ModelSchema` + `Design` + options | `RelationalSchema` or `DocumentSchema` | `web/src/core/physical/` |
+| Physical schema | `ModelSchema` + `Design` + options | `RelationalSchema`, `DocumentSchema`, `KeyValueSchema` or `WideColumnSchema` | `web/src/core/physical/` |
 | Writing | physical schema + settings | files | `web/src/core/generate/` |
 
 The model and the parsers come from [Mapper](https://github.com/RaulEstevezA/Mapper), where they are documented (`docs/internal-model.md`, `docs/parsers.md`). Model2DB adds `design/hints.ts`, which reads what the input says about persistence (`@Id`, `@ManyToOne`, `unique=True`, `@db.VarChar(80)`…).
@@ -31,8 +31,10 @@ web/src/
 │   ├── model/            ModelSchema, type helpers, naming
 │   ├── parsers/          Formats: data/, schema/, code/ and the registry (shared with Mapper)
 │   ├── design/           Analysis, hints, the proposal, one strategy per kind of database, edits
-│   ├── physical/         Model roles; tables (relational/) and collections (document.ts)
-│   ├── generate/         SQL, MongoDB, ORM (orm/) and ODM (odm/) writers, and the output registry
+│   ├── physical/         Model roles; tables (relational/), collections (document.ts), Redis keys (keyValue.ts),
+│   │                     Cassandra and ScyllaDB tables (wideColumn.ts)
+│   ├── generate/         SQL (also Flyway and Liquibase), MongoDB, Couchbase, Redis, CQL, ORM (orm/) and ODM (odm/)
+│   │                     writers, and the output registry
 │   └── interop/          Handoff between tools and project files
 ├── app/                  Interface logic without React: reading the input, pending decisions, projects
 ├── hooks/                Designs with undo, output settings, startup, handoff, stored preferences

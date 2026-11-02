@@ -23,7 +23,7 @@ A decision is a plain JSON value:
 - `options`: the values that make sense for this subject. The interface offers exactly these.
 - `manual`: set when the user made or confirmed the choice.
 
-A design has one entry per model (`include`, `key`, `table`, `fields`), one per field (`include`, `relation`, `foreignKey`, `unique`, `index`, `column`, `type`) and one per enum (`storage`). The design is for one kind of database: `relational` or `document`.
+A design has one entry per model (`include`, `key`, `table`, `fields`), one per field (`include`, `relation`, `foreignKey`, `unique`, `wholeNumber`, `index`, `column`, `type`) and one per enum (`storage`). The design is for one kind of database: `relational` (the SQL engines), `document` (MongoDB, Couchbase), `keyvalue` (Redis) or `widecolumn` (Cassandra, ScyllaDB). The kinds are listed in `STORAGE_TARGETS`; a project keeps one design per kind.
 
 ## How proposals are made
 
@@ -37,8 +37,9 @@ A design has one entry per model (`include`, `key`, `table`, `fields`), one per 
 | Several fields declared as key | The first | Conflict |
 | A field named like an identifier (`id`, `orderId` in `Order`) | That field | High |
 | Fields that could identify a row (`sku`, `code`), relational | A new integer key | Review |
-| No candidate, relational | A new integer key (or UUID) | Likely |
-| No candidate, MongoDB | `_id` (ObjectId) | Exact |
+| No candidate, relational or Redis | A new integer key (or UUID) | Likely |
+| No candidate, documents | `_id` (ObjectId in MongoDB, a UUID in Couchbase) | Exact |
+| No candidate, Cassandra and ScyllaDB | A new UUID (there is no auto-increment) | Likely |
 
 ### Fields that hold other models
 
@@ -64,12 +65,35 @@ Documents (MongoDB):
 | A model without key | Embedded (high) |
 | A model with key, used only here | Embedded (likely) |
 | A model with key that other models also use | Reference (review) |
+| A list of models whose documents point back (`User.posts` / `Post.author`) | Kept on the other side only (high): the list is not stored twice |
 | Lists and maps of plain values, free values | Embedded |
+
+Keys and values (Redis): each stored model is a hash under `prefix:<key>`. How the data is read decides most of it, and the model does not say, so lists of other models wait for the user.
+
+| Field | Proposal |
+|---|---|
+| A model with its own key | A hash field with its key (high) |
+| A model without key and without lists | Its fields in this hash, `address_city` (likely); otherwise JSON text |
+| A list of models with a key | A set of their keys under this key, `user:<key>:posts` (review) |
+| A list of models without key | JSON text in this hash (review) |
+| A list of plain values | A Redis list under this key (likely) |
+| A map of plain values | A Redis hash under this key (likely) |
+
+Wide columns (Cassandra, ScyllaDB): a table per stored model, partitioned by its key. There are no joins, so values live in the row and a list of other models is a table of its own, partitioned by the owner's key.
+
+| Field | Proposal |
+|---|---|
+| A model with its own key | A column with its key (high) |
+| A model without key | A user-defined type in the row, `frozen<address>` (likely); JSON text if it leads back to this model |
+| A list of models with a key | A table partitioned by this key with their keys, `user_posts` (review) |
+| A list of models without key | A list of user-defined types in the row (review) |
+| Lists and maps of plain values | Native collections, `list<text>`, `map<text, int>` (high) |
 
 ### Other fields
 
 - **Foreign keys by name** (relational): `customerId` next to a `Customer` model with a key is proposed as its foreign key (high), unless a `customer: Customer` field already says it.
-- **Unique**: declared ones are exact; `email`, `username`, `slug`, `sku`, `isbn`, `login` and `handle` are suggested for review.
+- **Unique**: declared ones are exact; `email`, `username`, `slug`, `sku`, `isbn`, `login` and `handle` are suggested for review. Couchbase, Redis, Cassandra and ScyllaDB have no unique indexes: the field gets a plain index and a note says the application keeps it unique.
+- **Whole numbers** (relational): a number without a size (TypeScript's `number`) named like a count (`quantity`, `count`, `numSeats`…) is stored as a whole number (likely); the user can choose decimals.
 - **Enums** (relational): a CHECK constraint (high); the user can choose a native type (PostgreSQL, MySQL, MariaDB), a lookup table or plain text. Documents use the validator's `enum`.
 - **Models**: one only used as a base class is left out (its fields go to its children); one no other model uses can be left out by the user.
 
@@ -81,9 +105,9 @@ When the input changes, `reconcile` proposes again for the new schema and keeps 
 
 ## Roles and pending decisions
 
-`physical/roles.ts` says what happens to each model once the decisions are applied: `stored` (own table or collection), `embedded`, `parent`, `excluded`, `pending` (it depends on a decision still to be made) or `unused`. The interface lists the pending decisions that matter for what is stored (`app/workspace.ts`); decisions of models that are still undecided appear once the decision that involves them is made.
+`physical/roles.ts` says what happens to each model once the decisions are applied: `stored` (own table, collection or keys), `embedded`, `parent`, `excluded`, `pending` (it depends on a decision still to be made) or `unused`. The interface lists the pending decisions that matter for what is stored (`app/workspace.ts`); decisions of models that are still undecided appear once the decision that involves them is made.
 
-## From the design to tables or collections
+## From the design to tables, collections or keys
 
 `physical/relational.ts` builds the relational schema in steps, each in its own file under `physical/relational/`:
 
@@ -93,5 +117,9 @@ When the input changes, `reconcile` proposes again for the new schema and keeps 
 4. `textKeys.ts`: a text without a length used by a key, a unique constraint or an index gets one where the engine needs it (MySQL, MariaDB, SQL Server, Oracle), with a note.
 
 `physical/document.ts` builds the collections: a `$jsonSchema` validator per collection, embedded models as nested objects, references as the other document's `_id`, and indexes for unique fields and references.
+
+`physical/keyValue.ts` builds the Redis keys: a hash per stored model with what each field holds, the lists, sets and hashes under its key, and a search index on the fields other keys point to and the ones chosen to be indexed.
+
+`physical/wideColumn.ts` builds the Cassandra and ScyllaDB schema: the user-defined types in the order they can be created, a table per stored model with its partition key, a table partitioned by the owner's key for each list of other models, and secondary indexes.
 
 A pending decision never becomes a column or a property: the physical schema keeps a `todo` in its place, which every output writes as a `TODO` comment (`generate/todos.ts`). What an output cannot store exactly as designed becomes a `note`, shown next to the result.

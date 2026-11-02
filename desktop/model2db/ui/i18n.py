@@ -223,6 +223,7 @@ def _reason_en(reason: dict) -> str:
         "valueList": "A list of plain values: a Redis list under this key keeps their order.",
         "valueHash": "Keys chosen at run time: a Redis hash under this key keeps them as they are.",
         "valueAsJson": f"“{_p(params, 'model')}” has no key and holds lists: kept as JSON inside this hash.",
+        "valueArray": "A list of plain values: kept as an array inside the document.",
         "targetExcluded": f"“{_p(params, 'model')}” is left out.",
         "foreignKeyNamed": f"Named after “{_p(params, 'model')}”: it most likely holds its key.",
         "uniqueDeclared": "Declared unique in the input.",
@@ -287,6 +288,7 @@ def _reason_es(reason: dict) -> str:
         "valueHash": "Claves elegidas al ejecutar: un hash de Redis bajo esta clave las guarda tal cual.",
         "valueAsJson": f"«{_p(params, 'model')}» no tiene clave y contiene listas: se guarda como JSON dentro de "
         "este hash.",
+        "valueArray": "Una lista de valores simples: se guarda como un array dentro del documento.",
         "targetExcluded": f"«{_p(params, 'model')}» está excluido.",
         "foreignKeyNamed": f"Lleva el nombre de «{_p(params, 'model')}»: lo más probable es que guarde su clave.",
         "uniqueDeclared": "Declarado único en la entrada.",

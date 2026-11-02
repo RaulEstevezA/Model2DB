@@ -17,7 +17,7 @@ def relation(context: dict, model: dict, field: dict, shape: dict) -> dict:
     kind = shape["kind"]
     if kind not in ("model", "models"):
         if kind == "values":
-            reasons = [reason("primitiveList")]
+            reasons = [reason("valueArray")]
         elif kind == "map":
             reasons = [reason("mapOfValues")]
         else:

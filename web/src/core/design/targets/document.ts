@@ -22,7 +22,7 @@ function relation(context: SchemaContext, model: ModelDef, field: FieldDef, shap
   if (shape.kind !== 'model' && shape.kind !== 'models') {
     const reasons =
       shape.kind === 'values'
-        ? [reason('primitiveList')]
+        ? [reason('valueArray')]
         : shape.kind === 'map'
           ? [reason('mapOfValues')]
           : [reason('freeShape', { type: field.originalType ?? '' })]

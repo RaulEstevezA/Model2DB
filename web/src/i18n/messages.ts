@@ -336,6 +336,8 @@ const en = {
         return 'Keys chosen at run time: a Redis hash under this key keeps them as they are.'
       case 'valueAsJson':
         return `“${p(params, 'model')}” has no key and holds lists: kept as JSON inside this hash.`
+      case 'valueArray':
+        return 'A list of plain values: kept as an array inside the document.'
       case 'targetExcluded':
         return `“${p(params, 'model')}” is left out.`
       case 'foreignKeyNamed':
@@ -741,6 +743,8 @@ const es: Messages = {
         return 'Claves elegidas al ejecutar: un hash de Redis bajo esta clave las guarda tal cual.'
       case 'valueAsJson':
         return `«${p(params, 'model')}» no tiene clave y contiene listas: se guarda como JSON dentro de este hash.`
+      case 'valueArray':
+        return 'Una lista de valores simples: se guarda como un array dentro del documento.'
       case 'targetExcluded':
         return `«${p(params, 'model')}» está excluido.`
       case 'foreignKeyNamed':

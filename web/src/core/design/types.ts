@@ -54,6 +54,8 @@ export type ReasonCode =
   | 'valueList'
   | 'valueHash'
   | 'valueAsJson'
+  // Documents
+  | 'valueArray'
   // Foreign keys by name
   | 'foreignKeyNamed'
   // Unique

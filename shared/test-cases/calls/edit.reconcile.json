@@ -2693,7 +2693,7 @@
         "confidence": "exact",
         "reasons": [
          {
-          "code": "primitiveList"
+          "code": "valueArray"
          }
         ],
         "options": [
@@ -6200,7 +6200,7 @@
         "confidence": "exact",
         "reasons": [
          {
-          "code": "primitiveList"
+          "code": "valueArray"
          }
         ],
         "options": [

@@ -4,6 +4,8 @@ models received from other tools and the work kept on this computer."""
 import json
 import zipfile
 
+from PySide6.QtCore import Qt
+from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication
 
 from model2db.core.generate.outputs import OUTPUTS
@@ -56,6 +58,21 @@ def test_accepting_a_decision_keeps_the_focus_on_it(window):
     focused = QApplication.focusWidget()
     rebuilt = pane.controls[f"unique:{ref['model']}.{ref['field']}"]
     assert focused is rebuilt.select
+
+
+def test_the_model_editor_keeps_tab_for_indenting_and_escape_then_tab_leaves_it(window):
+    window.load_example("store")
+    editor = window.input_pane.editor
+    editor.setFocus()
+    text = editor.toPlainText()
+    QTest.keyClick(editor, Qt.Key.Key_Escape)
+    QTest.keyClick(editor, Qt.Key.Key_Tab)
+    assert editor.toPlainText() == text
+    assert QApplication.focusWidget() is not editor
+    assert editor.accessibleDescription()
+    # The result is read-only: Tab goes on to the next control
+    assert window.result_pane.code.tabChangesFocus()
+    assert window.result_pane.code.accessibleName() == "PostgreSQL schema generated"
 
 
 def test_a_decision_can_be_undone_and_redone(window):

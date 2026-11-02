@@ -27,11 +27,27 @@ class CodeView(QPlainTextEdit):
         self.setReadOnly(read_only)
         self.setLineWrapMode(QPlainTextEdit.LineWrapMode.NoWrap)
         self.setTabStopDistance(self.fontMetrics().horizontalAdvance(" ") * 2)
+        # Read-only text gives Tab back to the window; editable text keeps it for indenting, and Escape then Tab
+        # leaves it, as in the web version's editor
+        self.setTabChangesFocus(read_only)
+        self._leaving = False
         self.highlighter = Highlighter(self.document(), language)
         self._numbers = _LineNumbers(self)
         self.blockCountChanged.connect(self._update_margin)
         self.updateRequest.connect(self._update_numbers)
         self._update_margin()
+
+    def keyPressEvent(self, event) -> None:  # noqa: N802 (Qt's name)
+        key = event.key()
+        if self._leaving and key in (Qt.Key.Key_Tab, Qt.Key.Key_Backtab):
+            self._leaving = False
+            # An editable text refuses to give the focus away while Tab indents: allowed for this one move
+            self.setTabChangesFocus(True)
+            self.focusNextPrevChild(key == Qt.Key.Key_Tab)
+            self.setTabChangesFocus(self.isReadOnly())
+            return
+        self._leaving = key == Qt.Key.Key_Escape
+        super().keyPressEvent(event)
 
     def set_language(self, language: str) -> None:
         self.highlighter.set_language(language)

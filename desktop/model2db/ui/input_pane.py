@@ -161,6 +161,7 @@ class InputPane(Pane):
         self.format_label.setText(t.format_label)
         self.editor.setPlaceholderText(t.input_placeholder)
         self.editor.setAccessibleName(t.input_title)
+        self.editor.setAccessibleDescription(t.editor_keys)
         # Text being typed is not replaced: it reaches the session once typing pauses
         if self.editor.toPlainText() != state["text"] and not self._timer.isActive():
             self.editor.setPlainText(state["text"])

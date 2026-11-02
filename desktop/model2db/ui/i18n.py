@@ -564,7 +564,9 @@ EN = SimpleNamespace(
     foreign_key_option=lambda model: f"Foreign key to “{model}”" if model else "Plain column",
     reason=_reason_en,
     # Result
+    editor_keys="Tab indents. To leave the editor, press Escape and then Tab.",
     result_title="Result",
+    result_label=lambda database: f"{database} schema generated",
     database_label="Database",
     output_groups={
         "relational": "Relational SQL",
@@ -768,7 +770,9 @@ ES = SimpleNamespace(
     foreign_key_option=lambda model: f"Clave ajena a «{model}»" if model else "Columna normal",
     reason=_reason_es,
     # Resultado
+    editor_keys="Tab sangra. Para salir del editor, pulsa Escape y después Tab.",
     result_title="Resultado",
+    result_label=lambda database: f"Esquema de {database} generado",
     database_label="Base de datos",
     output_groups={
         "relational": "SQL relacional",

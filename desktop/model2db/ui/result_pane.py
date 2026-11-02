@@ -178,6 +178,8 @@ class ResultPane(Pane):
 
     def _show_file(self) -> None:
         files = self.files
+        # Read by screen readers, as in the web version
+        self.code.setAccessibleName(self._i18n.t.result_label(self._session.output.label))
         if files:
             file = files[min(self._file_index, len(files) - 1)]
             self.code.set_language(file["editorLanguage"])

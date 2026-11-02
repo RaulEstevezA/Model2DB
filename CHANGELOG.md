@@ -26,7 +26,7 @@ Notable changes to Model2DB, the web and the desktop version together. The forma
 - Web: save and open projects, and "Remember in this browser".
 - Web: English and Spanish, keyboard and screen reader support, layout from 320px.
 - Web: privacy-first traffic and page-view measurement with Cloudflare Web Analytics.
-- Desktop: the same tool as a PySide6 application: the same design and exactly the same files for every output, checked by the shared test cases; projects, "Remember on this computer" and models from Mapper as files. Packaged with PyInstaller and released by GitHub Actions for macOS, Windows and Linux, with an automatic start-up check.
+- Desktop: the same tool as a PySide6 application: the same design and exactly the same files for every output, checked by the shared test cases; projects, "Remember on this computer" and models from Mapper as files; keyboard and screen reader support (in the model editor Tab indents, and Escape then Tab leaves it). Packaged with PyInstaller and released by GitHub Actions for macOS, Windows and Linux, with an automatic start-up check.
 
 [Unreleased]: https://github.com/RaulEstevezA/Model2DB/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/RaulEstevezA/Model2DB/releases/tag/v0.1.0

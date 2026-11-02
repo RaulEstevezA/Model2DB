@@ -223,6 +223,7 @@ class DesignPane(Pane):
         session = self._session
         schema, design = session.schema, session.design
         self.title.setText(t.design_title)
+        self.scroll.setAccessibleName(t.design_title)
         self.undo_button.setText(t.undo)
         self.undo_button.setToolTip(t.undo_title)
         self.undo_button.setEnabled(session.can_undo)

@@ -2,14 +2,9 @@ import { useCallback, useMemo } from 'react'
 import type { StorageTarget } from '../core/design/types.ts'
 import { findOutput, type Output, type OutputSettings } from '../core/generate/outputs.ts'
 import type { ProjectOutput } from '../core/interop/project.ts'
+import { DEFAULT_NAMING } from '../core/physical/naming.ts'
 import type { Dialect, NamingOptions } from '../core/physical/types.ts'
 import { useStoredState } from './useStoredState.ts'
-
-// Documents keep the field names of the model; tables follow the SQL convention
-const DEFAULT_NAMING: Record<StorageTarget, NamingOptions> = {
-  relational: { tables: 'plural', columns: 'snake' },
-  document: { tables: 'plural', columns: 'field' },
-}
 
 /** The chosen output and its settings, remembered in this browser as preferences (never the model). */
 export function useOutputSettings(): {

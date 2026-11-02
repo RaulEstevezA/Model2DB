@@ -67,7 +67,7 @@ export function DesignPane({
   const kind = design?.target ?? 'relational'
   const stored = schema && design ? schema.models.filter((model) => roles.get(model.name) === 'stored') : []
   const others = schema && design ? schema.models.filter((model) => roles.get(model.name) !== 'stored') : []
-  const roleText = kind === 'relational' ? t.role : t.documentRole
+  const roleText = kind === 'relational' ? t.role : kind === 'document' ? t.documentRole : t.keyValueRole
 
   const footer = design ? (
     <p className={pending.length > 0 ? 'design__status design__status--pending' : 'design__status'} role="status">
@@ -163,7 +163,7 @@ export function DesignPane({
           {others.length > 0 && (
             <section className="design__section" aria-labelledby="design-others">
               <h3 className="design__section-title" id="design-others">
-                {kind === 'relational' ? t.otherModelsTitle : t.otherDocumentsTitle}
+                {kind === 'relational' ? t.otherModelsTitle : kind === 'document' ? t.otherDocumentsTitle : t.otherKeysTitle}
               </h3>
               <ul className="design__list">
                 {others.map((model) => {

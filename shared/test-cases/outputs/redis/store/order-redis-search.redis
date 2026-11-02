@@ -1,0 +1,1 @@
+FT.CREATE idx:orders ON HASH PREFIX 1 orders: SCHEMA customer_id TAG status TAG

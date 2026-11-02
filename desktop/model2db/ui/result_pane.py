@@ -204,7 +204,8 @@ class ResultPane(Pane):
         if not generated:
             return 0
         physical = generated["physical"]
-        parts = physical["tables"] if physical["kind"] == "relational" else physical["collections"]
+        parts = {"relational": "tables", "document": "collections", "keyvalue": "entries"}[physical["kind"]]
+        parts = physical[parts]
         return sum(len(part["todos"]) for part in parts)
 
     def _options(self) -> None:
@@ -247,7 +248,7 @@ class ResultPane(Pane):
         naming = settings["naming"]
         tables = t.tables_naming_option
         add(
-            t.tables_naming if relational else t.collections_naming,
+            {"relational": t.tables_naming, "document": t.collections_naming}.get(output.target, t.prefixes_naming),
             choice(
                 [(tables[item], item) for item in TABLE_NAMINGS],
                 naming["tables"],
@@ -255,7 +256,7 @@ class ResultPane(Pane):
             ),
         )
         add(
-            t.columns_naming if relational else t.properties_naming,
+            {"relational": t.columns_naming, "document": t.properties_naming}.get(output.target, t.hash_fields_naming),
             choice(
                 [(t.columns_naming_option[item], item) for item in COLUMN_NAMINGS],
                 naming["columns"],

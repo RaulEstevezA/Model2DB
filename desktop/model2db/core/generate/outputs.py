@@ -5,6 +5,7 @@ from dataclasses import dataclass
 
 from ..model.schema import default_root
 from ..physical.document import build_document
+from ..physical.key_value import build_key_value
 from ..physical.relational.schema import build_relational
 from .couchbase.couchbase import CouchbaseOutput
 from .mongodb.mongodb import generate_mongo
@@ -23,6 +24,7 @@ from .orm.typescript.drizzle import DrizzleOutput
 from .orm.typescript.prisma import PrismaOutput
 from .orm.typescript.sequelize import SequelizeOutput
 from .orm.typescript.typeorm import TypeOrmOutput
+from .redis.redis import RedisOutput
 from .sql.migration_tools import FlywayOutput, LiquibaseOutput
 from .sql.sql import DIALECT_NAMES, generate_sql
 from .types import WriteContext, file_base, generated_file
@@ -47,6 +49,9 @@ class Output:
                 schema, design, {"naming": settings["naming"], "strings": settings["strings"], "dialect": engine}
             )
             context = WriteContext(schema, design, {**settings, "engine": engine}, title)
+        elif self.target == "keyvalue":
+            physical = build_key_value(schema, design, settings["naming"])
+            context = WriteContext(schema, design, settings, title)
         else:
             physical = build_document(schema, design, settings["naming"])
             context = WriteContext(schema, design, settings, title)
@@ -105,6 +110,7 @@ OUTPUTS: tuple[Output, ...] = (
     _output(LiquibaseOutput(), "relational"),
     _output(_MongoWriter(), "document"),
     _output(CouchbaseOutput(), "document"),
+    _output(RedisOutput(), "keyvalue"),
     _output(DjangoOutput(), "relational"),
     _output(SqlAlchemyOutput(), "relational"),
     _output(SqlModelOutput(), "relational"),

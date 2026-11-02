@@ -3,9 +3,9 @@
 
 def todo_text(todo: dict, model: str, kind: str) -> str:
     """The comment written for a decision still pending, in English like the rest of the generated code.
-    `kind` names what the database stores models in: `table`, or `collection` of documents."""
+    `kind` names what the database stores models in: `table`, `collection` of documents, or Redis `hash`."""
     params = todo["params"]
-    key = "primary key" if kind == "table" else "_id"
+    key = "primary key" if kind == "table" else "_id" if kind == "collection" else "key"
     code = todo["code"]
     if code == "relationPending":
         return f'TODO: decide how "{model}.{params["field"]}" is stored (pending in the design).'

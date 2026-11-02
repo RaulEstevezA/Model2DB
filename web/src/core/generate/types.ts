@@ -1,10 +1,19 @@
 import type { Design, StorageTarget } from '../design/types.ts'
 import type { ModelSchema } from '../model/schema.ts'
 import { toSnakeCase } from '../model/naming.ts'
-import type { BuildOptions, Dialect, DocumentSchema, NamingOptions, Note, PhysicalSchema, RelationalSchema } from '../physical/types.ts'
+import type {
+  BuildOptions,
+  Dialect,
+  DocumentSchema,
+  KeyValueSchema,
+  NamingOptions,
+  Note,
+  PhysicalSchema,
+  RelationalSchema,
+} from '../physical/types.ts'
 
 /** Groups of the output selector */
-export type OutputGroup = 'relational' | 'document' | 'python' | 'typescript' | 'jvm' | 'csharp' | 'php'
+export type OutputGroup = 'relational' | 'document' | 'keyvalue' | 'python' | 'typescript' | 'jvm' | 'csharp' | 'php'
 
 export interface GeneratedFile {
   /** Path inside the download (`models.py`, `migrations/0001_initial.py`) */
@@ -52,6 +61,14 @@ export interface DocumentWriter {
   group: OutputGroup
   migrations?: boolean
   write(physical: DocumentSchema, context: WriteContext): GeneratedFile[]
+}
+
+/** What a writer for keys and values needs: the keys of each stored model. */
+export interface KeyValueWriter {
+  id: string
+  label: string
+  group: OutputGroup
+  write(physical: KeyValueSchema, context: WriteContext): GeneratedFile[]
 }
 
 /** An entry of the output selector, whatever kind of database it writes for. The interface reads only

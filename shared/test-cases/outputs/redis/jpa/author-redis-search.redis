@@ -1,0 +1,1 @@
+FT.CREATE idx:authors ON HASH PREFIX 1 authors: SCHEMA email TAG

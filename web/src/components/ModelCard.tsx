@@ -27,7 +27,8 @@ export function ModelCard({ design, model, fields, canExclude, physical, onChang
   const table =
     physical?.kind === 'relational' ? physical.tables.find((item) => item.kind === 'entity' && item.model === model.model) : undefined
   const collection = physical?.kind === 'document' ? physical.collections.find((item) => item.model === model.model) : undefined
-  const tableName = table?.name ?? collection?.name ?? ''
+  const entry = physical?.kind === 'keyvalue' ? physical.entries.find((item) => item.model === model.model) : undefined
+  const tableName = table?.name ?? collection?.name ?? (entry ? `${entry.prefix}:<key>` : '')
   const titleId = `model-${model.model}`
   const choose = (ref: DecisionRef) => (value?: unknown) => onChange(decide(design, ref, value))
   const keyField = model.key?.status === 'active' && model.key.value.kind === 'field' ? model.key.value.field : null
@@ -71,16 +72,16 @@ export function ModelCard({ design, model, fields, canExclude, physical, onChang
       {editing === '' && (
         <div className="model-card__editor">
           <CommitInput
-            label={relational ? t.tableName : t.collectionName}
+            label={relational ? t.tableName : design.target === 'document' ? t.collectionName : t.keyPrefix}
             value={model.table ?? ''}
-            placeholder={tableName}
+            placeholder={entry?.prefix ?? tableName}
             onCommit={(value) => onChange(setTableName(design, model.model, value))}
           />
         </div>
       )}
       {model.key && (
         <div className="model-card__key">
-          <span className="model-card__label">{relational ? t.key : t.documentKey}</span>
+          <span className="model-card__label">{relational ? t.key : design.target === 'document' ? t.documentKey : t.keyValueKey}</span>
           <DecisionControl
             id={decisionElementId({ kind: 'key', model: model.model })}
             subject={t.subjects.key(model.model)}

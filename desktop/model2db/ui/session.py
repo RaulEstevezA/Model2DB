@@ -12,10 +12,12 @@ from PySide6.QtCore import QObject, QSettings, QTimer, Signal
 
 from ..core.design.edit import reconcile
 from ..core.design.propose import propose_design
+from ..core.design.types import per_target
 from ..core.generate.outputs import find_output, generate
 from ..core.interop.project import create_project, project_file_name, read_project
 from ..core.js import trim
 from ..core.model.schema import default_root
+from ..core.physical.naming import DEFAULT_NAMING
 from ..core.physical.roles import model_roles
 from ..core.workspace import (
     EMPTY_INPUT,
@@ -30,12 +32,7 @@ from ..examples import find_example
 
 # Steps kept for undo
 HISTORY_LIMIT = 100
-NO_DESIGNS = {"relational": None, "document": None}
-# Documents keep the field names of the model; tables follow the SQL convention
-DEFAULT_NAMING = {
-    "relational": {"tables": "plural", "columns": "snake"},
-    "document": {"tables": "plural", "columns": "field"},
-}
+NO_DESIGNS = per_target(lambda target: None)
 DIALECTS = ("postgresql", "mysql", "mariadb", "sqlite", "sqlserver", "oracle")
 
 
@@ -141,7 +138,7 @@ class Session(QObject):
             self._design_updated()
             return
         previous = self._next_designs
-        self._reset({target: reconcile(previous[target], schema, target) for target in ("relational", "document")})
+        self._reset(per_target(lambda target: reconcile(previous[target], schema, target)))
 
     # Designs and history
 

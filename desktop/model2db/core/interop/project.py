@@ -5,9 +5,10 @@ settings. Mirrors web/src/core/interop/project.ts; a project saved in one versio
 import re
 from datetime import UTC, datetime
 
-from ..design.types import FIELD_DECISIONS
+from ..design.types import FIELD_DECISIONS, per_target
 from ..js import parse_json_value
 from ..parsers.registry import find_parser
+from ..physical.naming import DEFAULT_NAMING
 
 PROJECT_FORMAT = "model2db-project"
 PROJECT_VERSION = 1
@@ -169,10 +170,14 @@ def _read_output(value, path: str) -> dict:
     _check(_is_bool(value.get("migrations")), f"{path}.migrations")
     return {
         "output": value["output"],
-        "naming": {
-            "relational": _read_naming(naming.get("relational"), f"{path}.naming.relational"),
-            "document": _read_naming(naming.get("document"), f"{path}.naming.document"),
-        },
+        # Projects saved before a kind of database existed have no naming for it
+        "naming": per_target(
+            lambda target: (
+                DEFAULT_NAMING[target]
+                if naming.get(target) is None and target == "keyvalue"
+                else _read_naming(naming.get(target), f"{path}.naming.{target}")
+            )
+        ),
         "strings": value["strings"],
         "engine": value["engine"],
         "migrations": value["migrations"],
@@ -210,10 +215,7 @@ def read_project(text: str) -> dict:
             "version": PROJECT_VERSION,
             "savedAt": value["savedAt"] if isinstance(value.get("savedAt"), str) else "",
             "input": _read_input(value.get("input", _MISSING), "$.input"),
-            "designs": {
-                "relational": _read_design(designs.get("relational"), "relational", "$.designs.relational"),
-                "document": _read_design(designs.get("document"), "document", "$.designs.document"),
-            },
+            "designs": per_target(lambda target: _read_design(designs.get(target), target, f"$.designs.{target}")),
             "output": _read_output(value.get("output", _MISSING), "$.output"),
         }
     except _Invalid as error:

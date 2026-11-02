@@ -44,7 +44,7 @@ def model_roles(schema: dict, design: dict) -> dict[str, str]:
                     queue.append(target)
             elif target not in embedded:
                 embedded.add(target)
-                visit(target, design["target"] == "relational")
+                visit(target, design["target"] != "document")
 
     while queue:
         visit(queue.pop(0), False)

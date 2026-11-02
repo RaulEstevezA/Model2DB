@@ -10,7 +10,7 @@ from dataclasses import dataclass, field
 from ..model.naming import to_snake_case
 
 # Groups of the output selector
-OUTPUT_GROUPS = ("relational", "document", "python", "typescript", "jvm", "csharp", "php")
+OUTPUT_GROUPS = ("relational", "document", "keyvalue", "python", "typescript", "jvm", "csharp", "php")
 
 
 def generated_file(name: str, content: str, editor_language: str) -> dict:

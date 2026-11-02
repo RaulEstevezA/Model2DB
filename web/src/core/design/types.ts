@@ -2,8 +2,16 @@
  * why, so the user can review it before any code is written. Decisions are plain JSON values; edits
  * return new designs (design/edit.ts), so undo and redo only keep previous values. */
 
-/** Where the models are stored. Relational covers every SQL dialect; document is MongoDB. */
-export type StorageTarget = 'relational' | 'document'
+/** Where the models are stored. Relational covers every SQL dialect; document is MongoDB and Couchbase;
+ * keyvalue is Redis. */
+export type StorageTarget = 'relational' | 'document' | 'keyvalue'
+
+export const STORAGE_TARGETS: readonly StorageTarget[] = ['relational', 'document', 'keyvalue']
+
+/** A value for each kind of database. */
+export function perTarget<T>(value: (target: StorageTarget) => T): Record<StorageTarget, T> {
+  return Object.fromEntries(STORAGE_TARGETS.map((target) => [target, value(target)])) as Record<StorageTarget, T>
+}
 
 /** The confidence scale of personal_web_style (patterns/confidence-states.md). Exact, high and probable
  * proposals are applied; review and conflict wait for the user. */
@@ -40,6 +48,12 @@ export type ReasonCode =
   | 'recursiveEmbed'
   | 'unboundedList'
   | 'targetExcluded'
+  // Keys and values
+  | 'keySet'
+  | 'listAsJson'
+  | 'valueList'
+  | 'valueHash'
+  | 'valueAsJson'
   // Foreign keys by name
   | 'foreignKeyNamed'
   // Unique
@@ -88,6 +102,13 @@ export type SurrogateType = 'integer' | 'uuid' | 'objectId'
  * - `embed`: the value is stored inside the document
  * - `reference`: the document stores the other document's `_id` (or a list of them)
  * - `child`: a list kept on the other side: the other documents store this one's `_id`, so it is not stored here
+ *
+ * Keys and values:
+ * - `reference`: a hash field holding the other model's key
+ * - `flatten`: the other model's fields become fields of this hash
+ * - `child`: a list, set or hash of its own under this model's key (`order:42:tags`); for a list of other
+ *   models, a set of their keys
+ * - `json`: a hash field holding JSON text
  */
 export type RelationChoice = 'reference' | 'flatten' | 'child' | 'join' | 'array' | 'json' | 'embed'
 

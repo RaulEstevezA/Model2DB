@@ -142,7 +142,57 @@ export interface DocumentSchema {
   notes: Note[]
 }
 
-export type PhysicalSchema = RelationalSchema | DocumentSchema
+/** What a hash field, or each item of a list, set or hash, holds. Redis keeps everything as text. */
+export type KeyValueHolds = 'text' | 'number' | 'boolean' | 'date' | 'json' | 'key'
+
+/** A field of a model's hash. */
+export interface HashField {
+  name: string
+  holds: KeyValueHolds
+  /** For `key`: the prefix of the keys it holds (`customer`) */
+  refers?: string
+  /** For an enum: the values it accepts */
+  values?: Literal[]
+  nullable: boolean
+  source: string
+}
+
+/** A list, set or hash of its own under the owner's key: `order:<key>:tags`. */
+export interface KeyStructure {
+  suffix: string
+  type: 'list' | 'set' | 'hash'
+  holds: KeyValueHolds
+  refers?: string
+  source: string
+}
+
+/** A hash field in the model's search index (Redis Query Engine). */
+export interface SearchField {
+  field: string
+  type: 'TAG' | 'NUMERIC'
+}
+
+/** The keys of a stored model: a hash under `prefix:<key>`, and what hangs from it. */
+export interface KeyEntry {
+  model: string
+  prefix: string
+  /** The field whose value is the key, or null when the application makes one */
+  keyField: string | null
+  /** How a new key is made when no field holds it */
+  newKey: 'counter' | 'uuid' | null
+  fields: HashField[]
+  structures: KeyStructure[]
+  search: SearchField[]
+  todos: Todo[]
+}
+
+export interface KeyValueSchema {
+  kind: 'keyvalue'
+  entries: KeyEntry[]
+  notes: Note[]
+}
+
+export type PhysicalSchema = RelationalSchema | DocumentSchema | KeyValueSchema
 
 export type TableNaming = 'plural' | 'singular' | 'model'
 export type ColumnNaming = 'snake' | 'field'

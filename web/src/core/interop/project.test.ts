@@ -9,14 +9,18 @@ const schema = schemaOf(TEXT, 'typescript')
 const relational = decide(proposeDesign(schema, 'relational'), { kind: 'unique', model: 'Customer', field: 'email' }, false)
 const output: ProjectOutput = {
   output: 'mysql',
-  naming: { relational: { tables: 'singular', columns: 'snake' }, document: { tables: 'plural', columns: 'field' } },
+  naming: {
+    relational: { tables: 'singular', columns: 'snake' },
+    document: { tables: 'plural', columns: 'field' },
+    keyvalue: { tables: 'singular', columns: 'snake' },
+  },
   strings: 'varchar',
   engine: 'mysql',
   migrations: false,
 }
 const project = createProject(
   { format: 'typescript', text: TEXT, fileName: 'models.ts' },
-  { relational, document: null },
+  { relational, document: null, keyvalue: null },
   output,
   new Date('2026-10-29T12:00:00Z'),
 )
@@ -56,6 +60,13 @@ describe('project files', () => {
       error: 'invalid',
       path: '$.output.engine',
     })
+  })
+
+  it('open projects saved before Redis was an output', () => {
+    const older = structuredClone(project) as unknown as { designs: Record<string, unknown>; output: { naming: Record<string, unknown> } }
+    delete older.designs.keyvalue
+    delete older.output.naming.keyvalue
+    expect(readProject(JSON.stringify(older))).toEqual({ ok: true, project })
   })
 
   it('leave unknown keys behind', () => {

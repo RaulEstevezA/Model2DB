@@ -69,6 +69,7 @@ def test_selector_order():
             "liquibase",
             "mongodb",
             "couchbase",
+            "redis",
         ),
         *("django", "sqlalchemy", "sqlmodel", "tortoise", "prisma", "typeorm", "sequelize", "drizzle"),
         *("jpa", "hibernate", "spring-data-jpa", "efcore", "eloquent", "doctrine"),

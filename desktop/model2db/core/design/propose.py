@@ -6,10 +6,11 @@ from .analysis import analyze, has_key, is_parent_only, key_field, keyable, shap
 from .decision import decision, reason
 from .hints import declares_key, declares_unique
 from .targets.document import STRATEGY as DOCUMENT
+from .targets.key_value import STRATEGY as KEY_VALUE
 from .targets.relational import STRATEGY as RELATIONAL
 
 # One strategy per kind of database. Adding a kind means adding its strategy here
-STRATEGIES = {"relational": RELATIONAL, "document": DOCUMENT}
+STRATEGIES = {"relational": RELATIONAL, "document": DOCUMENT, "keyvalue": KEY_VALUE}
 
 
 def propose_design(schema: dict, target: str) -> dict:

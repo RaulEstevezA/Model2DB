@@ -2,6 +2,15 @@
 
 import json
 
+# Where the models are stored: every SQL dialect; MongoDB and Couchbase; Redis
+STORAGE_TARGETS = ("relational", "document", "keyvalue")
+
+
+def per_target(value) -> dict:
+    """A value for each kind of database."""
+    return {target: value(target) for target in STORAGE_TARGETS}
+
+
 # The field decisions, in the order the interface shows them
 FIELD_DECISIONS = ("relation", "foreignKey", "unique", "wholeNumber")
 

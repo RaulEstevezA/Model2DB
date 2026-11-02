@@ -51,7 +51,7 @@ export function modelRoles(schema: ModelSchema, design: Design): Map<string, Mod
         }
       } else if (!embedded.has(target)) {
         embedded.add(target)
-        visit(target, design.target === 'relational')
+        visit(target, design.target !== 'document')
       }
     }
   }

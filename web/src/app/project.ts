@@ -1,4 +1,5 @@
 import { reconcile } from '../core/design/edit.ts'
+import { perTarget } from '../core/design/types.ts'
 import { readProject, type Model2DBProject, type ProjectDesigns } from '../core/interop/project.ts'
 import { readInput, type InputState } from './workspace.ts'
 
@@ -29,7 +30,7 @@ export function inputOfProject(project: Model2DBProject): InputState {
  * as when the input is edited. */
 export function designsForInput(designs: ProjectDesigns, input: InputState): ProjectDesigns {
   const read = readInput(input)
-  if (!read.outcome?.ok) return { relational: null, document: null }
+  if (!read.outcome?.ok) return perTarget(() => null)
   const schema = read.outcome.schema
-  return { relational: reconcile(designs.relational, schema, 'relational'), document: reconcile(designs.document, schema, 'document') }
+  return perTarget((target) => reconcile(designs[target], schema, target))
 }

@@ -135,6 +135,30 @@ def _relation_option_es(choice: str, shape: str) -> str:
     }[choice]
 
 
+def _key_value_option_en(choice: str, shape: str) -> str:
+    if choice == "reference":
+        return "Field with its key"
+    if choice == "flatten":
+        return "Fields in this hash"
+    if choice == "child":
+        if shape == "models":
+            return "Set of its keys, under this key"
+        return "Redis hash under this key" if shape == "map" else "Redis list under this key"
+    return "JSON text in this hash"
+
+
+def _key_value_option_es(choice: str, shape: str) -> str:
+    if choice == "reference":
+        return "Campo con su clave"
+    if choice == "flatten":
+        return "Campos en este hash"
+    if choice == "child":
+        if shape == "models":
+            return "Conjunto de sus claves, bajo esta clave"
+        return "Hash de Redis bajo esta clave" if shape == "map" else "Lista de Redis bajo esta clave"
+    return "Texto JSON en este hash"
+
+
 def _key_option_en(choice: dict) -> str:
     if choice["kind"] == "field":
         return f"Field “{choice['field']}”"
@@ -192,6 +216,13 @@ def _reason_en(reason: dict) -> str:
         "so it is referred to.",
         "unboundedList": "Embedded and read with its document. If the list can grow without limit, "
         f"refer to “{_p(params, 'model')}” instead.",
+        "keySet": f"A set of the keys of “{_p(params, 'model')}” under this one. Choose JSON if the list is always "
+        "read with this model and nobody else uses its items.",
+        "listAsJson": f"“{_p(params, 'model')}” has no key: the list is kept as JSON inside this hash. Choose a set if "
+        "each item should be stored on its own.",
+        "valueList": "A list of plain values: a Redis list under this key keeps their order.",
+        "valueHash": "Keys chosen at run time: a Redis hash under this key keeps them as they are.",
+        "valueAsJson": f"“{_p(params, 'model')}” has no key and holds lists: kept as JSON inside this hash.",
         "targetExcluded": f"“{_p(params, 'model')}” is left out.",
         "foreignKeyNamed": f"Named after “{_p(params, 'model')}”: it most likely holds its key.",
         "uniqueDeclared": "Declared unique in the input.",
@@ -248,6 +279,14 @@ def _reason_es(reason: dict) -> str:
         "así que se referencia.",
         "unboundedList": "Embebido y leído con su documento. Si la lista puede crecer sin límite, "
         f"referencia «{_p(params, 'model')}».",
+        "keySet": f"Un conjunto con las claves de «{_p(params, 'model')}» bajo esta. Elige JSON si la lista siempre se "
+        "lee con este modelo y nadie más usa sus elementos.",
+        "listAsJson": f"«{_p(params, 'model')}» no tiene clave: la lista se guarda como JSON dentro de este hash. "
+        "Elige un conjunto si cada elemento debe guardarse por separado.",
+        "valueList": "Una lista de valores simples: una lista de Redis bajo esta clave conserva su orden.",
+        "valueHash": "Claves elegidas al ejecutar: un hash de Redis bajo esta clave las guarda tal cual.",
+        "valueAsJson": f"«{_p(params, 'model')}» no tiene clave y contiene listas: se guarda como JSON dentro de "
+        "este hash.",
         "targetExcluded": f"«{_p(params, 'model')}» está excluido.",
         "foreignKeyNamed": f"Lleva el nombre de «{_p(params, 'model')}»: lo más probable es que guarde su clave.",
         "uniqueDeclared": "Declarado único en la entrada.",
@@ -381,14 +420,14 @@ EN = SimpleNamespace(
     # Design
     design_title="Design",
     design_waiting="The proposed design will appear here when the model can be read.",
-    design_for=lambda database, kind: (
-        f"Relational design for {database}" if kind == "relational" else f"Document design for {database}"
-    ),
-    design_summary=lambda stored, kind: (
-        f"{_en_number(stored)} {_plural(stored, 'table', 'tables')} from the models"
-        if kind == "relational"
-        else f"{_en_number(stored)} {_plural(stored, 'collection', 'collections')}"
-    ),
+    design_for=lambda database, kind: {
+        "relational": f"Relational design for {database}",
+        "document": f"Document design for {database}",
+    }.get(kind, f"Key-value design for {database}"),
+    design_summary=lambda stored, kind: {
+        "relational": f"{_en_number(stored)} {_plural(stored, 'table', 'tables')} from the models",
+        "document": f"{_en_number(stored)} {_plural(stored, 'collection', 'collections')}",
+    }.get(kind, f"{_en_number(stored)} {_plural(stored, 'model', 'models')} with keys of their own"),
     pending_count=lambda count: f"{_en_number(count)} {_plural(count, 'decision', 'decisions')} to review",
     all_decided="Nothing left to review.",
     review_summary=lambda count: f"{_en_number(count)} {_plural(count, 'decision waits', 'decisions wait')} for you",
@@ -406,12 +445,15 @@ EN = SimpleNamespace(
     edit_title=lambda field: f"Edit how “{field}” is stored",
     table_name="Table name",
     collection_name="Collection name",
+    key_prefix="Key prefix",
     key="Primary key",
     document_key="_id",
+    key_value_key="Key",
     include_model=lambda model: f"Store “{model}”",
     include_field="Store this field",
     column_name="Column name",
     property_name="Property name",
+    hash_field="Field name in the hash",
     column_type="Type in the database",
     column_type_help="Written as it is in the result, for every database. Leave it empty to use the derived type.",
     add_index="Add an index",
@@ -421,9 +463,18 @@ EN = SimpleNamespace(
     enums_title="Enums",
     other_models_title="Models without a table of their own",
     other_documents_title="Models without a collection of their own",
+    other_keys_title="Models without keys of their own",
     role={
         "stored": "Own table",
         "embedded": "Stored inside the models that use it",
+        "parent": "Base class: its fields go into the models that extend it",
+        "excluded": "Left out",
+        "pending": "Waits for a decision on a field that uses it",
+        "unused": "Nothing stored uses it",
+    },
+    key_value_role={
+        "stored": "Own keys: a hash for each one",
+        "embedded": "Stored inside the hashes that use it",
         "parent": "Base class: its fields go into the models that extend it",
         "excluded": "Left out",
         "pending": "Waits for a decision on a field that uses it",
@@ -456,6 +507,7 @@ EN = SimpleNamespace(
     relation_option=_relation_option_en,
     document_reference=lambda many: "References (list of _id)" if many else "Reference (_id)",
     document_other_side="Kept in the other collection (each one stores this _id)",
+    key_value_option=_key_value_option_en,
     key_option=_key_option_en,
     enum_option={
         "check": "Text with a CHECK constraint",
@@ -473,6 +525,7 @@ EN = SimpleNamespace(
     output_groups={
         "relational": "Relational SQL",
         "document": "Documents",
+        "keyvalue": "Key-value",
         "python": "Python",
         "typescript": "TypeScript / JavaScript",
         "jvm": "Java / Kotlin",
@@ -483,6 +536,7 @@ EN = SimpleNamespace(
     include_migration="Include the migration",
     tables_naming="Table names",
     collections_naming="Collection names",
+    prefixes_naming="Key prefixes",
     tables_naming_option={
         "plural": "Plural (order_lines)",
         "singular": "Singular (order_line)",
@@ -490,6 +544,7 @@ EN = SimpleNamespace(
     },
     columns_naming="Column names",
     properties_naming="Property names",
+    hash_fields_naming="Hash field names",
     columns_naming_option={"snake": "snake_case (created_at)", "field": "As the field (createdAt)"},
     strings_label="Text without a length",
     strings_option={"auto": "Database default", "varchar": "VARCHAR(255)", "text": "TEXT"},
@@ -564,14 +619,14 @@ ES = SimpleNamespace(
     # Diseño
     design_title="Diseño",
     design_waiting="El diseño propuesto aparecerá aquí cuando se pueda leer el modelo.",
-    design_for=lambda database, kind: (
-        f"Diseño relacional para {database}" if kind == "relational" else f"Diseño de documentos para {database}"
-    ),
-    design_summary=lambda stored, kind: (
-        f"{_es_number(stored)} {_plural(stored, 'tabla', 'tablas')} a partir de los modelos"
-        if kind == "relational"
-        else f"{_es_number(stored)} {_plural(stored, 'colección', 'colecciones')}"
-    ),
+    design_for=lambda database, kind: {
+        "relational": f"Diseño relacional para {database}",
+        "document": f"Diseño de documentos para {database}",
+    }.get(kind, f"Diseño clave-valor para {database}"),
+    design_summary=lambda stored, kind: {
+        "relational": f"{_es_number(stored)} {_plural(stored, 'tabla', 'tablas')} a partir de los modelos",
+        "document": f"{_es_number(stored)} {_plural(stored, 'colección', 'colecciones')}",
+    }.get(kind, f"{_es_number(stored)} {_plural(stored, 'modelo', 'modelos')} con claves propias"),
     pending_count=lambda count: f"{_es_number(count)} {_plural(count, 'decisión', 'decisiones')} para revisar",
     all_decided="No queda nada por revisar.",
     review_summary=lambda count: f"{_es_number(count)} {_plural(count, 'decisión te espera', 'decisiones te esperan')}",
@@ -589,12 +644,15 @@ ES = SimpleNamespace(
     edit_title=lambda field: f"Editar cómo se guarda «{field}»",
     table_name="Nombre de la tabla",
     collection_name="Nombre de la colección",
+    key_prefix="Prefijo de las claves",
     key="Clave primaria",
     document_key="_id",
+    key_value_key="Clave",
     include_model=lambda model: f"Guardar «{model}»",
     include_field="Guardar este campo",
     column_name="Nombre de la columna",
     property_name="Nombre de la propiedad",
+    hash_field="Nombre del campo en el hash",
     column_type="Tipo en la base de datos",
     column_type_help="Se escribe tal cual en el resultado, para cualquier base de datos. "
     "Déjalo vacío para usar el tipo deducido.",
@@ -605,9 +663,18 @@ ES = SimpleNamespace(
     enums_title="Enumeraciones",
     other_models_title="Modelos sin tabla propia",
     other_documents_title="Modelos sin colección propia",
+    other_keys_title="Modelos sin claves propias",
     role={
         "stored": "Tabla propia",
         "embedded": "Se guarda dentro de los modelos que lo usan",
+        "parent": "Clase base: sus campos van a los modelos que la heredan",
+        "excluded": "Excluido",
+        "pending": "Espera una decisión sobre un campo que lo usa",
+        "unused": "Nada de lo que se guarda lo usa",
+    },
+    key_value_role={
+        "stored": "Claves propias: un hash para cada uno",
+        "embedded": "Se guarda dentro de los hashes que lo usan",
         "parent": "Clase base: sus campos van a los modelos que la heredan",
         "excluded": "Excluido",
         "pending": "Espera una decisión sobre un campo que lo usa",
@@ -640,6 +707,7 @@ ES = SimpleNamespace(
     relation_option=_relation_option_es,
     document_reference=lambda many: "Referencias (lista de _id)" if many else "Referencia (_id)",
     document_other_side="En la otra colección (cada uno guarda este _id)",
+    key_value_option=_key_value_option_es,
     key_option=_key_option_es,
     enum_option={
         "check": "Texto con restricción CHECK",
@@ -657,6 +725,7 @@ ES = SimpleNamespace(
     output_groups={
         "relational": "SQL relacional",
         "document": "Documentos",
+        "keyvalue": "Clave-valor",
         "python": "Python",
         "typescript": "TypeScript / JavaScript",
         "jvm": "Java / Kotlin",
@@ -667,6 +736,7 @@ ES = SimpleNamespace(
     include_migration="Incluir la migración",
     tables_naming="Nombres de tabla",
     collections_naming="Nombres de colección",
+    prefixes_naming="Prefijos de las claves",
     tables_naming_option={
         "plural": "Plural (order_lines)",
         "singular": "Singular (order_line)",
@@ -674,6 +744,7 @@ ES = SimpleNamespace(
     },
     columns_naming="Nombres de columna",
     properties_naming="Nombres de propiedad",
+    hash_fields_naming="Nombres de los campos del hash",
     columns_naming_option={"snake": "snake_case (created_at)", "field": "Como el campo (createdAt)"},
     strings_label="Texto sin longitud",
     strings_option={"auto": "Según la base de datos", "varchar": "VARCHAR(255)", "text": "TEXT"},

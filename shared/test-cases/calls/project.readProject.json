@@ -300,7 +300,8 @@
        }
       ],
       "enums": []
-     }
+     },
+     "keyvalue": null
     },
     "output": {
      "output": "mysql",
@@ -312,6 +313,10 @@
       "document": {
        "tables": "plural",
        "columns": "field"
+      },
+      "keyvalue": {
+       "tables": "singular",
+       "columns": "snake"
       }
      },
      "strings": "varchar",
@@ -659,7 +664,8 @@
        }
       ],
       "enums": []
-     }
+     },
+     "keyvalue": null
     },
     "output": {
      "output": "mysql",
@@ -671,6 +677,10 @@
       "document": {
        "tables": "plural",
        "columns": "field"
+      },
+      "keyvalue": {
+       "tables": "singular",
+       "columns": "snake"
       }
      },
      "strings": "varchar",

@@ -38,7 +38,7 @@ export function ResultOptions({
         </label>
       )}
       <label className="field">
-        <span>{relational ? t.tablesNaming : t.collectionsNaming}</span>
+        <span>{relational ? t.tablesNaming : output.target === 'document' ? t.collectionsNaming : t.prefixesNaming}</span>
         <select
           className="select"
           value={settings.naming.tables}
@@ -52,7 +52,7 @@ export function ResultOptions({
         </select>
       </label>
       <label className="field">
-        <span>{relational ? t.columnsNaming : t.propertiesNaming}</span>
+        <span>{relational ? t.columnsNaming : output.target === 'document' ? t.propertiesNaming : t.hashFieldsNaming}</span>
         <select
           className="select"
           value={settings.naming.columns}

@@ -6,7 +6,7 @@ it was opened from, for detection) and `receivedFrom` (the tool that sent it).""
 
 from .design.analysis import analyze, is_top_level
 from .design.edit import reconcile
-from .design.types import FIELD_DECISIONS
+from .design.types import FIELD_DECISIONS, per_target
 from .interop.handoff import read_handoff, schema_text
 from .js import trim
 from .model.schema import all_fields
@@ -97,9 +97,6 @@ def designs_for_input(designs: dict, state: dict) -> dict:
     the input is edited."""
     read = read_input(state)
     if not read["outcome"] or not read["outcome"]["ok"]:
-        return {"relational": None, "document": None}
+        return per_target(lambda target: None)
     schema = read["outcome"]["schema"]
-    return {
-        "relational": reconcile(designs["relational"], schema, "relational"),
-        "document": reconcile(designs["document"], schema, "document"),
-    }
+    return per_target(lambda target: reconcile(designs[target], schema, target))

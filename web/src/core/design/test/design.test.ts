@@ -5,6 +5,7 @@ import { decide, reconcile, setFieldInclude, setFieldOverride } from '../edit.ts
 import { proposeDesign } from '../propose.ts'
 import { findFieldDesign, findModelDesign, type Design } from '../types.ts'
 import { findOutput, generate, type OutputSettings } from '../../generate/outputs.ts'
+import { buildKeyValue } from '../../physical/keyValue.ts'
 
 const store = () => schemaOf(findExample('store')!.text, 'typescript')
 const jpa = () => schemaOf(findExample('jpa')!.text, 'java')
@@ -140,6 +141,40 @@ describe('relations in a document database', () => {
       status: 'pending',
       options: ['embed', 'reference'],
     })
+  })
+})
+
+describe('keys and values', () => {
+  const prisma = schemaOf(findExample('prisma')!.text, 'prisma')
+  const design = proposeDesign(prisma, 'keyvalue')
+
+  it('refers to models with a key, flattens values and waits on lists of other models', () => {
+    expect(relation(design, 'Post', 'author')).toMatchObject({ value: 'reference', status: 'active' })
+    expect(relation(design, 'User', 'profile')).toMatchObject({ value: 'flatten', status: 'active' })
+    expect(relation(design, 'User', 'posts')).toMatchObject({
+      value: 'child',
+      status: 'pending',
+      reasons: [{ code: 'keySet', params: { model: 'Post' } }],
+      options: ['child', 'json'],
+    })
+    expect(relation(design, 'Post', 'tags')).toMatchObject({ value: 'child', status: 'active', reasons: [{ code: 'valueList' }] })
+  })
+
+  it('keeps a hash per stored model, sets of keys and lists under its key, and indexes what points to other keys', () => {
+    const decided = decide(design, { kind: 'relation', model: 'User', field: 'posts' })
+    const physical = buildKeyValue(prisma, decided, { tables: 'singular', columns: 'snake' })
+    const user = physical.entries.find((entry) => entry.model === 'User')!
+    const post = physical.entries.find((entry) => entry.model === 'Post')!
+    expect(user).toMatchObject({
+      prefix: 'user',
+      keyField: 'id',
+      structures: [{ suffix: 'posts', type: 'set', holds: 'key', refers: 'post' }],
+    })
+    expect(post.fields.find((field) => field.name === 'author_id')).toMatchObject({ holds: 'key', refers: 'user' })
+    expect(post.fields.some((field) => field.name === 'author_id_2')).toBe(false)
+    expect(post.structures).toEqual([{ suffix: 'tags', type: 'list', holds: 'text', source: 'Post.tags' }])
+    expect(post.search).toEqual([{ field: 'author_id', type: 'TAG' }])
+    expect(physical.notes).toContainEqual({ code: 'uniqueInApplication', params: { database: 'Redis', field: 'User.email' } })
   })
 })
 

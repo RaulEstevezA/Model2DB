@@ -5,6 +5,7 @@ import { decision, reason } from './decision.ts'
 import { declaresKey, declaresUnique } from './hints.ts'
 import type { DesignStrategy } from './strategy.ts'
 import { documentStrategy } from './targets/document.ts'
+import { keyValueStrategy } from './targets/keyValue.ts'
 import { relationalStrategy } from './targets/relational.ts'
 import type { Decision, Design, EnumDesign, FieldDesign, KeyChoice, ModelDesign, StorageTarget } from './types.ts'
 
@@ -12,6 +13,7 @@ import type { Decision, Design, EnumDesign, FieldDesign, KeyChoice, ModelDesign,
 const STRATEGIES: Record<StorageTarget, DesignStrategy> = {
   relational: relationalStrategy,
   document: documentStrategy,
+  keyvalue: keyValueStrategy,
 }
 
 /** Proposes a persistence design for a model schema. Facts declared in the input (keys, relations,

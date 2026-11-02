@@ -1,5 +1,6 @@
 import {
   FIELD_DECISIONS,
+  perTarget,
   type Confidence,
   type Decision,
   type DecisionStatus,
@@ -11,6 +12,7 @@ import {
   type StorageTarget,
 } from '../design/types.ts'
 import type { OutputSettings } from '../generate/types.ts'
+import { DEFAULT_NAMING } from '../physical/naming.ts'
 import type { Dialect, NamingOptions } from '../physical/types.ts'
 import { findParser } from '../parsers/registry.ts'
 import type { InputFormatId } from '../parsers/types.ts'
@@ -177,10 +179,12 @@ function readOutput(value: unknown, path: string): ProjectOutput {
   check(typeof output.migrations === 'boolean', `${path}.migrations`)
   return {
     output: output.output as string,
-    naming: {
-      relational: readNaming(naming.relational, `${path}.naming.relational`),
-      document: readNaming(naming.document, `${path}.naming.document`),
-    },
+    // Projects saved before a kind of database existed have no naming for it
+    naming: perTarget((target) =>
+      naming[target] === undefined && target === 'keyvalue'
+        ? DEFAULT_NAMING[target]
+        : readNaming(naming[target], `${path}.naming.${target}`),
+    ),
     strings: output.strings as OutputSettings['strings'],
     engine: output.engine as Dialect,
     migrations: output.migrations as boolean,
@@ -222,10 +226,7 @@ export function readProject(text: string): ProjectReadResult {
         version: PROJECT_VERSION,
         savedAt: typeof value.savedAt === 'string' ? value.savedAt : '',
         input: readInput(value.input, '$.input'),
-        designs: {
-          relational: readDesign(designs.relational ?? null, 'relational', '$.designs.relational'),
-          document: readDesign(designs.document ?? null, 'document', '$.designs.document'),
-        },
+        designs: perTarget((target) => readDesign(designs[target] ?? null, target, `$.designs.${target}`)),
         output: readOutput(value.output, '$.output'),
       },
     }

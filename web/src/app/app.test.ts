@@ -54,10 +54,14 @@ describe('the work kept in this browser', () => {
   )
   const project = createProject(
     { format: 'typescript', text: TEXT },
-    { relational, document: null },
+    { relational, document: null, keyvalue: null },
     {
       output: 'postgresql',
-      naming: { relational: { tables: 'plural', columns: 'snake' }, document: { tables: 'plural', columns: 'field' } },
+      naming: {
+        relational: { tables: 'plural', columns: 'snake' },
+        document: { tables: 'plural', columns: 'field' },
+        keyvalue: { tables: 'singular', columns: 'snake' },
+      },
       strings: 'auto',
       engine: 'postgresql',
       migrations: true,

@@ -4,6 +4,13 @@ import re
 
 from ..model.naming import name_words, to_snake_case
 
+# Documents keep the field names of the model; tables follow the SQL convention; Redis keys are singular
+DEFAULT_NAMING = {
+    "relational": {"tables": "plural", "columns": "snake"},
+    "document": {"tables": "plural", "columns": "field"},
+    "keyvalue": {"tables": "singular", "columns": "snake"},
+}
+
 
 def pluralize(word: str) -> str:
     """Plural of an English word, for table names: `order` → `orders`, `category` → `categories`."""

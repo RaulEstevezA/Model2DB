@@ -1,0 +1,1 @@
+FT.CREATE idx:invoices ON HASH PREFIX 1 invoices: SCHEMA customer_id TAG

@@ -1,5 +1,14 @@
 import { nameWords, toSnakeCase } from '../model/naming.ts'
+import type { StorageTarget } from '../design/types.ts'
 import type { NamingOptions } from './types.ts'
+
+/** Documents keep the field names of the model; tables follow the SQL convention; Redis keys are singular
+ * (`order:42`). */
+export const DEFAULT_NAMING: Record<StorageTarget, NamingOptions> = {
+  relational: { tables: 'plural', columns: 'snake' },
+  document: { tables: 'plural', columns: 'field' },
+  keyvalue: { tables: 'singular', columns: 'snake' },
+}
 
 /** Plural of an English word, for table names: `order` → `orders`, `category` → `categories`. */
 export function pluralize(word: string): string {

@@ -1,4 +1,4 @@
-import type { EnumChoice, KeyChoice, Reason, RelationChoice } from '../core/design/types.ts'
+import type { EnumChoice, KeyChoice, Reason, RelationChoice, StorageTarget } from '../core/design/types.ts'
 import type { OutputGroup } from '../core/generate/outputs.ts'
 import type { Note } from '../core/physical/types.ts'
 import type { ModelRole } from '../core/physical/roles.ts'
@@ -137,12 +137,18 @@ const en = {
   // Design
   designTitle: 'Design',
   designWaiting: 'The proposed design will appear here when the model can be read.',
-  designFor: (database: string, kind: 'relational' | 'document') =>
-    kind === 'relational' ? `Relational design for ${database}` : `Document design for ${database}`,
-  designSummary: (stored: number, kind: 'relational' | 'document') =>
+  designFor: (database: string, kind: StorageTarget) =>
+    kind === 'relational'
+      ? `Relational design for ${database}`
+      : kind === 'document'
+        ? `Document design for ${database}`
+        : `Key-value design for ${database}`,
+  designSummary: (stored: number, kind: StorageTarget) =>
     kind === 'relational'
       ? `${en$(stored)} ${plural(stored, 'table', 'tables')} from the models`
-      : `${en$(stored)} ${plural(stored, 'collection', 'collections')}`,
+      : kind === 'document'
+        ? `${en$(stored)} ${plural(stored, 'collection', 'collections')}`
+        : `${en$(stored)} ${plural(stored, 'model', 'models')} with keys of their own`,
   pendingCount: (count: number) => `${en$(count)} ${plural(count, 'decision', 'decisions')} to review`,
   allDecided: 'Nothing left to review.',
   reviewSummary: (count: number) => `${en$(count)} ${plural(count, 'decision waits', 'decisions wait')} for you`,
@@ -160,12 +166,15 @@ const en = {
   editTitle: (field: string) => `Edit how “${field}” is stored`,
   tableName: 'Table name',
   collectionName: 'Collection name',
+  keyPrefix: 'Key prefix',
   key: 'Primary key',
   documentKey: '_id',
+  keyValueKey: 'Key',
   includeModel: (model: string) => `Store “${model}”`,
   includeField: 'Store this field',
   columnName: 'Column name',
   propertyName: 'Property name',
+  hashField: 'Field name in the hash',
   columnType: 'Type in the database',
   columnTypeHelp: 'Written as it is in the result, for every database. Leave it empty to use the derived type.',
   addIndex: 'Add an index',
@@ -178,9 +187,18 @@ const en = {
   enumsTitle: 'Enums',
   otherModelsTitle: 'Models without a table of their own',
   otherDocumentsTitle: 'Models without a collection of their own',
+  otherKeysTitle: 'Models without keys of their own',
   role: {
     stored: 'Own table',
     embedded: 'Stored inside the models that use it',
+    parent: 'Base class: its fields go into the models that extend it',
+    excluded: 'Left out',
+    pending: 'Waits for a decision on a field that uses it',
+    unused: 'Nothing stored uses it',
+  } satisfies Record<ModelRole, string>,
+  keyValueRole: {
+    stored: 'Own keys: a hash for each one',
+    embedded: 'Stored inside the hashes that use it',
     parent: 'Base class: its fields go into the models that extend it',
     excluded: 'Left out',
     pending: 'Waits for a decision on a field that uses it',
@@ -230,6 +248,22 @@ const en = {
   },
   documentReference: (many: boolean): string => (many ? 'References (list of _id)' : 'Reference (_id)'),
   documentOtherSide: 'Kept in the other collection (each one stores this _id)',
+  keyValueOption: (choice: RelationChoice, shape: RelationShape): string => {
+    switch (choice) {
+      case 'reference':
+        return 'Field with its key'
+      case 'flatten':
+        return 'Fields in this hash'
+      case 'child':
+        return shape === 'models'
+          ? 'Set of its keys, under this key'
+          : shape === 'map'
+            ? 'Redis hash under this key'
+            : 'Redis list under this key'
+      default:
+        return 'JSON text in this hash'
+    }
+  },
   keyOption: (choice: KeyChoice): string =>
     choice.kind === 'field'
       ? `Field “${choice.field}”`
@@ -292,6 +326,16 @@ const en = {
         return `“${p(params, 'model')}” leads back to this model: embedding it would never end, so it is referred to.`
       case 'unboundedList':
         return `Embedded and read with its document. If the list can grow without limit, refer to “${p(params, 'model')}” instead.`
+      case 'keySet':
+        return `A set of the keys of “${p(params, 'model')}” under this one. Choose JSON if the list is always read with this model and nobody else uses its items.`
+      case 'listAsJson':
+        return `“${p(params, 'model')}” has no key: the list is kept as JSON inside this hash. Choose a set if each item should be stored on its own.`
+      case 'valueList':
+        return 'A list of plain values: a Redis list under this key keeps their order.'
+      case 'valueHash':
+        return 'Keys chosen at run time: a Redis hash under this key keeps them as they are.'
+      case 'valueAsJson':
+        return `“${p(params, 'model')}” has no key and holds lists: kept as JSON inside this hash.`
       case 'targetExcluded':
         return `“${p(params, 'model')}” is left out.`
       case 'foreignKeyNamed':
@@ -319,6 +363,7 @@ const en = {
   outputGroups: {
     relational: 'Relational SQL',
     document: 'Documents',
+    keyvalue: 'Key-value',
     python: 'Python',
     typescript: 'TypeScript / JavaScript',
     jvm: 'Java / Kotlin',
@@ -331,10 +376,12 @@ const en = {
   downloadZip: (count: number) => `Download .zip (${en$(count)} files)`,
   tablesNaming: 'Table names',
   collectionsNaming: 'Collection names',
+  prefixesNaming: 'Key prefixes',
   tablesNamingOption: { plural: 'Plural (order_lines)', singular: 'Singular (order_line)', model: 'As the model (OrderLine)' },
   collectionsNamingOption: { plural: 'Plural (order_lines)', singular: 'Singular (order_line)', model: 'As the model (OrderLine)' },
   columnsNaming: 'Column names',
   propertiesNaming: 'Property names',
+  hashFieldsNaming: 'Hash field names',
   columnsNamingOption: { snake: 'snake_case (created_at)', field: 'As the field (createdAt)' },
   stringsLabel: 'Text without a length',
   stringsOption: { auto: 'Database default', varchar: 'VARCHAR(255)', text: 'TEXT' },
@@ -495,11 +542,18 @@ const es: Messages = {
 
   designTitle: 'Diseño',
   designWaiting: 'El diseño propuesto aparecerá aquí cuando se pueda leer el modelo.',
-  designFor: (database, kind) => (kind === 'relational' ? `Diseño relacional para ${database}` : `Diseño de documentos para ${database}`),
+  designFor: (database, kind) =>
+    kind === 'relational'
+      ? `Diseño relacional para ${database}`
+      : kind === 'document'
+        ? `Diseño de documentos para ${database}`
+        : `Diseño clave-valor para ${database}`,
   designSummary: (stored, kind) =>
     kind === 'relational'
       ? `${es$(stored)} ${plural(stored, 'tabla', 'tablas')} a partir de los modelos`
-      : `${es$(stored)} ${plural(stored, 'colección', 'colecciones')}`,
+      : kind === 'document'
+        ? `${es$(stored)} ${plural(stored, 'colección', 'colecciones')}`
+        : `${es$(stored)} ${plural(stored, 'modelo', 'modelos')} con claves propias`,
   pendingCount: (count) => `${es$(count)} ${plural(count, 'decisión', 'decisiones')} para revisar`,
   allDecided: 'No queda nada por revisar.',
   reviewSummary: (count) => `${es$(count)} ${plural(count, 'decisión te espera', 'decisiones te esperan')}`,
@@ -517,12 +571,15 @@ const es: Messages = {
   editTitle: (field) => `Editar cómo se guarda «${field}»`,
   tableName: 'Nombre de la tabla',
   collectionName: 'Nombre de la colección',
+  keyPrefix: 'Prefijo de las claves',
   key: 'Clave primaria',
   documentKey: '_id',
+  keyValueKey: 'Clave',
   includeModel: (model) => `Guardar «${model}»`,
   includeField: 'Guardar este campo',
   columnName: 'Nombre de la columna',
   propertyName: 'Nombre de la propiedad',
+  hashField: 'Nombre del campo en el hash',
   columnType: 'Tipo en la base de datos',
   columnTypeHelp: 'Se escribe tal cual en el resultado, para cualquier base de datos. Déjalo vacío para usar el tipo deducido.',
   addIndex: 'Añadir un índice',
@@ -535,9 +592,18 @@ const es: Messages = {
   enumsTitle: 'Enumeraciones',
   otherModelsTitle: 'Modelos sin tabla propia',
   otherDocumentsTitle: 'Modelos sin colección propia',
+  otherKeysTitle: 'Modelos sin claves propias',
   role: {
     stored: 'Tabla propia',
     embedded: 'Se guarda dentro de los modelos que lo usan',
+    parent: 'Clase base: sus campos van a los modelos que la heredan',
+    excluded: 'Excluido',
+    pending: 'Espera una decisión sobre un campo que lo usa',
+    unused: 'Nada de lo que se guarda lo usa',
+  },
+  keyValueRole: {
+    stored: 'Claves propias: un hash para cada uno',
+    embedded: 'Se guarda dentro de los hashes que lo usan',
     parent: 'Clase base: sus campos van a los modelos que la heredan',
     excluded: 'Excluido',
     pending: 'Espera una decisión sobre un campo que lo usa',
@@ -587,6 +653,22 @@ const es: Messages = {
   },
   documentReference: (many) => (many ? 'Referencias (lista de _id)' : 'Referencia (_id)'),
   documentOtherSide: 'En la otra colección (cada uno guarda este _id)',
+  keyValueOption: (choice, shape) => {
+    switch (choice) {
+      case 'reference':
+        return 'Campo con su clave'
+      case 'flatten':
+        return 'Campos en este hash'
+      case 'child':
+        return shape === 'models'
+          ? 'Conjunto de sus claves, bajo esta clave'
+          : shape === 'map'
+            ? 'Hash de Redis bajo esta clave'
+            : 'Lista de Redis bajo esta clave'
+      default:
+        return 'Texto JSON en este hash'
+    }
+  },
   keyOption: (choice) =>
     choice.kind === 'field'
       ? `Campo «${choice.field}»`
@@ -649,6 +731,16 @@ const es: Messages = {
         return `«${p(params, 'model')}» lleva de vuelta a este modelo: embeberlo no terminaría nunca, así que se referencia.`
       case 'unboundedList':
         return `Embebido y leído con su documento. Si la lista puede crecer sin límite, referencia «${p(params, 'model')}».`
+      case 'keySet':
+        return `Un conjunto con las claves de «${p(params, 'model')}» bajo esta. Elige JSON si la lista siempre se lee con este modelo y nadie más usa sus elementos.`
+      case 'listAsJson':
+        return `«${p(params, 'model')}» no tiene clave: la lista se guarda como JSON dentro de este hash. Elige un conjunto si cada elemento debe guardarse por separado.`
+      case 'valueList':
+        return 'Una lista de valores simples: una lista de Redis bajo esta clave conserva su orden.'
+      case 'valueHash':
+        return 'Claves elegidas al ejecutar: un hash de Redis bajo esta clave las guarda tal cual.'
+      case 'valueAsJson':
+        return `«${p(params, 'model')}» no tiene clave y contiene listas: se guarda como JSON dentro de este hash.`
       case 'targetExcluded':
         return `«${p(params, 'model')}» está excluido.`
       case 'foreignKeyNamed':
@@ -675,6 +767,7 @@ const es: Messages = {
   outputGroups: {
     relational: 'SQL relacional',
     document: 'Documentos',
+    keyvalue: 'Clave-valor',
     python: 'Python',
     typescript: 'TypeScript / JavaScript',
     jvm: 'Java / Kotlin',
@@ -687,10 +780,12 @@ const es: Messages = {
   downloadZip: (count) => `Descargar .zip (${es$(count)} archivos)`,
   tablesNaming: 'Nombres de tabla',
   collectionsNaming: 'Nombres de colección',
+  prefixesNaming: 'Prefijos de las claves',
   tablesNamingOption: { plural: 'Plural (order_lines)', singular: 'Singular (order_line)', model: 'Como el modelo (OrderLine)' },
   collectionsNamingOption: { plural: 'Plural (order_lines)', singular: 'Singular (order_line)', model: 'Como el modelo (OrderLine)' },
   columnsNaming: 'Nombres de columna',
   propertiesNaming: 'Nombres de propiedad',
+  hashFieldsNaming: 'Nombres de los campos del hash',
   columnsNamingOption: { snake: 'snake_case (created_at)', field: 'Como el campo (createdAt)' },
   stringsLabel: 'Texto sin longitud',
   stringsOption: { auto: 'Según la base de datos', varchar: 'VARCHAR(255)', text: 'TEXT' },

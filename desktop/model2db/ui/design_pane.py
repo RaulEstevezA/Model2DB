@@ -200,6 +200,8 @@ class DesignPane(Pane):
             return subjects.key(ref["model"])
         if ref["kind"] == "unique":
             return subjects.unique(ref["model"], ref["field"])
+        if ref["kind"] == "wholeNumber":
+            return subjects.whole_number(ref["model"], ref["field"])
         if ref["kind"] == "enum":
             return subjects.enum(ref["enum"])
         return subjects.field(ref["model"], ref["field"])
@@ -441,6 +443,9 @@ class DesignPane(Pane):
             if decided.get("unique"):
                 ref = {"kind": "unique", "model": model, "field": field["name"]}
                 layout.addWidget(self._control(ref, decided["unique"], t.unique_option))
+            if decided.get("wholeNumber"):
+                ref = {"kind": "wholeNumber", "model": model, "field": field["name"]}
+                layout.addWidget(self._control(ref, decided["wholeNumber"], t.whole_number_option))
 
         if self._editing == (model, field["name"]):
             editor = QFrame()

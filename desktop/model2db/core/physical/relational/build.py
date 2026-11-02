@@ -72,6 +72,11 @@ class RelationalBuild:
         """The type of a field's column: the one the user wrote, or the one derived from the field."""
         if decided and decided.get("type"):
             return {"kind": "raw", "sql": decided["type"]}
+        whole = (decided or {}).get("wholeNumber")
+        type_ref = field["type"]
+        if whole and whole["status"] == "active" and whole["value"] and type_ref["kind"] == "primitive":
+            if type_ref["name"] == "float":
+                return {"kind": "primitive", "name": "integer"}
         return self.column_type(field["type"], field, path)
 
     def column_type(self, type_ref: dict, field: dict, path: str) -> dict:

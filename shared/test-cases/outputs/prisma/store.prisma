@@ -48,7 +48,7 @@ model Order {
 
 model OrderLine {
   id        BigInt @id(map: "pk_order_lines") @default(autoincrement())
-  quantity  Float
+  quantity  Int
   unitPrice Float @map("unit_price")
   orderId   BigInt @map("order_id")
   productId BigInt @map("product_id")

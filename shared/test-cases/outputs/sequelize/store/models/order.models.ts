@@ -92,7 +92,7 @@ export function initModels(sequelize: Sequelize): void {
   OrderLine.init(
     {
       id: { type: DataTypes.BIGINT, field: 'id', primaryKey: true, autoIncrement: true, allowNull: false },
-      quantity: { type: DataTypes.DOUBLE, field: 'quantity', allowNull: false },
+      quantity: { type: DataTypes.INTEGER, field: 'quantity', allowNull: false },
       unitPrice: { type: DataTypes.DOUBLE, field: 'unit_price', allowNull: false },
       orderId: { type: DataTypes.BIGINT, field: 'order_id', allowNull: false },
       productId: { type: DataTypes.BIGINT, field: 'product_id', allowNull: false },

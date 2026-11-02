@@ -75,7 +75,7 @@ export class OrderLine {
   @PrimaryGeneratedColumn({ name: 'id', type: 'bigint' })
   id!: string
 
-  @Column({ name: 'quantity', type: 'double precision' })
+  @Column({ name: 'quantity', type: 'integer' })
   quantity!: number
 
   @Column({ name: 'unit_price', type: 'double precision' })

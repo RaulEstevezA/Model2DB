@@ -46,6 +46,8 @@ export function DesignPane({
         return t.subjects.key(ref.model)
       case 'unique':
         return t.subjects.unique(ref.model, ref.field)
+      case 'wholeNumber':
+        return t.subjects.wholeNumber(ref.model, ref.field)
       case 'enum':
         return t.subjects.enum(ref.enum)
       default:

@@ -5,6 +5,7 @@ settings. Mirrors web/src/core/interop/project.ts; a project saved in one versio
 import re
 from datetime import UTC, datetime
 
+from ..design.types import FIELD_DECISIONS
 from ..js import parse_json_value
 from ..parsers.registry import find_parser
 
@@ -93,7 +94,7 @@ def _read_decision(value, path: str) -> dict | None:
 def _read_field(value, path: str) -> dict:
     _check(_is_object(value) and isinstance(value.get("field"), str) and _is_bool(value.get("include")), path)
     result = {"field": value["field"], "include": value["include"]}
-    for kind in ("relation", "foreignKey", "unique"):
+    for kind in FIELD_DECISIONS:
         decision = _read_decision(value.get(kind, _MISSING), f"{path}.{kind}")
         if decision:
             result[kind] = decision

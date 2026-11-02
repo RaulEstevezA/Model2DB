@@ -59,7 +59,7 @@ class OrderLine(SQLModel, table=True):
     __tablename__ = "order_lines"
 
     id: int | None = Field(default=None, sa_column=Column(BigInteger().with_variant(Integer(), "sqlite"), primary_key=True))
-    quantity: float = Field(sa_column=Column(Double, nullable=False))
+    quantity: int = Field(sa_column=Column(Integer, nullable=False))
     unit_price: float = Field(sa_column=Column(Double, nullable=False))
     order_id: int = Field(sa_column=Column(BigInteger, ForeignKey("orders.id", ondelete="CASCADE"), index=True, nullable=False))
     product_id: int = Field(sa_column=Column(BigInteger, ForeignKey("products.id"), index=True, nullable=False))

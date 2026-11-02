@@ -22,7 +22,7 @@ public class OrderLine {
     private Long id;
 
     @Column(name = "quantity", nullable = false)
-    private Double quantity;
+    private Integer quantity;
 
     @Column(name = "unit_price", nullable = false)
     private Double unitPrice;
@@ -43,11 +43,11 @@ public class OrderLine {
         this.id = id;
     }
 
-    public Double getQuantity() {
+    public Integer getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(Double quantity) {
+    public void setQuantity(Integer quantity) {
         this.quantity = quantity;
     }
 

@@ -66,7 +66,7 @@ class OrderLine(Base):
     __tablename__ = "order_lines"
 
     id: Mapped[int] = mapped_column(BigInteger().with_variant(Integer(), "sqlite"), primary_key=True)
-    quantity: Mapped[float] = mapped_column(Double)
+    quantity: Mapped[int] = mapped_column(Integer)
     unit_price: Mapped[float] = mapped_column(Double)
     order_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("orders.id", ondelete="CASCADE"), index=True)
     product_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("products.id"), index=True)

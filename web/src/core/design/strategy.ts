@@ -14,6 +14,8 @@ export interface DesignStrategy {
   relation(context: SchemaContext, model: ModelDef, field: FieldDef, shape: Shape): Decision<RelationChoice>
   /** Whether scalar fields named after another model (`customerId`) are proposed as foreign keys */
   foreignKeys: boolean
+  /** Whether numbers without a size named like counts (`quantity`) are proposed as whole numbers */
+  wholeNumbers: boolean
   /** How each enum is stored; null when the database has a single way */
   enum(name: string): EnumDesign | null
 }

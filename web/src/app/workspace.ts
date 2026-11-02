@@ -1,6 +1,6 @@
 import type { DecisionRef } from '../core/design/edit.ts'
 import { analyze, isTopLevel } from '../core/design/analysis.ts'
-import type { Decision, Design } from '../core/design/types.ts'
+import { FIELD_DECISIONS, type Decision, type Design } from '../core/design/types.ts'
 import type { ModelRole } from '../core/physical/roles.ts'
 import { allFields, type ModelSchema } from '../core/model/schema.ts'
 import { detectFormat, parseInput } from '../core/parsers/registry.ts'
@@ -52,7 +52,7 @@ export function pendingDecisions(design: Design, roles: Map<string, ModelRole>):
     if (!fieldsMatter) continue
     for (const field of model.fields) {
       if (!field.include) continue
-      for (const kind of ['relation', 'foreignKey', 'unique'] as const) {
+      for (const kind of FIELD_DECISIONS) {
         const decision = field[kind] as Decision<unknown> | undefined
         if (decision?.status === 'pending') items.push({ ref: { kind, model: model.model, field: field.field }, decision })
       }

@@ -37,7 +37,7 @@ CREATE TABLE products (
 
 CREATE TABLE order_lines (
   id BIGINT IDENTITY(1, 1) NOT NULL,
-  quantity FLOAT NOT NULL,
+  quantity INT NOT NULL,
   unit_price FLOAT NOT NULL,
   order_id BIGINT NOT NULL,
   product_id BIGINT NOT NULL,

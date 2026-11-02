@@ -39,7 +39,7 @@ class Order(models.Model):
 
 class OrderLine(models.Model):
     id = models.BigAutoField(primary_key=True)
-    quantity = models.FloatField()
+    quantity = models.IntegerField()
     unit_price = models.FloatField()
     order = models.ForeignKey("Order", on_delete=models.CASCADE, related_name="lines")
     product = models.ForeignKey("Product", on_delete=models.PROTECT, related_name="+")

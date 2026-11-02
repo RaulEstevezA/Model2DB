@@ -53,7 +53,7 @@ class Migration(migrations.Migration):
             name="OrderLine",
             fields=[
                 ("id", models.BigAutoField(primary_key=True, serialize=False)),
-                ("quantity", models.FloatField()),
+                ("quantity", models.IntegerField()),
                 ("unit_price", models.FloatField()),
                 ("order", models.ForeignKey("app.Order", on_delete=models.CASCADE, related_name="lines")),
                 ("product", models.ForeignKey("app.Product", on_delete=models.PROTECT, related_name="+")),

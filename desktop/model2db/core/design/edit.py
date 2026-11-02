@@ -2,7 +2,7 @@
 keep it for undo. Mirrors web/src/core/design/edit.ts."""
 
 from .propose import propose_design
-from .types import same_value
+from .types import FIELD_DECISIONS, same_value
 
 
 def _map_model(design: dict, model: str, change) -> dict:
@@ -134,7 +134,7 @@ def reconcile(previous: dict | None, schema: dict, target: str) -> dict:
                 fields.append(field)
                 continue
             updated = {**field, "include": was["include"]}
-            for kind in ("relation", "foreignKey", "unique"):
+            for kind in FIELD_DECISIONS:
                 kept = _keep(field.get(kind), was.get(kind))
                 if kept:
                     updated[kind] = kept

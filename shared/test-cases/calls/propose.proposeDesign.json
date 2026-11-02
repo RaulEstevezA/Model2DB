@@ -726,7 +726,24 @@
       },
       {
        "field": "quantity",
-       "include": true
+       "include": true,
+       "wholeNumber": {
+        "value": true,
+        "status": "active",
+        "confidence": "probable",
+        "reasons": [
+         {
+          "code": "wholeNumberNamed",
+          "params": {
+           "field": "quantity"
+          }
+         }
+        ],
+        "options": [
+         true,
+         false
+        ]
+       }
       },
       {
        "field": "unitPrice",

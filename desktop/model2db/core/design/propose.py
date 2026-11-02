@@ -66,6 +66,11 @@ def _propose_field(context: dict, model: dict, fields: list[dict], field: dict, 
     unique = _propose_unique(model, fields, field)
     if unique:
         design["unique"] = unique
+    whole_number = (
+        _propose_whole_number(model, fields, field) if strategy["whole_numbers"] and not foreign_key else None
+    )
+    if whole_number:
+        design["wholeNumber"] = whole_number
     return design
 
 
@@ -81,6 +86,30 @@ def _propose_unique(model: dict, fields: list[dict], field: dict) -> dict | None
     if words and words[-1] in ("email", "username", "slug", "sku", "isbn", "login", "handle") and len(words) <= 2:
         return decision(True, "review", [reason("uniqueNamed", {"field": field["name"]})], [True, False])
     return None
+
+
+# Last words of names that count things: a number without a size (TypeScript's `number`) named like
+# this is most likely whole
+WHOLE_NUMBER_WORDS = {
+    *("count", "quantity", "qty", "age", "year", "position", "rank", "level", "version", "attempts", "retries"),
+    *("votes", "likes", "views", "stock", "page", "port", "priority", "sequence", "index", "id", "number"),
+    *("bytes", "step", "floor", "seats", "copies"),
+}
+
+
+def _propose_whole_number(model: dict, fields: list[dict], field: dict) -> dict | None:
+    """`quantity: number`: stored as a whole number. Keys and foreign keys already take the key's type."""
+    type_ref = field["type"]
+    if type_ref["kind"] != "primitive" or type_ref["name"] != "float" or type_ref.get("bits") is not None:
+        return None
+    key = key_field(model, fields)
+    if key and key["field"]["name"] == field["name"]:
+        return None
+    words = name_words(field["name"])
+    named = bool(words) and (words[-1] in WHOLE_NUMBER_WORDS or (len(words) > 1 and words[0] in ("num", "count")))
+    if not named:
+        return None
+    return decision(True, "probable", [reason("wholeNumberNamed", {"field": field["name"]})], [True, False])
 
 
 def _propose_foreign_key(context: dict, model: dict, fields: list[dict], field: dict) -> dict | None:

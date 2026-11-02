@@ -27,7 +27,7 @@ export const orders = pgTable('orders', {
 
 export const orderLines = pgTable('order_lines', {
   id: bigint('id', { mode: 'number' }).generatedByDefaultAsIdentity().primaryKey(),
-  quantity: doublePrecision('quantity').notNull(),
+  quantity: integer('quantity').notNull(),
   unitPrice: doublePrecision('unit_price').notNull(),
   orderId: bigint('order_id', { mode: 'number' }).notNull().references((): AnyPgColumn => orders.id, { onDelete: 'cascade' }),
   productId: bigint('product_id', { mode: 'number' }).notNull().references((): AnyPgColumn => products.id),

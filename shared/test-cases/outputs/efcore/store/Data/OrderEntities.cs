@@ -62,7 +62,7 @@ public class Order
 public class OrderLine
 {
     public long Id { get; set; }
-    public double Quantity { get; set; }
+    public int Quantity { get; set; }
     public double UnitPrice { get; set; }
     public long OrderId { get; set; }
     public long ProductId { get; set; }

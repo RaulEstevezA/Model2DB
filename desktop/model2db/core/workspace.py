@@ -6,6 +6,7 @@ it was opened from, for detection) and `receivedFrom` (the tool that sent it).""
 
 from .design.analysis import analyze, is_top_level
 from .design.edit import reconcile
+from .design.types import FIELD_DECISIONS
 from .interop.handoff import read_handoff, schema_text
 from .js import trim
 from .model.schema import all_fields
@@ -43,7 +44,7 @@ def pending_decisions(design: dict, roles: dict[str, str]) -> list[dict]:
         for field in model["fields"]:
             if not field["include"]:
                 continue
-            for kind in ("relation", "foreignKey", "unique"):
+            for kind in FIELD_DECISIONS:
                 decision = field.get(kind)
                 if decision and decision["status"] == "pending":
                     ref = {"kind": kind, "model": model["model"], "field": field["field"]}

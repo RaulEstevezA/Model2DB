@@ -75,6 +75,13 @@ export class RelationalBuild {
   /** The type of a field's column: the one the user wrote, or the one derived from the field. */
   typeOf(field: FieldDef, decided: FieldDesign | undefined, path: string): ColumnType {
     if (decided?.type) return { kind: 'raw', sql: decided.type }
+    if (
+      decided?.wholeNumber?.status === 'active' &&
+      decided.wholeNumber.value &&
+      field.type.kind === 'primitive' &&
+      field.type.name === 'float'
+    )
+      return { kind: 'primitive', name: 'integer' }
     return this.columnType(field.type, field, path)
   }
 

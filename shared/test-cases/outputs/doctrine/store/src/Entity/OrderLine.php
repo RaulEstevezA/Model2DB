@@ -17,8 +17,8 @@ class OrderLine
     #[ORM\Column(name: 'id', type: Types::BIGINT)]
     private ?int $id = null;
 
-    #[ORM\Column(name: 'quantity', type: Types::FLOAT)]
-    private float $quantity;
+    #[ORM\Column(name: 'quantity', type: Types::INTEGER)]
+    private int $quantity;
 
     #[ORM\Column(name: 'unit_price', type: Types::FLOAT)]
     private float $unitPrice;
@@ -43,12 +43,12 @@ class OrderLine
         return $this;
     }
 
-    public function getQuantity(): float
+    public function getQuantity(): int
     {
         return $this->quantity;
     }
 
-    public function setQuantity(float $quantity): static
+    public function setQuantity(int $quantity): static
     {
         $this->quantity = $quantity;
 

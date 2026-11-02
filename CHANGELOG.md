@@ -8,6 +8,7 @@ Notable changes to Model2DB, the web and the desktop version together. The forma
 
 - Web: reads models in 23 formats (code in 12 languages, JSON Schema, OpenAPI, GraphQL, Protocol Buffers, Smithy, Prisma, model schema, and JSON, YAML, XML or CSV documents), with the parsers of Mapper.
 - Web: proposes a relational or a MongoDB design (tables or collections, keys, relations, value objects, child and join tables, embedded documents, enums, unique columns and indexes), each proposal with its confidence and its reason. What the input declares (`@Id`, `@ManyToOne`, `unique=True`, `@db.VarChar(80)`…) is taken as it is.
+- Web: numbers without a size (TypeScript's `number`) named like counts (`quantity`, `count`, `numSeats`…) are proposed as whole numbers, which can be changed back to decimals.
 - Web: decisions to review are listed and never applied on their own; the result leaves a `TODO` where each one goes.
 - Web: every decision, name, column type, index and model or field left out can be changed, with undo, redo and reset. Editing the model keeps the decisions that still apply.
 - Web: 26 outputs: SQL for PostgreSQL, MySQL, MariaDB, SQLite, SQL Server and Oracle Database; a MongoDB script with validators and indexes; Django, SQLAlchemy, SQLModel, Tortoise, PyMongo, MongoEngine, Beanie, Prisma, TypeORM, Sequelize, Drizzle, Mongoose, JPA, Hibernate, Spring Data JPA, Spring Data MongoDB, Entity Framework Core, Laravel Eloquent and Doctrine, with migrations where the tool has them.

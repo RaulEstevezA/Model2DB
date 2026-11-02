@@ -45,6 +45,8 @@ export type ReasonCode =
   // Unique
   | 'uniqueDeclared'
   | 'uniqueNamed'
+  // Whole numbers
+  | 'wholeNumberNamed'
   // Enums
   | 'enumCheck'
   | 'enumDocument'
@@ -100,6 +102,8 @@ export interface FieldDesign {
   /** A scalar field that holds another model's key (`customerId`): the model it points to, or null */
   foreignKey?: Decision<string | null>
   unique?: Decision<boolean>
+  /** Only for numbers without a size (TypeScript's `number`): true stores a whole number (INTEGER) */
+  wholeNumber?: Decision<boolean>
   /** A plain index on the column, chosen by the user (foreign keys are indexed on their own) */
   index?: boolean
   /** Column or property name chosen by the user, instead of the one derived from the field */
@@ -107,6 +111,11 @@ export interface FieldDesign {
   /** Database type written by the user (`VARCHAR(80)`), instead of the one derived from the field */
   type?: string
 }
+
+/** The field decisions, in the order the interface shows them. */
+export const FIELD_DECISIONS = ['relation', 'foreignKey', 'unique', 'wholeNumber'] as const
+
+export type FieldDecisionKind = (typeof FIELD_DECISIONS)[number]
 
 export interface ModelDesign {
   model: string

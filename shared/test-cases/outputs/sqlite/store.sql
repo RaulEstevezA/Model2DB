@@ -39,7 +39,7 @@ CREATE TABLE products (
 
 CREATE TABLE order_lines (
   id INTEGER PRIMARY KEY,
-  quantity REAL NOT NULL,
+  quantity INTEGER NOT NULL,
   unit_price REAL NOT NULL,
   order_id INTEGER NOT NULL,
   product_id INTEGER NOT NULL,

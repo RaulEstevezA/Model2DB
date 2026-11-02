@@ -95,6 +95,16 @@ export function FieldRow({ design, model, field, decided, isKey, table, editing,
           onAccept={choose({ kind: 'unique', model, field: field.name })}
         />
       )}
+      {decided.include && decided.wholeNumber && (
+        <DecisionControl
+          id={decisionElementId({ kind: 'wholeNumber', model, field: field.name })}
+          subject={t.subjects.wholeNumber(model, field.name)}
+          decision={decided.wholeNumber}
+          optionLabel={t.wholeNumberOption}
+          onChoose={choose({ kind: 'wholeNumber', model, field: field.name })}
+          onAccept={choose({ kind: 'wholeNumber', model, field: field.name })}
+        />
+      )}
       {editing && (
         <div className="field-row__editor">
           <label className="check">

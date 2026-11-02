@@ -1,13 +1,14 @@
-import type {
-  Confidence,
-  Decision,
-  DecisionStatus,
-  Design,
-  EnumDesign,
-  FieldDesign,
-  ModelDesign,
-  Reason,
-  StorageTarget,
+import {
+  FIELD_DECISIONS,
+  type Confidence,
+  type Decision,
+  type DecisionStatus,
+  type Design,
+  type EnumDesign,
+  type FieldDesign,
+  type ModelDesign,
+  type Reason,
+  type StorageTarget,
 } from '../design/types.ts'
 import type { OutputSettings } from '../generate/types.ts'
 import type { Dialect, NamingOptions } from '../physical/types.ts'
@@ -115,7 +116,7 @@ function readField(value: unknown, path: string): FieldDesign {
   check(isObject(value) && typeof value.field === 'string' && typeof value.include === 'boolean', path)
   const field = value as Json
   const result: FieldDesign = { field: field.field as string, include: field.include as boolean }
-  for (const kind of ['relation', 'foreignKey', 'unique'] as const) {
+  for (const kind of FIELD_DECISIONS) {
     const decision = readDecision(field[kind], `${path}.${kind}`)
     if (decision) (result as unknown as Json)[kind] = decision
   }

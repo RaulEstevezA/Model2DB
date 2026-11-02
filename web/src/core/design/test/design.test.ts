@@ -123,6 +123,32 @@ describe('relations in a document database', () => {
   })
 })
 
+describe('whole numbers', () => {
+  const schema = () =>
+    schemaOf(
+      'interface Line { id: number; quantity: number; numSeats: number; price: number; customerId: number }\ninterface Customer { id: number }',
+      'typescript',
+    )
+
+  it('stores numbers named like counts as whole numbers, and only in tables', () => {
+    const design = proposeDesign(schema(), 'relational')
+    for (const field of ['quantity', 'numSeats'])
+      expect(findFieldDesign(design, 'Line', field)?.wholeNumber).toMatchObject({
+        value: true,
+        status: 'active',
+        confidence: 'probable',
+        reasons: [{ code: 'wholeNumberNamed', params: { field } }],
+      })
+    for (const field of ['id', 'price', 'customerId']) expect(findFieldDesign(design, 'Line', field)?.wholeNumber).toBeUndefined()
+    expect(findFieldDesign(proposeDesign(schema(), 'document'), 'Line', 'quantity')?.wholeNumber).toBeUndefined()
+  })
+
+  it('leaves numbers with a size as they are', () => {
+    const design = proposeDesign(schemaOf('class Line { public double Quantity { get; set; } }', 'csharp'), 'relational')
+    expect(findFieldDesign(design, 'Line', 'Quantity')?.wholeNumber).toBeUndefined()
+  })
+})
+
 describe('edits', () => {
   it('confirms a suggestion or chooses another option', () => {
     const design = proposeDesign(store(), 'relational')

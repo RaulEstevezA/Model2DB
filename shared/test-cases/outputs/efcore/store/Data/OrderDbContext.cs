@@ -49,7 +49,7 @@ public class OrderDbContext(DbContextOptions<OrderDbContext> options) : DbContex
             entity.ToTable("order_lines");
             entity.HasKey(e => e.Id).HasName("pk_order_lines");
             entity.Property(e => e.Id).HasColumnName("id").HasColumnType("BIGINT").IsRequired().ValueGeneratedOnAdd();
-            entity.Property(e => e.Quantity).HasColumnName("quantity").HasColumnType("DOUBLE PRECISION").IsRequired();
+            entity.Property(e => e.Quantity).HasColumnName("quantity").HasColumnType("INTEGER").IsRequired();
             entity.Property(e => e.UnitPrice).HasColumnName("unit_price").HasColumnType("DOUBLE PRECISION").IsRequired();
             entity.Property(e => e.OrderId).HasColumnName("order_id").HasColumnType("BIGINT").IsRequired();
             entity.Property(e => e.ProductId).HasColumnName("product_id").HasColumnType("BIGINT").IsRequired();

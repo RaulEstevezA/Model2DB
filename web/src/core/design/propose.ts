@@ -74,6 +74,8 @@ function proposeField(context: SchemaContext, model: ModelDef, fields: FieldDef[
   if (foreignKey) design.foreignKey = foreignKey
   const unique = proposeUnique(model, fields, field)
   if (unique) design.unique = unique
+  const wholeNumber = strategy.wholeNumbers && !foreignKey ? proposeWholeNumber(model, fields, field) : null
+  if (wholeNumber) design.wholeNumber = wholeNumber
   return design
 }
 
@@ -88,6 +90,48 @@ function proposeUnique(model: ModelDef, fields: FieldDef[], field: FieldDef): De
   if (['email', 'username', 'slug', 'sku', 'isbn', 'login', 'handle'].includes(last) && words.length <= 2)
     return decision(true, 'review', [reason('uniqueNamed', { field: field.name })], [true, false])
   return null
+}
+
+/** Last words of names that count things: a number without a size (TypeScript's `number`) named like
+ * this is most likely whole. */
+const WHOLE_NUMBER_WORDS = new Set([
+  'count',
+  'quantity',
+  'qty',
+  'age',
+  'year',
+  'position',
+  'rank',
+  'level',
+  'version',
+  'attempts',
+  'retries',
+  'votes',
+  'likes',
+  'views',
+  'stock',
+  'page',
+  'port',
+  'priority',
+  'sequence',
+  'index',
+  'id',
+  'number',
+  'bytes',
+  'step',
+  'floor',
+  'seats',
+  'copies',
+])
+
+/** `quantity: number`: stored as a whole number. Keys and foreign keys already take the key's type. */
+function proposeWholeNumber(model: ModelDef, fields: FieldDef[], field: FieldDef): Decision<boolean> | null {
+  if (field.type.kind !== 'primitive' || field.type.name !== 'float' || field.type.bits !== undefined) return null
+  if (keyField(model, fields)?.field.name === field.name) return null
+  const words = nameWords(field.name)
+  const named = WHOLE_NUMBER_WORDS.has(words[words.length - 1]) || (words.length > 1 && ['num', 'count'].includes(words[0]))
+  if (!named) return null
+  return decision(true, 'probable', [reason('wholeNumberNamed', { field: field.name })], [true, false])
 }
 
 /** `customerId` next to a `Customer` model: the column most likely holds its key. */

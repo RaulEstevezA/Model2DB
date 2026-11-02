@@ -14,6 +14,7 @@ export const documentStrategy: DesignStrategy = {
   },
   relation,
   foreignKeys: false,
+  wholeNumbers: false,
   enum: () => null,
 }
 

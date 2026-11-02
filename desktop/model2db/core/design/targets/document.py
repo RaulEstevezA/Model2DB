@@ -48,5 +48,6 @@ STRATEGY = {
     "key_without_field": key_without_field,
     "relation": relation,
     "foreign_keys": False,
+    "whole_numbers": False,
     "enum": lambda _name: None,
 }

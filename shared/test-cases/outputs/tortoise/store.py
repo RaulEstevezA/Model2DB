@@ -44,7 +44,7 @@ class Order(Model):
 
 class OrderLine(Model):
     id = fields.BigIntField(primary_key=True)
-    quantity = fields.FloatField()
+    quantity = fields.IntField()
     unit_price = fields.FloatField()
     order = fields.ForeignKeyField("models.Order", related_name="lines", on_delete=fields.CASCADE, db_index=True)
     product = fields.ForeignKeyField("models.Product", related_name=False, on_delete=fields.RESTRICT, db_index=True)

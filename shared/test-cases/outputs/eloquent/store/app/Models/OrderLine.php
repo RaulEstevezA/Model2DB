@@ -19,7 +19,7 @@ class OrderLine extends Model
     {
         return [
             'id' => 'integer',
-            'quantity' => 'float',
+            'quantity' => 'integer',
             'unit_price' => 'float',
             'order_id' => 'integer',
             'product_id' => 'integer',

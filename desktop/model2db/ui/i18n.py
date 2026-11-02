@@ -196,6 +196,8 @@ def _reason_en(reason: dict) -> str:
         "foreignKeyNamed": f"Named after “{_p(params, 'model')}”: it most likely holds its key.",
         "uniqueDeclared": "Declared unique in the input.",
         "uniqueNamed": f"“{_p(params, 'field')}” is usually unique. Confirm it if two rows can never share it.",
+        "wholeNumberNamed": f"“{_p(params, 'field')}” counts things: stored as a whole number. "
+        "Choose decimals if it can have them.",
         "enumCheck": "A CHECK constraint keeps the allowed values without a type of its own and is easy to change.",
         "enumDocument": "The validator lists the allowed values.",
         "parentOnly": "Only used as a base class.",
@@ -250,6 +252,8 @@ def _reason_es(reason: dict) -> str:
         "foreignKeyNamed": f"Lleva el nombre de «{_p(params, 'model')}»: lo más probable es que guarde su clave.",
         "uniqueDeclared": "Declarado único en la entrada.",
         "uniqueNamed": f"«{_p(params, 'field')}» suele ser único. Confírmalo si dos filas nunca pueden compartirlo.",
+        "wholeNumberNamed": f"«{_p(params, 'field')}» cuenta cosas: se guarda como número entero. "
+        "Elige decimales si puede tenerlos.",
         "enumCheck": "Una restricción CHECK limita los valores sin un tipo propio y es fácil de cambiar.",
         "enumDocument": "El validador enumera los valores permitidos.",
         "parentOnly": "Solo se usa como clase base.",
@@ -442,6 +446,7 @@ EN = SimpleNamespace(
         key=lambda model: f"key of {model}",
         field=lambda model, field: f"{model}.{field}",
         unique=lambda model, field: f"unique {model}.{field}",
+        whole_number=lambda model, field: f"number type of {model}.{field}",
         enum=lambda name: f"enum {name}",
     ),
     relation_option=_relation_option_en,
@@ -454,6 +459,7 @@ EN = SimpleNamespace(
         "text": "Plain text, no constraint",
     },
     unique_option=lambda value: "Unique" if value else "Not unique",
+    whole_number_option=lambda value: "Whole number" if value else "Number with decimals",
     foreign_key_option=lambda model: f"Foreign key to “{model}”" if model else "Plain column",
     reason=_reason_en,
     # Result
@@ -623,6 +629,7 @@ ES = SimpleNamespace(
         key=lambda model: f"clave de {model}",
         field=lambda model, field: f"{model}.{field}",
         unique=lambda model, field: f"única {model}.{field}",
+        whole_number=lambda model, field: f"tipo de número de {model}.{field}",
         enum=lambda name: f"enumeración {name}",
     ),
     relation_option=_relation_option_es,
@@ -635,6 +642,7 @@ ES = SimpleNamespace(
         "text": "Texto sin restricción",
     },
     unique_option=lambda value: "Única" if value else "No única",
+    whole_number_option=lambda value: "Número entero" if value else "Número con decimales",
     foreign_key_option=lambda model: f"Clave ajena a «{model}»" if model else "Columna normal",
     reason=_reason_es,
     # Resultado

@@ -1,15 +1,22 @@
 import type { ModelSchema } from '../model/schema.ts'
 import { proposeDesign } from './propose.ts'
-import { sameValue, type Decision, type Design, type FieldDesign, type ModelDesign, type StorageTarget } from './types.ts'
+import {
+  FIELD_DECISIONS,
+  sameValue,
+  type Decision,
+  type Design,
+  type FieldDecisionKind,
+  type FieldDesign,
+  type ModelDesign,
+  type StorageTarget,
+} from './types.ts'
 
 /** Edits of a design. Each returns a new design and leaves the previous one untouched, so the history
  * can keep it for undo. */
 
 /** Which decision an edit is about. */
 export type DecisionRef =
-  | { kind: 'key'; model: string }
-  | { kind: 'relation' | 'foreignKey' | 'unique'; model: string; field: string }
-  | { kind: 'enum'; enum: string }
+  { kind: 'key'; model: string } | { kind: FieldDecisionKind; model: string; field: string } | { kind: 'enum'; enum: string }
 
 function mapModel(design: Design, model: string, change: (item: ModelDesign) => ModelDesign): Design {
   return { ...design, models: design.models.map((item) => (item.model === model ? change(item) : item)) }
@@ -113,7 +120,7 @@ export function reconcile(previous: Design | null, schema: ModelSchema, target: 
           const was = old.fields.find((item) => item.field === field.field)
           if (!was) return field
           const next: FieldDesign = { ...field, include: was.include }
-          for (const kind of ['relation', 'foreignKey', 'unique'] as const) {
+          for (const kind of FIELD_DECISIONS) {
             const kept = keep(field[kind] as Decision<unknown> | undefined, was[kind] as Decision<unknown> | undefined)
             if (kept) (next as unknown as Record<string, unknown>)[kind] = kept
           }

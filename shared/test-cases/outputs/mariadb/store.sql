@@ -37,7 +37,7 @@ CREATE TABLE products (
 
 CREATE TABLE order_lines (
   id BIGINT AUTO_INCREMENT NOT NULL,
-  quantity DOUBLE NOT NULL,
+  quantity INT NOT NULL,
   unit_price DOUBLE NOT NULL,
   order_id BIGINT NOT NULL,
   product_id BIGINT NOT NULL,

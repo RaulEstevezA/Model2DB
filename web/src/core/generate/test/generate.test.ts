@@ -96,7 +96,7 @@ describe('names', () => {
     // Oracle also reserves usual field names
     const oracle = schemaOf('interface Level { id: number; level: number; comment: string }', 'typescript')
     expect(text(generate(oracle, proposeDesign(oracle, 'relational'), findOutput('oracle'), settings))).toContain(
-      '"level" BINARY_DOUBLE NOT NULL',
+      '"level" NUMBER(10) NOT NULL',
     )
   })
 

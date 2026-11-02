@@ -207,6 +207,7 @@ const en = {
     key: (model: string) => `key of ${model}`,
     field: (model: string, field: string) => `${model}.${field}`,
     unique: (model: string, field: string) => `unique ${model}.${field}`,
+    wholeNumber: (model: string, field: string) => `number type of ${model}.${field}`,
     enum: (name: string) => `enum ${name}`,
   },
   relationOption: (choice: RelationChoice, shape: RelationShape): string => {
@@ -243,6 +244,7 @@ const en = {
     text: 'Plain text, no constraint',
   } satisfies Record<EnumChoice, string>,
   uniqueOption: (value: boolean): string => (value ? 'Unique' : 'Not unique'),
+  wholeNumberOption: (value: boolean): string => (value ? 'Whole number' : 'Number with decimals'),
   foreignKeyOption: (model: string | null) => (model ? `Foreign key to “${model}”` : 'Plain column'),
   reason: (reason: Reason): string => {
     const params = reason.params
@@ -297,6 +299,8 @@ const en = {
         return 'Declared unique in the input.'
       case 'uniqueNamed':
         return `“${p(params, 'field')}” is usually unique. Confirm it if two rows can never share it.`
+      case 'wholeNumberNamed':
+        return `“${p(params, 'field')}” counts things: stored as a whole number. Choose decimals if it can have them.`
       case 'enumCheck':
         return 'A CHECK constraint keeps the allowed values without a type of its own and is easy to change.'
       case 'enumDocument':
@@ -557,6 +561,7 @@ const es: Messages = {
     key: (model) => `clave de ${model}`,
     field: (model, field) => `${model}.${field}`,
     unique: (model, field) => `única ${model}.${field}`,
+    wholeNumber: (model, field) => `tipo de número de ${model}.${field}`,
     enum: (name) => `enumeración ${name}`,
   },
   relationOption: (choice, shape) => {
@@ -593,6 +598,7 @@ const es: Messages = {
     text: 'Texto sin restricción',
   },
   uniqueOption: (value) => (value ? 'Única' : 'No única'),
+  wholeNumberOption: (value) => (value ? 'Número entero' : 'Número con decimales'),
   foreignKeyOption: (model) => (model ? `Clave ajena a «${model}»` : 'Columna normal'),
   reason: (reason) => {
     const params = reason.params
@@ -647,6 +653,8 @@ const es: Messages = {
         return 'Declarado único en la entrada.'
       case 'uniqueNamed':
         return `«${p(params, 'field')}» suele ser único. Confírmalo si dos filas nunca pueden compartirlo.`
+      case 'wholeNumberNamed':
+        return `«${p(params, 'field')}» cuenta cosas: se guarda como número entero. Elige decimales si puede tenerlos.`
       case 'enumCheck':
         return 'Una restricción CHECK limita los valores sin un tipo propio y es fácil de cambiar.'
       case 'enumDocument':

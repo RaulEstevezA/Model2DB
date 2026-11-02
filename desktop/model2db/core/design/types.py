@@ -2,6 +2,9 @@
 
 import json
 
+# The field decisions, in the order the interface shows them
+FIELD_DECISIONS = ("relation", "foreignKey", "unique", "wholeNumber")
+
 
 def find_model_design(design: dict, model: str) -> dict | None:
     return next((item for item in design["models"] if item["model"] == model), None)

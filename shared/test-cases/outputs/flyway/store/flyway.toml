@@ -1,0 +1,9 @@
+# Flyway settings written by Model2DB from Order. Fill in the connection, then run: flyway migrate
+# The password is read from the FLYWAY_PASSWORD environment variable.
+[environments.default]
+url = "jdbc:postgresql://localhost:5432/app"
+user = "app"
+
+[flyway]
+environment = "default"
+locations = ["filesystem:db/migration"]

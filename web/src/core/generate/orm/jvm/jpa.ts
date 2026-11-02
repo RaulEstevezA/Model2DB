@@ -457,7 +457,7 @@ function writer(id: string, label: string, flavor: Flavor): RelationalWriter {
       if (context.settings.migrations)
         files.push({
           name: 'src/main/resources/db/migration/V1__create_schema.sql',
-          content: generateSql(physical, context.settings.engine, { title: context.title }),
+          content: generateSql(physical, context.settings.engine, { title: context.title, migration: true }),
           editorLanguage: 'sql',
         })
       return files

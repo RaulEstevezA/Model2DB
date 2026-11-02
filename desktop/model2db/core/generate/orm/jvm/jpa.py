@@ -505,7 +505,7 @@ class JpaOutput:
             files.append(
                 generated_file(
                     "src/main/resources/db/migration/V1__create_schema.sql",
-                    generate_sql(physical, context.settings["engine"], context.title),
+                    generate_sql(physical, context.settings["engine"], context.title, migration=True),
                     "sql",
                 )
             )

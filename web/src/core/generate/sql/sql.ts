@@ -338,6 +338,8 @@ function literal(value: Literal, column: Column, rules: DialectRules, enums: Phy
 export interface SqlOptions {
   /** Shown in the header comment: the model the schema comes from */
   title?: string
+  /** Run by a migration tool (Flyway, Liquibase) inside a transaction, where SQLite's PRAGMA is not allowed */
+  migration?: boolean
 }
 
 export function generateSql(schema: RelationalSchema, dialect: Dialect, options: SqlOptions = {}): string {
@@ -346,7 +348,11 @@ export function generateSql(schema: RelationalSchema, dialect: Dialect, options:
   const out: string[] = []
   const header = `-- ${DIALECT_NAMES[dialect]} schema written by Model2DB${options.title ? ` from ${options.title}` : ''}.`
   out.push(header, '-- Review it before running it: nothing here has been run.')
-  if (dialect === 'sqlite') out.push('', 'PRAGMA foreign_keys = ON;')
+  if (dialect === 'sqlite')
+    out.push(
+      '',
+      options.migration ? '-- SQLite checks foreign keys on connections that run PRAGMA foreign_keys = ON.' : 'PRAGMA foreign_keys = ON;',
+    )
 
   for (const item of schema.enums) {
     if (item.storage !== 'native' || dialect !== 'postgresql') continue

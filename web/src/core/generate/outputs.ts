@@ -19,6 +19,7 @@ import { drizzleOutput } from './orm/typescript/drizzle.ts'
 import { prismaOutput } from './orm/typescript/prisma.ts'
 import { sequelizeOutput } from './orm/typescript/sequelize.ts'
 import { typeormOutput } from './orm/typescript/typeorm.ts'
+import { flywayOutput, liquibaseOutput } from './sql/migrationTools.ts'
 import { DIALECT_NAMES, generateSql } from './sql/sql.ts'
 import {
   fileBase,
@@ -98,6 +99,8 @@ const mongoWriter: DocumentWriter = {
 /** Every output, in the order the selector shows them. Adding one means listing it here. */
 export const OUTPUTS: readonly Output[] = [
   ...sqlWriters.map(relational),
+  relational(flywayOutput),
+  relational(liquibaseOutput),
   documental(mongoWriter),
   relational(djangoOutput),
   relational(sqlalchemyOutput),

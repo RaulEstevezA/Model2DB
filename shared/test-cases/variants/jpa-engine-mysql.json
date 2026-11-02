@@ -13,6 +13,30 @@
  },
  "outputs": "engine",
  "files": {
+  "flyway": [
+   {
+    "name": "flyway.toml",
+    "content": "# Flyway settings written by Model2DB from Author. Fill in the connection, then run: flyway migrate\n# The password is read from the FLYWAY_PASSWORD environment variable.\n[environments.default]\nurl = \"jdbc:mysql://localhost:3306/app\"\nuser = \"app\"\n\n[flyway]\nenvironment = \"default\"\nlocations = [\"filesystem:db/migration\"]\n"
+   },
+   {
+    "name": "db/migration/V1__create_author_schema.sql",
+    "content": "-- MySQL schema written by Model2DB from Author.\n-- Review it before running it: nothing here has been run.\n\nCREATE TABLE authors (\n  id BIGINT AUTO_INCREMENT NOT NULL,\n  name VARCHAR(120) NOT NULL,\n  email VARCHAR(255) NOT NULL,\n  CONSTRAINT pk_authors PRIMARY KEY (id),\n  CONSTRAINT uq_authors_email UNIQUE (email)\n);\n\nCREATE TABLE books (\n  id BIGINT AUTO_INCREMENT NOT NULL,\n  isbn VARCHAR(13) NOT NULL,\n  title VARCHAR(255) NOT NULL,\n  price DECIMAL(8, 2) NOT NULL,\n  published_on DATE NOT NULL,\n  genre VARCHAR(20) NOT NULL,\n  author_id BIGINT NOT NULL,\n  shelf_room VARCHAR(255) NOT NULL,\n  shelf_row INT,\n  CONSTRAINT pk_books PRIMARY KEY (id),\n  CONSTRAINT uq_books_isbn UNIQUE (isbn),\n  CONSTRAINT fk_books_author_id FOREIGN KEY (author_id) REFERENCES authors (id),\n  CONSTRAINT ck_books_genre CHECK (genre IN ('FICTION', 'ESSAY', 'POETRY', 'SCIENCE'))\n);\nCREATE INDEX ix_books_author_id ON books (author_id);\n\nCREATE TABLE tags (\n  code VARCHAR(255) NOT NULL,\n  label VARCHAR(255) NOT NULL,\n  CONSTRAINT pk_tags PRIMARY KEY (code)\n);\n\nCREATE TABLE books_tags (\n  book_id BIGINT NOT NULL,\n  tag_code VARCHAR(255) NOT NULL,\n  CONSTRAINT pk_books_tags PRIMARY KEY (book_id, tag_code),\n  CONSTRAINT fk_books_tags_book_id FOREIGN KEY (book_id) REFERENCES books (id) ON DELETE CASCADE,\n  CONSTRAINT fk_books_tags_tag_code FOREIGN KEY (tag_code) REFERENCES tags (code) ON DELETE CASCADE\n);\n"
+   }
+  ],
+  "liquibase": [
+   {
+    "name": "liquibase.properties",
+    "content": "# Liquibase settings written by Model2DB from Author. Fill in the connection, then run: liquibase update\n# The password is read from the LIQUIBASE_COMMAND_PASSWORD environment variable.\nchangeLogFile=db/changelog/db.changelog-master.yaml\nurl=jdbc:mysql://localhost:3306/app\nusername=app\n"
+   },
+   {
+    "name": "db/changelog/db.changelog-master.yaml",
+    "content": "databaseChangeLog:\n  - include:\n      file: changes/001-create-author-schema.sql\n      relativeToChangelogFile: true\n"
+   },
+   {
+    "name": "db/changelog/changes/001-create-author-schema.sql",
+    "content": "--liquibase formatted sql\n\n-- MySQL schema written by Model2DB from Author.\n-- Review it before running it: nothing here has been run.\n\n--changeset model2db:create-table-authors\nCREATE TABLE authors (\n  id BIGINT AUTO_INCREMENT NOT NULL,\n  name VARCHAR(120) NOT NULL,\n  email VARCHAR(255) NOT NULL,\n  CONSTRAINT pk_authors PRIMARY KEY (id),\n  CONSTRAINT uq_authors_email UNIQUE (email)\n);\n--rollback DROP TABLE authors;\n\n--changeset model2db:create-table-books\nCREATE TABLE books (\n  id BIGINT AUTO_INCREMENT NOT NULL,\n  isbn VARCHAR(13) NOT NULL,\n  title VARCHAR(255) NOT NULL,\n  price DECIMAL(8, 2) NOT NULL,\n  published_on DATE NOT NULL,\n  genre VARCHAR(20) NOT NULL,\n  author_id BIGINT NOT NULL,\n  shelf_room VARCHAR(255) NOT NULL,\n  shelf_row INT,\n  CONSTRAINT pk_books PRIMARY KEY (id),\n  CONSTRAINT uq_books_isbn UNIQUE (isbn),\n  CONSTRAINT fk_books_author_id FOREIGN KEY (author_id) REFERENCES authors (id),\n  CONSTRAINT ck_books_genre CHECK (genre IN ('FICTION', 'ESSAY', 'POETRY', 'SCIENCE'))\n);\nCREATE INDEX ix_books_author_id ON books (author_id);\n--rollback DROP TABLE books;\n\n--changeset model2db:create-table-tags\nCREATE TABLE tags (\n  code VARCHAR(255) NOT NULL,\n  label VARCHAR(255) NOT NULL,\n  CONSTRAINT pk_tags PRIMARY KEY (code)\n);\n--rollback DROP TABLE tags;\n\n--changeset model2db:create-table-books_tags\nCREATE TABLE books_tags (\n  book_id BIGINT NOT NULL,\n  tag_code VARCHAR(255) NOT NULL,\n  CONSTRAINT pk_books_tags PRIMARY KEY (book_id, tag_code),\n  CONSTRAINT fk_books_tags_book_id FOREIGN KEY (book_id) REFERENCES books (id) ON DELETE CASCADE,\n  CONSTRAINT fk_books_tags_tag_code FOREIGN KEY (tag_code) REFERENCES tags (code) ON DELETE CASCADE\n);\n--rollback DROP TABLE books_tags;\n"
+   }
+  ],
   "django": [
    {
     "name": "models.py",

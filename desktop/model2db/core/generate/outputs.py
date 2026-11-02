@@ -22,6 +22,7 @@ from .orm.typescript.drizzle import DrizzleOutput
 from .orm.typescript.prisma import PrismaOutput
 from .orm.typescript.sequelize import SequelizeOutput
 from .orm.typescript.typeorm import TypeOrmOutput
+from .sql.migration_tools import FlywayOutput, LiquibaseOutput
 from .sql.sql import DIALECT_NAMES, generate_sql
 from .types import WriteContext, file_base, generated_file
 
@@ -99,6 +100,8 @@ OUTPUTS: tuple[Output, ...] = (
         _output(_SqlWriter(dialect), "relational")
         for dialect in ("postgresql", "mysql", "mariadb", "sqlite", "sqlserver", "oracle")
     ),
+    _output(FlywayOutput(), "relational"),
+    _output(LiquibaseOutput(), "relational"),
     _output(_MongoWriter(), "document"),
     _output(DjangoOutput(), "relational"),
     _output(SqlAlchemyOutput(), "relational"),

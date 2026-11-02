@@ -58,7 +58,7 @@ def test_outputs(example, output):
 def test_selector_order():
     """The same entries, in the same order, as OUTPUTS in web/src/core/generate/outputs.ts."""
     assert [output.id for output in OUTPUTS] == [
-        *("postgresql", "mysql", "mariadb", "sqlite", "sqlserver", "oracle", "mongodb"),
+        *("postgresql", "mysql", "mariadb", "sqlite", "sqlserver", "oracle", "flyway", "liquibase", "mongodb"),
         *("django", "sqlalchemy", "sqlmodel", "tortoise", "prisma", "typeorm", "sequelize", "drizzle"),
         *("jpa", "hibernate", "spring-data-jpa", "efcore", "eloquent", "doctrine"),
         *("pymongo", "mongoengine", "beanie", "mongoose", "spring-data-mongodb"),

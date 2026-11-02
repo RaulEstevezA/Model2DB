@@ -110,6 +110,17 @@ describe('names', () => {
     )
   })
 
+  it('undoes each Liquibase changeset, foreign keys between tables that refer to each other first', () => {
+    const cycle = schemaOf('interface Team { id: number; captain: Player }\ninterface Player { id: number; team: Team }', 'typescript')
+    const changelog = (engine: 'postgresql' | 'mysql') => {
+      const files = generate(cycle, proposeDesign(cycle, 'relational'), findOutput('liquibase'), { ...settings, engine }).files
+      return files.find((file) => file.name.startsWith('db/changelog/changes/'))!.content
+    }
+    expect(changelog('postgresql')).toContain('--rollback ALTER TABLE players DROP CONSTRAINT fk_players_team_id;')
+    expect(changelog('mysql')).toContain('--rollback ALTER TABLE players DROP FOREIGN KEY fk_players_team_id;')
+    expect(changelog('postgresql')).toContain('--changeset model2db:create-table-players\n')
+  })
+
   it('follows the naming chosen for tables and columns', () => {
     const design = proposeDesign(schema, 'relational')
     const content = text(generate(schema, design, findOutput('postgresql'), { ...settings, naming: { tables: 'model', columns: 'field' } }))

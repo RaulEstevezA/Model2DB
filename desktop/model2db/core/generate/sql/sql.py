@@ -342,14 +342,19 @@ def _literal(value, column: dict, rules: _Rules, enums: list[dict]) -> str | Non
     return js_string(stored) if is_number(stored) else "'" + stored.replace("'", "''") + "'"
 
 
-def generate_sql(schema: dict, dialect: str, title: str | None = None) -> str:
+def generate_sql(schema: dict, dialect: str, title: str | None = None, migration: bool = False) -> str:
+    """`migration`: run by a migration tool (Flyway, Liquibase) inside a transaction, where SQLite's PRAGMA
+    is not allowed."""
     rules = RULES[dialect]
     q = rules.quote
     out: list[str] = []
     out.append(f"-- {DIALECT_NAMES[dialect]} schema written by Model2DB{f' from {title}' if title else ''}.")
     out.append("-- Review it before running it: nothing here has been run.")
     if dialect == "sqlite":
-        out.extend(["", "PRAGMA foreign_keys = ON;"])
+        pragma = "PRAGMA foreign_keys = ON;"
+        out.extend(
+            ["", f"-- SQLite checks foreign keys on connections that run {pragma[:-1]}." if migration else pragma]
+        )
 
     for item in schema["enums"]:
         if item["storage"] != "native" or dialect != "postgresql":

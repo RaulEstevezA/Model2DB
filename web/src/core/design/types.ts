@@ -3,10 +3,10 @@
  * return new designs (design/edit.ts), so undo and redo only keep previous values. */
 
 /** Where the models are stored. Relational covers every SQL dialect; document is MongoDB and Couchbase;
- * keyvalue is Redis. */
-export type StorageTarget = 'relational' | 'document' | 'keyvalue'
+ * keyvalue is Redis; widecolumn is Cassandra and ScyllaDB. */
+export type StorageTarget = 'relational' | 'document' | 'keyvalue' | 'widecolumn'
 
-export const STORAGE_TARGETS: readonly StorageTarget[] = ['relational', 'document', 'keyvalue']
+export const STORAGE_TARGETS: readonly StorageTarget[] = ['relational', 'document', 'keyvalue', 'widecolumn']
 
 /** A value for each kind of database. */
 export function perTarget<T>(value: (target: StorageTarget) => T): Record<StorageTarget, T> {
@@ -56,6 +56,11 @@ export type ReasonCode =
   | 'valueAsJson'
   // Documents
   | 'valueArray'
+  // Wide columns
+  | 'valueType'
+  | 'partitionTable'
+  | 'embeddedList'
+  | 'nativeCollection'
   // Foreign keys by name
   | 'foreignKeyNamed'
   // Unique
@@ -111,6 +116,14 @@ export type SurrogateType = 'integer' | 'uuid' | 'objectId'
  * - `child`: a list, set or hash of its own under this model's key (`order:42:tags`); for a list of other
  *   models, a set of their keys
  * - `json`: a hash field holding JSON text
+ *
+ * Wide columns:
+ * - `reference`: a column holding the other model's key
+ * - `embed`: a user-defined type in the row (`frozen<address>`), or a list of them
+ * - `flatten`: the other model's fields become columns of this table
+ * - `child`: a table of its own partitioned by this model's key, with the other models' keys
+ * - `array`: a native collection (`list<text>`, `map<text, int>`)
+ * - `json`: a text column holding JSON
  */
 export type RelationChoice = 'reference' | 'flatten' | 'child' | 'join' | 'array' | 'json' | 'embed'
 

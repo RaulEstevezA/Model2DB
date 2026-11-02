@@ -9,6 +9,7 @@ DEFAULT_NAMING = {
     "relational": {"tables": "plural", "columns": "snake"},
     "document": {"tables": "plural", "columns": "field"},
     "keyvalue": {"tables": "singular", "columns": "snake"},
+    "widecolumn": {"tables": "plural", "columns": "snake"},
 }
 
 

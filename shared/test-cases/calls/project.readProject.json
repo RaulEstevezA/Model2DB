@@ -301,7 +301,8 @@
       ],
       "enums": []
      },
-     "keyvalue": null
+     "keyvalue": null,
+     "widecolumn": null
     },
     "output": {
      "output": "mysql",
@@ -316,6 +317,10 @@
       },
       "keyvalue": {
        "tables": "singular",
+       "columns": "snake"
+      },
+      "widecolumn": {
+       "tables": "plural",
        "columns": "snake"
       }
      },
@@ -665,7 +670,8 @@
       ],
       "enums": []
      },
-     "keyvalue": null
+     "keyvalue": null,
+     "widecolumn": null
     },
     "output": {
      "output": "mysql",
@@ -680,6 +686,10 @@
       },
       "keyvalue": {
        "tables": "singular",
+       "columns": "snake"
+      },
+      "widecolumn": {
+       "tables": "plural",
        "columns": "snake"
       }
      },

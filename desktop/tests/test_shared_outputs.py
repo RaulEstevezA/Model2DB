@@ -70,6 +70,8 @@ def test_selector_order():
             "mongodb",
             "couchbase",
             "redis",
+            "cassandra",
+            "scylladb",
         ),
         *("django", "sqlalchemy", "sqlmodel", "tortoise", "prisma", "typeorm", "sequelize", "drizzle"),
         *("jpa", "hibernate", "spring-data-jpa", "efcore", "eloquent", "doctrine"),

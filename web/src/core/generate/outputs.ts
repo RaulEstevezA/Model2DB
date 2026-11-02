@@ -21,6 +21,8 @@ import { sequelizeOutput } from './orm/typescript/sequelize.ts'
 import { typeormOutput } from './orm/typescript/typeorm.ts'
 import { couchbaseOutput } from './couchbase/couchbase.ts'
 import { redisOutput } from './redis/redis.ts'
+import { cassandraOutput, scyllaOutput } from './cql/cql.ts'
+import { buildWideColumn } from '../physical/wideColumn.ts'
 import { buildKeyValue } from '../physical/keyValue.ts'
 import { flywayOutput, liquibaseOutput } from './sql/migrationTools.ts'
 import { DIALECT_NAMES, generateSql } from './sql/sql.ts'
@@ -29,6 +31,7 @@ import {
   type DocumentWriter,
   type GeneratedFile,
   type KeyValueWriter,
+  type WideColumnWriter,
   type Output,
   type OutputGroup,
   type OutputSettings,
@@ -37,7 +40,17 @@ import {
 
 export type { GeneratedFile, Output, OutputGroup, OutputSettings, WriteContext } from './types.ts'
 
-export const OUTPUT_GROUPS: readonly OutputGroup[] = ['relational', 'document', 'keyvalue', 'python', 'typescript', 'jvm', 'csharp', 'php']
+export const OUTPUT_GROUPS: readonly OutputGroup[] = [
+  'relational',
+  'document',
+  'keyvalue',
+  'widecolumn',
+  'python',
+  'typescript',
+  'jvm',
+  'csharp',
+  'php',
+]
 
 /** The engine a writer builds for: its own (plain SQL), or the one chosen among those it supports. */
 function engineOf(writer: RelationalWriter, settings: OutputSettings): Dialect {
@@ -67,6 +80,20 @@ function keyValued(writer: KeyValueWriter): Output {
     target: 'keyvalue',
     generate(schema, design, settings, title) {
       const physical = buildKeyValue(schema, design, settings.naming)
+      const notes: Note[] = []
+      const files = writer.write(physical, { schema, design, settings, title, note: (note) => notes.push(note) })
+      return { physical: { ...physical, notes: [...physical.notes, ...notes] }, files }
+    },
+  }
+}
+
+/** A writer for Cassandra or ScyllaDB as an output: it builds the tables and types first. */
+function wideColumned(writer: WideColumnWriter): Output {
+  return {
+    ...writer,
+    target: 'widecolumn',
+    generate(schema, design, settings, title) {
+      const physical = buildWideColumn(schema, design, settings.naming, writer.label)
       const notes: Note[] = []
       const files = writer.write(physical, { schema, design, settings, title, note: (note) => notes.push(note) })
       return { physical: { ...physical, notes: [...physical.notes, ...notes] }, files }
@@ -122,6 +149,8 @@ export const OUTPUTS: readonly Output[] = [
   documental(mongoWriter),
   documental(couchbaseOutput),
   keyValued(redisOutput),
+  wideColumned(cassandraOutput),
+  wideColumned(scyllaOutput),
   relational(djangoOutput),
   relational(sqlalchemyOutput),
   relational(sqlmodelOutput),

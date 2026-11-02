@@ -7,7 +7,9 @@ from ..model.schema import default_root
 from ..physical.document import build_document
 from ..physical.key_value import build_key_value
 from ..physical.relational.schema import build_relational
+from ..physical.wide_column import build_wide_column
 from .couchbase.couchbase import CouchbaseOutput
+from .cql.cql import CassandraOutput, ScyllaOutput
 from .mongodb.mongodb import generate_mongo
 from .odm.mongoose import MongooseOutput
 from .odm.python.mongo import BeanieOutput, MongoEngineOutput, PyMongoOutput
@@ -49,6 +51,9 @@ class Output:
                 schema, design, {"naming": settings["naming"], "strings": settings["strings"], "dialect": engine}
             )
             context = WriteContext(schema, design, {**settings, "engine": engine}, title)
+        elif self.target == "widecolumn":
+            physical = build_wide_column(schema, design, settings["naming"], self.label)
+            context = WriteContext(schema, design, settings, title)
         elif self.target == "keyvalue":
             physical = build_key_value(schema, design, settings["naming"])
             context = WriteContext(schema, design, settings, title)
@@ -111,6 +116,8 @@ OUTPUTS: tuple[Output, ...] = (
     _output(_MongoWriter(), "document"),
     _output(CouchbaseOutput(), "document"),
     _output(RedisOutput(), "keyvalue"),
+    _output(CassandraOutput, "widecolumn"),
+    _output(ScyllaOutput, "widecolumn"),
     _output(DjangoOutput(), "relational"),
     _output(SqlAlchemyOutput(), "relational"),
     _output(SqlModelOutput(), "relational"),

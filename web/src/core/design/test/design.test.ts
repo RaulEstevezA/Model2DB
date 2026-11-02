@@ -6,6 +6,7 @@ import { proposeDesign } from '../propose.ts'
 import { findFieldDesign, findModelDesign, type Design } from '../types.ts'
 import { findOutput, generate, type OutputSettings } from '../../generate/outputs.ts'
 import { buildKeyValue } from '../../physical/keyValue.ts'
+import { buildWideColumn } from '../../physical/wideColumn.ts'
 
 const store = () => schemaOf(findExample('store')!.text, 'typescript')
 const jpa = () => schemaOf(findExample('jpa')!.text, 'java')
@@ -175,6 +176,49 @@ describe('keys and values', () => {
     expect(post.structures).toEqual([{ suffix: 'tags', type: 'list', holds: 'text', source: 'Post.tags' }])
     expect(post.search).toEqual([{ field: 'author_id', type: 'TAG' }])
     expect(physical.notes).toContainEqual({ code: 'uniqueInApplication', params: { database: 'Redis', field: 'User.email' } })
+  })
+})
+
+describe('wide columns', () => {
+  const prisma = schemaOf(findExample('prisma')!.text, 'prisma')
+  const design = proposeDesign(prisma, 'widecolumn')
+
+  it('keeps values in the row and waits on lists of other models', () => {
+    expect(relation(design, 'User', 'profile')).toMatchObject({ value: 'embed', status: 'active', reasons: [{ code: 'valueType' }] })
+    expect(relation(design, 'Post', 'tags')).toMatchObject({ value: 'array', status: 'active' })
+    expect(relation(design, 'User', 'posts')).toMatchObject({ value: 'child', status: 'pending', reasons: [{ code: 'partitionTable' }] })
+    expect(relation(design, 'Post', 'comments')).toMatchObject({ value: 'embed', status: 'pending', reasons: [{ code: 'embeddedList' }] })
+    expect(key(proposeDesign(schemaOf('interface Note { text: string }', 'typescript'), 'widecolumn'), 'Note')).toMatchObject({
+      value: { kind: 'surrogate', type: 'uuid' },
+      options: [
+        { kind: 'field', field: 'text' },
+        { kind: 'surrogate', type: 'uuid' },
+      ],
+    })
+  })
+
+  it('partitions each table by its key, and a list of other models by the owner key', () => {
+    const decided = decide(decide(design, { kind: 'relation', model: 'User', field: 'posts' }), {
+      kind: 'relation',
+      model: 'Post',
+      field: 'comments',
+    })
+    const physical = buildWideColumn(prisma, decided, { tables: 'plural', columns: 'snake' }, 'Cassandra')
+    expect(physical.types.map((type) => type.name)).toEqual(['profile', 'comment'])
+    const posts = physical.tables.find((table) => table.name === 'posts')!
+    expect(posts.partitionKey).toEqual(['id'])
+    expect(posts.columns.find((column) => column.name === 'comments')?.type).toBe('list<frozen<comment>>')
+    expect(posts.columns.filter((column) => column.name.startsWith('author'))).toEqual([
+      { name: 'author_id', type: 'text', source: 'Post.authorId' },
+    ])
+    expect(physical.tables.find((table) => table.kind === 'child')).toMatchObject({
+      name: 'user_posts',
+      partitionKey: ['user_id'],
+      clusteringKey: ['post_id'],
+      columns: [{ type: 'text' }, { type: 'int' }],
+    })
+    expect(physical.tables.find((table) => table.name === 'users')!.indexes).toEqual([{ name: 'ix_users_email', column: 'email' }])
+    expect(physical.notes).toContainEqual({ code: 'uniqueInApplication', params: { database: 'Cassandra', field: 'User.email' } })
   })
 })
 

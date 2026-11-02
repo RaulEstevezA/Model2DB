@@ -23,6 +23,8 @@ def model_roles(schema: dict, design: dict) -> dict[str, str]:
             queue.append(model["name"])
     embedded: set[str] = set()
     pending: set[str] = set()
+    # Embedded documents and user-defined types can still refer to other models; flattened columns and JSON cannot
+    nested = design["target"] in ("document", "widecolumn")
 
     def visit(name: str, inside: bool) -> None:
         model = find_model(schema, name)
@@ -37,14 +39,14 @@ def model_roles(schema: dict, design: dict) -> dict[str, str]:
             if decided["relation"]["status"] == "pending":
                 pending.add(target)
                 continue
-            stores = decided["relation"]["value"] in _NEEDS_STORAGE and (design["target"] == "document" or not inside)
+            stores = decided["relation"]["value"] in _NEEDS_STORAGE and (nested or not inside)
             if stores:
                 if roles.get(target) != "stored":
                     roles[target] = "stored"
                     queue.append(target)
             elif target not in embedded:
                 embedded.add(target)
-                visit(target, design["target"] != "document")
+                visit(target, not nested)
 
     while queue:
         visit(queue.pop(0), False)

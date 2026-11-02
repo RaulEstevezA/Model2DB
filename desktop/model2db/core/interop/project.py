@@ -174,7 +174,7 @@ def _read_output(value, path: str) -> dict:
         "naming": per_target(
             lambda target: (
                 DEFAULT_NAMING[target]
-                if naming.get(target) is None and target == "keyvalue"
+                if naming.get(target) is None and target not in ("relational", "document")
                 else _read_naming(naming.get(target), f"{path}.naming.{target}")
             )
         ),

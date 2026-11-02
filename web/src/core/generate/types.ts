@@ -10,10 +10,11 @@ import type {
   Note,
   PhysicalSchema,
   RelationalSchema,
+  WideColumnSchema,
 } from '../physical/types.ts'
 
 /** Groups of the output selector */
-export type OutputGroup = 'relational' | 'document' | 'keyvalue' | 'python' | 'typescript' | 'jvm' | 'csharp' | 'php'
+export type OutputGroup = 'relational' | 'document' | 'keyvalue' | 'widecolumn' | 'python' | 'typescript' | 'jvm' | 'csharp' | 'php'
 
 export interface GeneratedFile {
   /** Path inside the download (`models.py`, `migrations/0001_initial.py`) */
@@ -69,6 +70,14 @@ export interface KeyValueWriter {
   label: string
   group: OutputGroup
   write(physical: KeyValueSchema, context: WriteContext): GeneratedFile[]
+}
+
+/** What a writer for Cassandra or ScyllaDB needs: the tables and user-defined types. */
+export interface WideColumnWriter {
+  id: string
+  label: string
+  group: OutputGroup
+  write(physical: WideColumnSchema, context: WriteContext): GeneratedFile[]
 }
 
 /** An entry of the output selector, whatever kind of database it writes for. The interface reads only

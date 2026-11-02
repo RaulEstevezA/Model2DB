@@ -37,11 +37,13 @@ export function FieldRow({ design, model, field, decided, isKey, table, editing,
   const relationLabel = (value: unknown) =>
     design.target === 'keyvalue'
       ? t.keyValueOption(value as never, shape)
-      : !relational && value === 'reference'
-        ? t.documentReference(shape === 'models')
-        : !relational && value === 'child'
-          ? t.documentOtherSide
-          : t.relationOption(value as never, shape)
+      : design.target === 'widecolumn'
+        ? t.wideColumnOption(value as never, shape)
+        : !relational && value === 'reference'
+          ? t.documentReference(shape === 'models')
+          : !relational && value === 'child'
+            ? t.documentOtherSide
+            : t.relationOption(value as never, shape)
 
   return (
     <li className={`field-row${decided.include ? '' : ' field-row--excluded'}`}>
@@ -124,7 +126,7 @@ export function FieldRow({ design, model, field, decided, isKey, table, editing,
           {decided.include && (
             <div className="field-row__inputs">
               <CommitInput
-                label={relational ? t.columnName : design.target === 'document' ? t.propertyName : t.hashField}
+                label={design.target === 'document' ? t.propertyName : design.target === 'keyvalue' ? t.hashField : t.columnName}
                 value={decided.column ?? ''}
                 placeholder={derivedColumn || field.name}
                 onCommit={(value) => onChange(setFieldOverride(design, model, field.name, 'column', value))}

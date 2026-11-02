@@ -2,7 +2,7 @@ import { nameWords, toPascalCase, toSnakeCase } from '../../model/naming.ts'
 import type { FieldDef } from '../../model/schema.ts'
 import type { FieldDesign } from '../../design/types.ts'
 import { columnName, joinNames } from '../naming.ts'
-import type { BuildOptions, ColumnType } from '../types.ts'
+import type { BuildOptions, ColumnType, NamingOptions } from '../types.ts'
 
 /** Names and small facts the relational build needs; no state. */
 
@@ -27,7 +27,7 @@ export function keyType(type: ColumnType): ColumnType {
 
 /** Name of a column holding another table's key: `customer` + `id` → `customer_id`; a key that already
  * starts with the prefix is kept as it is (`customer` + `customer_id` → `customer_id`). */
-export function keyColumnName(prefix: string, key: string, options: BuildOptions): string {
+export function keyColumnName(prefix: string, key: string, options: { naming: NamingOptions }): string {
   const prefixWords = nameWords(prefix)
   const keyWords = nameWords(key)
   if (keyWords.length > prefixWords.length && prefixWords.every((word, i) => keyWords[i] === word)) return joinNames([key], options.naming)
@@ -35,7 +35,7 @@ export function keyColumnName(prefix: string, key: string, options: BuildOptions
 }
 
 /** Table of a list or map owned by a model: `Order.tags` → `order_tags`. */
-export function ownedTableName(model: string, field: string, options: BuildOptions): string {
+export function ownedTableName(model: string, field: string, options: { naming: NamingOptions }): string {
   if (options.naming.tables === 'model') return `${model}${toPascalCase(field)}`
   return `${toSnakeCase(model)}_${toSnakeCase(field)}`
 }

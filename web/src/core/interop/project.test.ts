@@ -13,6 +13,7 @@ const output: ProjectOutput = {
     relational: { tables: 'singular', columns: 'snake' },
     document: { tables: 'plural', columns: 'field' },
     keyvalue: { tables: 'singular', columns: 'snake' },
+    widecolumn: { tables: 'plural', columns: 'snake' },
   },
   strings: 'varchar',
   engine: 'mysql',
@@ -20,7 +21,7 @@ const output: ProjectOutput = {
 }
 const project = createProject(
   { format: 'typescript', text: TEXT, fileName: 'models.ts' },
-  { relational, document: null, keyvalue: null },
+  { relational, document: null, keyvalue: null, widecolumn: null },
   output,
   new Date('2026-10-29T12:00:00Z'),
 )
@@ -66,6 +67,8 @@ describe('project files', () => {
     const older = structuredClone(project) as unknown as { designs: Record<string, unknown>; output: { naming: Record<string, unknown> } }
     delete older.designs.keyvalue
     delete older.output.naming.keyvalue
+    delete older.designs.widecolumn
+    delete older.output.naming.widecolumn
     expect(readProject(JSON.stringify(older))).toEqual({ ok: true, project })
   })
 

@@ -142,13 +142,17 @@ const en = {
       ? `Relational design for ${database}`
       : kind === 'document'
         ? `Document design for ${database}`
-        : `Key-value design for ${database}`,
+        : kind === 'keyvalue'
+          ? `Key-value design for ${database}`
+          : `Wide-column design for ${database}`,
   designSummary: (stored: number, kind: StorageTarget) =>
     kind === 'relational'
       ? `${en$(stored)} ${plural(stored, 'table', 'tables')} from the models`
       : kind === 'document'
         ? `${en$(stored)} ${plural(stored, 'collection', 'collections')}`
-        : `${en$(stored)} ${plural(stored, 'model', 'models')} with keys of their own`,
+        : kind === 'keyvalue'
+          ? `${en$(stored)} ${plural(stored, 'model', 'models')} with keys of their own`
+          : `${en$(stored)} ${plural(stored, 'table', 'tables')} from the models`,
   pendingCount: (count: number) => `${en$(count)} ${plural(count, 'decision', 'decisions')} to review`,
   allDecided: 'Nothing left to review.',
   reviewSummary: (count: number) => `${en$(count)} ${plural(count, 'decision waits', 'decisions wait')} for you`,
@@ -248,6 +252,22 @@ const en = {
   },
   documentReference: (many: boolean): string => (many ? 'References (list of _id)' : 'Reference (_id)'),
   documentOtherSide: 'Kept in the other collection (each one stores this _id)',
+  wideColumnOption: (choice: RelationChoice, shape: RelationShape): string => {
+    switch (choice) {
+      case 'reference':
+        return 'Column with its key'
+      case 'embed':
+        return shape === 'models' ? 'List of user-defined types in the row' : 'User-defined type in the row'
+      case 'flatten':
+        return 'Columns in this table'
+      case 'child':
+        return 'Table partitioned by this key'
+      case 'array':
+        return shape === 'map' ? 'Map collection in the row' : 'List collection in the row'
+      default:
+        return 'JSON text column'
+    }
+  },
   keyValueOption: (choice: RelationChoice, shape: RelationShape): string => {
     switch (choice) {
       case 'reference':
@@ -338,6 +358,14 @@ const en = {
         return `“${p(params, 'model')}” has no key and holds lists: kept as JSON inside this hash.`
       case 'valueArray':
         return 'A list of plain values: kept as an array inside the document.'
+      case 'valueType':
+        return `“${p(params, 'model')}” has no key: a user-defined type keeps it inside the row.`
+      case 'partitionTable':
+        return `A table partitioned by this model's key, with the keys of its “${p(params, 'model')}”: one query reads them. Embed copies instead if they are always read with this model.`
+      case 'embeddedList':
+        return `“${p(params, 'model')}” has no key: the list is kept in the row as user-defined types. Choose a table of its own if the list can grow without limit.`
+      case 'nativeCollection':
+        return 'A collection of the database keeps the values inside the row.'
       case 'targetExcluded':
         return `“${p(params, 'model')}” is left out.`
       case 'foreignKeyNamed':
@@ -366,6 +394,7 @@ const en = {
     relational: 'Relational SQL',
     document: 'Documents',
     keyvalue: 'Key-value',
+    widecolumn: 'Wide-column',
     python: 'Python',
     typescript: 'TypeScript / JavaScript',
     jvm: 'Java / Kotlin',
@@ -549,13 +578,17 @@ const es: Messages = {
       ? `Diseño relacional para ${database}`
       : kind === 'document'
         ? `Diseño de documentos para ${database}`
-        : `Diseño clave-valor para ${database}`,
+        : kind === 'keyvalue'
+          ? `Diseño clave-valor para ${database}`
+          : `Diseño de columnas anchas para ${database}`,
   designSummary: (stored, kind) =>
     kind === 'relational'
       ? `${es$(stored)} ${plural(stored, 'tabla', 'tablas')} a partir de los modelos`
       : kind === 'document'
         ? `${es$(stored)} ${plural(stored, 'colección', 'colecciones')}`
-        : `${es$(stored)} ${plural(stored, 'modelo', 'modelos')} con claves propias`,
+        : kind === 'keyvalue'
+          ? `${es$(stored)} ${plural(stored, 'modelo', 'modelos')} con claves propias`
+          : `${es$(stored)} ${plural(stored, 'tabla', 'tablas')} a partir de los modelos`,
   pendingCount: (count) => `${es$(count)} ${plural(count, 'decisión', 'decisiones')} para revisar`,
   allDecided: 'No queda nada por revisar.',
   reviewSummary: (count) => `${es$(count)} ${plural(count, 'decisión te espera', 'decisiones te esperan')}`,
@@ -655,6 +688,22 @@ const es: Messages = {
   },
   documentReference: (many) => (many ? 'Referencias (lista de _id)' : 'Referencia (_id)'),
   documentOtherSide: 'En la otra colección (cada uno guarda este _id)',
+  wideColumnOption: (choice, shape) => {
+    switch (choice) {
+      case 'reference':
+        return 'Columna con su clave'
+      case 'embed':
+        return shape === 'models' ? 'Lista de tipos definidos por el usuario en la fila' : 'Tipo definido por el usuario en la fila'
+      case 'flatten':
+        return 'Columnas en esta tabla'
+      case 'child':
+        return 'Tabla particionada por esta clave'
+      case 'array':
+        return shape === 'map' ? 'Colección map en la fila' : 'Colección list en la fila'
+      default:
+        return 'Columna de texto JSON'
+    }
+  },
   keyValueOption: (choice, shape) => {
     switch (choice) {
       case 'reference':
@@ -745,6 +794,14 @@ const es: Messages = {
         return `«${p(params, 'model')}» no tiene clave y contiene listas: se guarda como JSON dentro de este hash.`
       case 'valueArray':
         return 'Una lista de valores simples: se guarda como un array dentro del documento.'
+      case 'valueType':
+        return `«${p(params, 'model')}» no tiene clave: un tipo definido por el usuario lo guarda dentro de la fila.`
+      case 'partitionTable':
+        return `Una tabla particionada por la clave de este modelo, con las claves de sus «${p(params, 'model')}»: una consulta los lee. Embebe copias si siempre se leen con este modelo.`
+      case 'embeddedList':
+        return `«${p(params, 'model')}» no tiene clave: la lista se guarda en la fila como tipos definidos por el usuario. Elige una tabla propia si la lista puede crecer sin límite.`
+      case 'nativeCollection':
+        return 'Una colección de la base de datos guarda los valores dentro de la fila.'
       case 'targetExcluded':
         return `«${p(params, 'model')}» está excluido.`
       case 'foreignKeyNamed':
@@ -772,6 +829,7 @@ const es: Messages = {
     relational: 'SQL relacional',
     document: 'Documentos',
     keyvalue: 'Clave-valor',
+    widecolumn: 'Columnas anchas',
     python: 'Python',
     typescript: 'TypeScript / JavaScript',
     jvm: 'Java / Kotlin',

@@ -38,7 +38,7 @@ export function ResultPane({ output, settings, generated, onOutputChange, onSett
   const fileLanguage = file?.editorLanguage ?? 'text'
   const physical = generated?.physical
   const todos = physical
-    ? physical.kind === 'relational'
+    ? physical.kind === 'relational' || physical.kind === 'widecolumn'
       ? physical.tables.reduce((total, table) => total + table.todos.length, 0)
       : physical.kind === 'document'
         ? physical.collections.reduce((total, collection) => total + collection.todos.length, 0)

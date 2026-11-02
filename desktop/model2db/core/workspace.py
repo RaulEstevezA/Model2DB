@@ -35,7 +35,7 @@ def pending_decisions(design: dict, roles: dict[str, str]) -> list[dict]:
     items = []
     for model in design["models"]:
         role = roles.get(model["model"])
-        fields_matter = role == "stored" or (design["target"] == "document" and role == "embedded")
+        fields_matter = role == "stored" or (design["target"] in ("document", "widecolumn") and role == "embedded")
         key = model.get("key")
         if role == "stored" and key and key["status"] == "pending":
             items.append({"ref": {"kind": "key", "model": model["model"]}, "decision": key})

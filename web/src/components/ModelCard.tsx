@@ -23,12 +23,13 @@ interface ModelCardProps {
 export function ModelCard({ design, model, fields, canExclude, physical, onChange }: ModelCardProps) {
   const { t } = useI18n()
   const [editing, setEditing] = useState<string | null>(null)
-  const relational = design.target === 'relational'
   const table =
     physical?.kind === 'relational' ? physical.tables.find((item) => item.kind === 'entity' && item.model === model.model) : undefined
+  const cqlTable =
+    physical?.kind === 'widecolumn' ? physical.tables.find((item) => item.kind === 'entity' && item.model === model.model) : undefined
   const collection = physical?.kind === 'document' ? physical.collections.find((item) => item.model === model.model) : undefined
   const entry = physical?.kind === 'keyvalue' ? physical.entries.find((item) => item.model === model.model) : undefined
-  const tableName = table?.name ?? collection?.name ?? (entry ? `${entry.prefix}:<key>` : '')
+  const tableName = table?.name ?? cqlTable?.name ?? collection?.name ?? (entry ? `${entry.prefix}:<key>` : '')
   const titleId = `model-${model.model}`
   const choose = (ref: DecisionRef) => (value?: unknown) => onChange(decide(design, ref, value))
   const keyField = model.key?.status === 'active' && model.key.value.kind === 'field' ? model.key.value.field : null
@@ -72,7 +73,7 @@ export function ModelCard({ design, model, fields, canExclude, physical, onChang
       {editing === '' && (
         <div className="model-card__editor">
           <CommitInput
-            label={relational ? t.tableName : design.target === 'document' ? t.collectionName : t.keyPrefix}
+            label={design.target === 'document' ? t.collectionName : design.target === 'keyvalue' ? t.keyPrefix : t.tableName}
             value={model.table ?? ''}
             placeholder={entry?.prefix ?? tableName}
             onCommit={(value) => onChange(setTableName(design, model.model, value))}
@@ -81,7 +82,9 @@ export function ModelCard({ design, model, fields, canExclude, physical, onChang
       )}
       {model.key && (
         <div className="model-card__key">
-          <span className="model-card__label">{relational ? t.key : design.target === 'document' ? t.documentKey : t.keyValueKey}</span>
+          <span className="model-card__label">
+            {design.target === 'document' ? t.documentKey : design.target === 'keyvalue' ? t.keyValueKey : t.key}
+          </span>
           <DecisionControl
             id={decisionElementId({ kind: 'key', model: model.model })}
             subject={t.subjects.key(model.model)}

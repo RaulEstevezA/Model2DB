@@ -2,8 +2,8 @@
 
 import json
 
-# Where the models are stored: every SQL dialect; MongoDB and Couchbase; Redis
-STORAGE_TARGETS = ("relational", "document", "keyvalue")
+# Where the models are stored: every SQL dialect; MongoDB and Couchbase; Redis; Cassandra and ScyllaDB
+STORAGE_TARGETS = ("relational", "document", "keyvalue", "widecolumn")
 
 
 def per_target(value) -> dict:

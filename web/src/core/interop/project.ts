@@ -181,7 +181,7 @@ function readOutput(value: unknown, path: string): ProjectOutput {
     output: output.output as string,
     // Projects saved before a kind of database existed have no naming for it
     naming: perTarget((target) =>
-      naming[target] === undefined && target === 'keyvalue'
+      naming[target] === undefined && target !== 'relational' && target !== 'document'
         ? DEFAULT_NAMING[target]
         : readNaming(naming[target], `${path}.naming.${target}`),
     ),

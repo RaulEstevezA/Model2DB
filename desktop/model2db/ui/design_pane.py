@@ -292,12 +292,12 @@ class DesignPane(Pane):
         if others:
             self._content.addWidget(
                 self._section_title(
-                    {"relational": t.other_models_title, "document": t.other_documents_title}.get(
-                        kind, t.other_keys_title
+                    {"document": t.other_documents_title, "keyvalue": t.other_keys_title}.get(
+                        kind, t.other_models_title
                     )
                 )
             )
-            role_text = {"relational": t.role, "document": t.document_role}.get(kind, t.key_value_role)
+            role_text = {"document": t.document_role, "keyvalue": t.key_value_role}.get(kind, t.role)
             for model in others:
                 role = roles.get(model["name"], "unused")
                 row = QHBoxLayout()
@@ -340,7 +340,12 @@ class DesignPane(Pane):
         model = item["model"]
         table = None
         name = ""
-        if physical and physical["kind"] == "relational":
+        if physical and physical["kind"] == "widecolumn":
+            entry = next(
+                (entry for entry in physical["tables"] if entry["kind"] == "entity" and entry["model"] == model), None
+            )
+            name = entry["name"] if entry else ""
+        elif physical and physical["kind"] == "relational":
             table = next(
                 (entry for entry in physical["tables"] if entry["kind"] == "entity" and entry["model"] == model), None
             )
@@ -374,7 +379,7 @@ class DesignPane(Pane):
         header.addWidget(edit)
         layout.addLayout(header)
         if self._editing == (model, ""):
-            label = {"relational": t.table_name, "document": t.collection_name}.get(design["target"], t.key_prefix)
+            label = {"document": t.collection_name, "keyvalue": t.key_prefix}.get(design["target"], t.table_name)
             line = CommitLine(
                 item.get("table", ""),
                 name.removesuffix(":<key>"),
@@ -390,7 +395,7 @@ class DesignPane(Pane):
         )
         if key:
             layout.addWidget(
-                muted({"relational": t.key, "document": t.document_key}.get(design["target"], t.key_value_key))
+                muted({"document": t.document_key, "keyvalue": t.key_value_key}.get(design["target"], t.key))
             )
             layout.addWidget(self._control({"kind": "key", "model": model}, key, t.key_option))
 
@@ -412,6 +417,8 @@ class DesignPane(Pane):
         def relation_label(value) -> str:
             if design["target"] == "keyvalue":
                 return t.key_value_option(value, shape)
+            if design["target"] == "widecolumn":
+                return t.wide_column_option(value, shape)
             if not relational and value == "reference":
                 return t.document_reference(shape == "models")
             if not relational and value == "child":
@@ -471,7 +478,7 @@ class DesignPane(Pane):
             )
             box.addWidget(include)
             if decided["include"]:
-                label = {"relational": t.column_name, "document": t.property_name}.get(design["target"], t.hash_field)
+                label = {"document": t.property_name, "keyvalue": t.hash_field}.get(design["target"], t.column_name)
                 box.addWidget(muted(label))
                 column = CommitLine(
                     decided.get("column", ""),

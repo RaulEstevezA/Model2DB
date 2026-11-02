@@ -8,9 +8,10 @@ from .hints import declares_key, declares_unique
 from .targets.document import STRATEGY as DOCUMENT
 from .targets.key_value import STRATEGY as KEY_VALUE
 from .targets.relational import STRATEGY as RELATIONAL
+from .targets.wide_column import STRATEGY as WIDE_COLUMN
 
 # One strategy per kind of database. Adding a kind means adding its strategy here
-STRATEGIES = {"relational": RELATIONAL, "document": DOCUMENT, "keyvalue": KEY_VALUE}
+STRATEGIES = {"relational": RELATIONAL, "document": DOCUMENT, "keyvalue": KEY_VALUE, "widecolumn": WIDE_COLUMN}
 
 
 def propose_design(schema: dict, target: str) -> dict:

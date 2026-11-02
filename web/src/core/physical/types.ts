@@ -192,7 +192,42 @@ export interface KeyValueSchema {
   notes: Note[]
 }
 
-export type PhysicalSchema = RelationalSchema | DocumentSchema | KeyValueSchema
+/** A column of a Cassandra or ScyllaDB table, or a field of a user-defined type. The type is CQL as both
+ * write it (`text`, `list<frozen<order_line>>`). */
+export interface CqlColumn {
+  name: string
+  type: string
+  source?: string
+}
+
+export interface CqlTable {
+  name: string
+  model: string
+  /** `entity`: a stored model; `child`: the keys of a list of other models, partitioned by the owner's key */
+  kind: 'entity' | 'child'
+  columns: CqlColumn[]
+  partitionKey: string[]
+  clusteringKey: string[]
+  /** Secondary indexes, on one column each */
+  indexes: { name: string; column: string }[]
+  todos: Todo[]
+}
+
+/** A user-defined type: a model without a key kept inside the rows that use it. */
+export interface CqlType {
+  name: string
+  fields: CqlColumn[]
+}
+
+export interface WideColumnSchema {
+  kind: 'widecolumn'
+  /** In the order they can be created: a type comes after the types it uses */
+  types: CqlType[]
+  tables: CqlTable[]
+  notes: Note[]
+}
+
+export type PhysicalSchema = RelationalSchema | DocumentSchema | KeyValueSchema | WideColumnSchema
 
 export type TableNaming = 'plural' | 'singular' | 'model'
 export type ColumnNaming = 'snake' | 'field'

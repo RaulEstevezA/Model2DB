@@ -8,6 +8,7 @@ export const DEFAULT_NAMING: Record<StorageTarget, NamingOptions> = {
   relational: { tables: 'plural', columns: 'snake' },
   document: { tables: 'plural', columns: 'field' },
   keyvalue: { tables: 'singular', columns: 'snake' },
+  widecolumn: { tables: 'plural', columns: 'snake' },
 }
 
 /** Plural of an English word, for table names: `order` → `orders`, `category` → `categories`. */

@@ -204,7 +204,7 @@ class ResultPane(Pane):
         if not generated:
             return 0
         physical = generated["physical"]
-        parts = {"relational": "tables", "document": "collections", "keyvalue": "entries"}[physical["kind"]]
+        parts = {"document": "collections", "keyvalue": "entries"}.get(physical["kind"], "tables")
         parts = physical[parts]
         return sum(len(part["todos"]) for part in parts)
 
@@ -248,7 +248,7 @@ class ResultPane(Pane):
         naming = settings["naming"]
         tables = t.tables_naming_option
         add(
-            {"relational": t.tables_naming, "document": t.collections_naming}.get(output.target, t.prefixes_naming),
+            {"document": t.collections_naming, "keyvalue": t.prefixes_naming}.get(output.target, t.tables_naming),
             choice(
                 [(tables[item], item) for item in TABLE_NAMINGS],
                 naming["tables"],
@@ -256,7 +256,7 @@ class ResultPane(Pane):
             ),
         )
         add(
-            {"relational": t.columns_naming, "document": t.properties_naming}.get(output.target, t.hash_fields_naming),
+            {"document": t.properties_naming, "keyvalue": t.hash_fields_naming}.get(output.target, t.columns_naming),
             choice(
                 [(t.columns_naming_option[item], item) for item in COLUMN_NAMINGS],
                 naming["columns"],

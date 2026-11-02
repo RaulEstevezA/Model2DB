@@ -47,7 +47,7 @@ export function pendingDecisions(design: Design, roles: Map<string, ModelRole>):
   const items: PendingItem[] = []
   for (const model of design.models) {
     const role = roles.get(model.model)
-    const fieldsMatter = role === 'stored' || (design.target === 'document' && role === 'embedded')
+    const fieldsMatter = role === 'stored' || ((design.target === 'document' || design.target === 'widecolumn') && role === 'embedded')
     if (role === 'stored' && model.key?.status === 'pending') items.push({ ref: { kind: 'key', model: model.model }, decision: model.key })
     if (!fieldsMatter) continue
     for (const field of model.fields) {

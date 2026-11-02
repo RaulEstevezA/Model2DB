@@ -159,6 +159,32 @@ def _key_value_option_es(choice: str, shape: str) -> str:
     return "Texto JSON en este hash"
 
 
+def _wide_column_option_en(choice: str, shape: str) -> str:
+    if choice == "embed":
+        return "List of user-defined types in the row" if shape == "models" else "User-defined type in the row"
+    if choice == "array":
+        return "Map collection in the row" if shape == "map" else "List collection in the row"
+    return {
+        "reference": "Column with its key",
+        "flatten": "Columns in this table",
+        "child": "Table partitioned by this key",
+    }.get(choice, "JSON text column")
+
+
+def _wide_column_option_es(choice: str, shape: str) -> str:
+    if choice == "embed":
+        if shape == "models":
+            return "Lista de tipos definidos por el usuario en la fila"
+        return "Tipo definido por el usuario en la fila"
+    if choice == "array":
+        return "Colección map en la fila" if shape == "map" else "Colección list en la fila"
+    return {
+        "reference": "Columna con su clave",
+        "flatten": "Columnas en esta tabla",
+        "child": "Tabla particionada por esta clave",
+    }.get(choice, "Columna de texto JSON")
+
+
 def _key_option_en(choice: dict) -> str:
     if choice["kind"] == "field":
         return f"Field “{choice['field']}”"
@@ -224,6 +250,12 @@ def _reason_en(reason: dict) -> str:
         "valueHash": "Keys chosen at run time: a Redis hash under this key keeps them as they are.",
         "valueAsJson": f"“{_p(params, 'model')}” has no key and holds lists: kept as JSON inside this hash.",
         "valueArray": "A list of plain values: kept as an array inside the document.",
+        "valueType": f"“{_p(params, 'model')}” has no key: a user-defined type keeps it inside the row.",
+        "partitionTable": f"A table partitioned by this model's key, with the keys of its “{_p(params, 'model')}”: one "
+        "query reads them. Embed copies instead if they are always read with this model.",
+        "embeddedList": f"“{_p(params, 'model')}” has no key: the list is kept in the row as user-defined types. "
+        "Choose a table of its own if the list can grow without limit.",
+        "nativeCollection": "A collection of the database keeps the values inside the row.",
         "targetExcluded": f"“{_p(params, 'model')}” is left out.",
         "foreignKeyNamed": f"Named after “{_p(params, 'model')}”: it most likely holds its key.",
         "uniqueDeclared": "Declared unique in the input.",
@@ -289,6 +321,13 @@ def _reason_es(reason: dict) -> str:
         "valueAsJson": f"«{_p(params, 'model')}» no tiene clave y contiene listas: se guarda como JSON dentro de "
         "este hash.",
         "valueArray": "Una lista de valores simples: se guarda como un array dentro del documento.",
+        "valueType": f"«{_p(params, 'model')}» no tiene clave: un tipo definido por el usuario lo guarda dentro de "
+        "la fila.",
+        "partitionTable": f"Una tabla particionada por la clave de este modelo, con las claves de sus "
+        f"«{_p(params, 'model')}»: una consulta los lee. Embebe copias si siempre se leen con este modelo.",
+        "embeddedList": f"«{_p(params, 'model')}» no tiene clave: la lista se guarda en la fila como tipos definidos "
+        "por el usuario. Elige una tabla propia si la lista puede crecer sin límite.",
+        "nativeCollection": "Una colección de la base de datos guarda los valores dentro de la fila.",
         "targetExcluded": f"«{_p(params, 'model')}» está excluido.",
         "foreignKeyNamed": f"Lleva el nombre de «{_p(params, 'model')}»: lo más probable es que guarde su clave.",
         "uniqueDeclared": "Declarado único en la entrada.",
@@ -425,11 +464,13 @@ EN = SimpleNamespace(
     design_for=lambda database, kind: {
         "relational": f"Relational design for {database}",
         "document": f"Document design for {database}",
-    }.get(kind, f"Key-value design for {database}"),
+        "keyvalue": f"Key-value design for {database}",
+    }.get(kind, f"Wide-column design for {database}"),
     design_summary=lambda stored, kind: {
         "relational": f"{_en_number(stored)} {_plural(stored, 'table', 'tables')} from the models",
         "document": f"{_en_number(stored)} {_plural(stored, 'collection', 'collections')}",
-    }.get(kind, f"{_en_number(stored)} {_plural(stored, 'model', 'models')} with keys of their own"),
+        "keyvalue": f"{_en_number(stored)} {_plural(stored, 'model', 'models')} with keys of their own",
+    }.get(kind, f"{_en_number(stored)} {_plural(stored, 'table', 'tables')} from the models"),
     pending_count=lambda count: f"{_en_number(count)} {_plural(count, 'decision', 'decisions')} to review",
     all_decided="Nothing left to review.",
     review_summary=lambda count: f"{_en_number(count)} {_plural(count, 'decision waits', 'decisions wait')} for you",
@@ -510,6 +551,7 @@ EN = SimpleNamespace(
     document_reference=lambda many: "References (list of _id)" if many else "Reference (_id)",
     document_other_side="Kept in the other collection (each one stores this _id)",
     key_value_option=_key_value_option_en,
+    wide_column_option=_wide_column_option_en,
     key_option=_key_option_en,
     enum_option={
         "check": "Text with a CHECK constraint",
@@ -528,6 +570,7 @@ EN = SimpleNamespace(
         "relational": "Relational SQL",
         "document": "Documents",
         "keyvalue": "Key-value",
+        "widecolumn": "Wide-column",
         "python": "Python",
         "typescript": "TypeScript / JavaScript",
         "jvm": "Java / Kotlin",
@@ -624,11 +667,13 @@ ES = SimpleNamespace(
     design_for=lambda database, kind: {
         "relational": f"Diseño relacional para {database}",
         "document": f"Diseño de documentos para {database}",
-    }.get(kind, f"Diseño clave-valor para {database}"),
+        "keyvalue": f"Diseño clave-valor para {database}",
+    }.get(kind, f"Diseño de columnas anchas para {database}"),
     design_summary=lambda stored, kind: {
         "relational": f"{_es_number(stored)} {_plural(stored, 'tabla', 'tablas')} a partir de los modelos",
         "document": f"{_es_number(stored)} {_plural(stored, 'colección', 'colecciones')}",
-    }.get(kind, f"{_es_number(stored)} {_plural(stored, 'modelo', 'modelos')} con claves propias"),
+        "keyvalue": f"{_es_number(stored)} {_plural(stored, 'modelo', 'modelos')} con claves propias",
+    }.get(kind, f"{_es_number(stored)} {_plural(stored, 'tabla', 'tablas')} a partir de los modelos"),
     pending_count=lambda count: f"{_es_number(count)} {_plural(count, 'decisión', 'decisiones')} para revisar",
     all_decided="No queda nada por revisar.",
     review_summary=lambda count: f"{_es_number(count)} {_plural(count, 'decisión te espera', 'decisiones te esperan')}",
@@ -710,6 +755,7 @@ ES = SimpleNamespace(
     document_reference=lambda many: "Referencias (lista de _id)" if many else "Referencia (_id)",
     document_other_side="En la otra colección (cada uno guarda este _id)",
     key_value_option=_key_value_option_es,
+    wide_column_option=_wide_column_option_es,
     key_option=_key_option_es,
     enum_option={
         "check": "Texto con restricción CHECK",
@@ -728,6 +774,7 @@ ES = SimpleNamespace(
         "relational": "SQL relacional",
         "document": "Documentos",
         "keyvalue": "Clave-valor",
+        "widecolumn": "Columnas anchas",
         "python": "Python",
         "typescript": "TypeScript / JavaScript",
         "jvm": "Java / Kotlin",

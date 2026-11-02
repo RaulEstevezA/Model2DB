@@ -31,6 +31,8 @@ export function modelRoles(schema: ModelSchema, design: Design): Map<string, Mod
   // columns or JSON everything is part of the value; an embedded document can still refer to others.
   const embedded = new Set<string>()
   const pending = new Set<string>()
+  // Embedded documents and user-defined types can still refer to other models; flattened columns and JSON cannot
+  const nested = design.target === 'document' || design.target === 'widecolumn'
   const visit = (name: string, inside: boolean) => {
     const model = findModel(schema, name)
     const item = findModelDesign(design, name)
@@ -43,7 +45,7 @@ export function modelRoles(schema: ModelSchema, design: Design): Map<string, Mod
         pending.add(target)
         continue
       }
-      const storesTarget = NEEDS_STORAGE.includes(decided.relation.value) && (design.target === 'document' || !inside)
+      const storesTarget = NEEDS_STORAGE.includes(decided.relation.value) && (nested || !inside)
       if (storesTarget) {
         if (roles.get(target) !== 'stored') {
           roles.set(target, 'stored')
@@ -51,7 +53,7 @@ export function modelRoles(schema: ModelSchema, design: Design): Map<string, Mod
         }
       } else if (!embedded.has(target)) {
         embedded.add(target)
-        visit(target, design.target !== 'document')
+        visit(target, !nested)
       }
     }
   }

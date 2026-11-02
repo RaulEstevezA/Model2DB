@@ -17,16 +17,6 @@ export function IntroPanel({ onExample }: { onExample: (id: ExampleId) => void }
         <p className="intro__description">{t.introDescription}</p>
       </div>
       <div className="intro__side">
-        <div className="intro__privacy" role="note" aria-labelledby="privacy-title">
-          <p className="intro__privacy-title" id="privacy-title">
-            {t.privacyTitle}
-          </p>
-          <ul>
-            {t.privacyPoints.map((point) => (
-              <li key={point}>{point}</li>
-            ))}
-          </ul>
-        </div>
         <div className="intro__examples" role="group" aria-labelledby="examples-label">
           <span id="examples-label" className="intro__examples-label">
             {t.examplesLabel}

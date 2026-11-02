@@ -415,18 +415,14 @@ def _project_error_es(error: str, path: str | None = None) -> str:
 
 EN = SimpleNamespace(
     tagline="Turn a data model into a database design you review before any code is written",
-    intro_description="Paste or open your models (classes, DTOs, JSON, schemas) or receive them from Mapper. "
-    "Model2DB proposes tables, keys, relations, embedded documents and indexes, explains each proposal and waits "
-    "for you where it is not sure. Then save the SQL schema or its migration, the scripts for MongoDB, Couchbase, "
-    "Redis, Cassandra or ScyllaDB, or the models of your ORM: Django, SQLAlchemy, Prisma, TypeORM, JPA, Entity "
-    "Framework and more.",
+    intro_description="Paste or open your models in any of 23 formats (classes, DTOs, JSON, schemas) or receive them "
+    "from Mapper. Model2DB proposes a design for a relational, document, key-value or wide-column database: tables or "
+    "collections, keys, relations, embedded documents and indexes. It explains each proposal and how sure it is, and "
+    "waits for you where it is not sure: nothing uncertain is applied until you decide. Then save the SQL schema or "
+    "its migration (Flyway, Liquibase), the scripts for MongoDB, Couchbase, Redis, Cassandra or ScyllaDB, or the "
+    "models of your ORM: Django, SQLAlchemy, Prisma, TypeORM, JPA, Entity Framework and more. Everything happens on "
+    "your computer: what you paste is never sent anywhere, and code is analyzed, never run.",
     privacy_short="Processed locally",
-    privacy_points=[
-        "What you paste or open never leaves your computer.",
-        "Code is analyzed, never run, and the original is never changed.",
-        "Nothing uncertain is applied until you decide.",
-        "Nothing is saved unless you turn on “Remember on this computer”.",
-    ],
     examples_label="Try an example",
     examples={"store": "Online shop", "jpa": "JPA entities", "json": "JSON response", "prisma": "Prisma to MongoDB"},
     example_descriptions={
@@ -621,17 +617,14 @@ EN = SimpleNamespace(
 
 ES = SimpleNamespace(
     tagline="Convierte un modelo de datos en un diseño de base de datos que revisas antes de generar código",
-    intro_description="Pega o abre tus modelos (clases, DTOs, JSON, esquemas) o recíbelos de Mapper. Model2DB propone "
-    "tablas, claves, relaciones, documentos embebidos e índices, explica cada propuesta y te espera donde no está "
-    "seguro. Después guarda el esquema SQL o su migración, los scripts para MongoDB, Couchbase, Redis, Cassandra o "
-    "ScyllaDB, o los modelos de tu ORM: Django, SQLAlchemy, Prisma, TypeORM, JPA, Entity Framework y más.",
+    intro_description="Pega o abre tus modelos en cualquiera de 23 formatos (clases, DTOs, JSON, esquemas) o recíbelos "
+    "de Mapper. Model2DB propone un diseño para una base de datos relacional, de documentos, clave-valor o de columnas "
+    "anchas: tablas o colecciones, claves, relaciones, documentos embebidos e índices. Explica cada propuesta y cuánto "
+    "de seguro está, y te espera donde no lo está: nada dudoso se aplica hasta que decides. Después guarda el esquema "
+    "SQL o su migración (Flyway, Liquibase), los scripts para MongoDB, Couchbase, Redis, Cassandra o ScyllaDB, o los "
+    "modelos de tu ORM: Django, SQLAlchemy, Prisma, TypeORM, JPA, Entity Framework y más. Todo ocurre en tu equipo: lo "
+    "que pegas no se envía a ningún sitio, y el código se analiza, nunca se ejecuta.",
     privacy_short="Procesado en local",
-    privacy_points=[
-        "Lo que pegas o abres no sale de tu equipo.",
-        "El código se analiza, nunca se ejecuta, y el original no se modifica.",
-        "Nada dudoso se aplica hasta que decides.",
-        "No se guarda nada salvo que actives «Recordar en este equipo».",
-    ],
     examples_label="Prueba un ejemplo",
     examples={"store": "Tienda online", "jpa": "Entidades JPA", "json": "Respuesta JSON", "prisma": "Prisma a MongoDB"},
     example_descriptions={

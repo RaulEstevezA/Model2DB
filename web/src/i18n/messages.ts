@@ -46,15 +46,8 @@ const JSON_DETAIL_ES: Record<string, string> = {
 const en = {
   tagline: 'Turn a data model into a database design you review before any code is written',
   introDescription:
-    'Paste or open your models (classes, DTOs, JSON, schemas) or receive them from Mapper. Model2DB proposes tables, keys, relations, embedded documents and indexes, explains each proposal and waits for you where it is not sure. Then copy the SQL schema or its migration, the scripts for MongoDB, Couchbase, Redis, Cassandra or ScyllaDB, or the models of your ORM: Django, SQLAlchemy, Prisma, TypeORM, JPA, Entity Framework and more.',
+    'Paste or open your models in any of 23 formats (classes, DTOs, JSON, schemas) or receive them from Mapper. Model2DB proposes a design for a relational, document, key-value or wide-column database: tables or collections, keys, relations, embedded documents and indexes. It explains each proposal and how sure it is, and waits for you where it is not sure: nothing uncertain is applied until you decide. Then copy the SQL schema or its migration (Flyway, Liquibase), the scripts for MongoDB, Couchbase, Redis, Cassandra or ScyllaDB, or the models of your ORM: Django, SQLAlchemy, Prisma, TypeORM, JPA, Entity Framework and more. Everything happens in your browser: what you paste is never sent anywhere, and code is analyzed, never run.',
   privacyShort: 'Processed locally',
-  privacyTitle: 'Your models stay with you',
-  privacyPoints: [
-    'What you paste or open never leaves your browser.',
-    'Code is analyzed, never run, and the original is never changed.',
-    'Nothing uncertain is applied until you decide.',
-    'Nothing is saved unless you turn on “Remember in this browser”.',
-  ],
   examplesLabel: 'Try an example',
   examples: {
     store: 'Online shop',
@@ -71,6 +64,13 @@ const en = {
   confirmReplace: 'This replaces your model and the decisions you made. Continue?',
   languageLabel: 'Language',
   license: 'MIT License',
+  downloadDesktop: 'Download for desktop',
+  downloadFor: (platform: string) => `Download for ${platform}`,
+  otherPlatforms: 'Other platforms',
+  otherArchitecture: (architecture: string) => `${architecture} version`,
+  downloadNote: 'Desktop version for Windows, macOS and Linux. It is not signed, so the first time your system will show a warning.',
+  howToOpen: 'How to open it',
+  howToOpenUrl: 'https://github.com/RaulEstevezA/Model2DB/blob/main/desktop/README_en.md#opening-it-the-first-time',
   sourceCode: 'Source code',
   allTools: 'All tools',
   mapperNote: 'Two models that do not match yet? Relate them with Mapper first.',
@@ -484,15 +484,8 @@ export type Messages = typeof en
 const es: Messages = {
   tagline: 'Convierte un modelo de datos en un diseño de base de datos que revisas antes de generar código',
   introDescription:
-    'Pega o abre tus modelos (clases, DTOs, JSON, esquemas) o recíbelos de Mapper. Model2DB propone tablas, claves, relaciones, documentos embebidos e índices, explica cada propuesta y te espera donde no está seguro. Después copia el esquema SQL o su migración, los scripts para MongoDB, Couchbase, Redis, Cassandra o ScyllaDB, o los modelos de tu ORM: Django, SQLAlchemy, Prisma, TypeORM, JPA, Entity Framework y más.',
+    'Pega o abre tus modelos en cualquiera de 23 formatos (clases, DTOs, JSON, esquemas) o recíbelos de Mapper. Model2DB propone un diseño para una base de datos relacional, de documentos, clave-valor o de columnas anchas: tablas o colecciones, claves, relaciones, documentos embebidos e índices. Explica cada propuesta y cuánto de seguro está, y te espera donde no lo está: nada dudoso se aplica hasta que decides. Después copia el esquema SQL o su migración (Flyway, Liquibase), los scripts para MongoDB, Couchbase, Redis, Cassandra o ScyllaDB, o los modelos de tu ORM: Django, SQLAlchemy, Prisma, TypeORM, JPA, Entity Framework y más. Todo ocurre en tu navegador: lo que pegas no se envía a ningún sitio, y el código se analiza, nunca se ejecuta.',
   privacyShort: 'Procesado en local',
-  privacyTitle: 'Tus modelos no salen de aquí',
-  privacyPoints: [
-    'Lo que pegas o abres no sale de tu navegador.',
-    'El código se analiza, nunca se ejecuta, y el original no se modifica.',
-    'Nada dudoso se aplica hasta que decides.',
-    'No se guarda nada salvo que actives «Recordar en este navegador».',
-  ],
   examplesLabel: 'Prueba un ejemplo',
   examples: {
     store: 'Tienda online',
@@ -509,6 +502,13 @@ const es: Messages = {
   confirmReplace: 'Se sustituirán tu modelo y las decisiones que has tomado. ¿Continuar?',
   languageLabel: 'Idioma',
   license: 'Licencia MIT',
+  downloadDesktop: 'Descargar para escritorio',
+  downloadFor: (platform) => `Descargar para ${platform}`,
+  otherPlatforms: 'Otras plataformas',
+  otherArchitecture: (architecture) => `Versión ${architecture}`,
+  downloadNote: 'Versión de escritorio para Windows, macOS y Linux. No está firmada, así que la primera vez el sistema mostrará un aviso.',
+  howToOpen: 'Cómo abrirla',
+  howToOpenUrl: 'https://github.com/RaulEstevezA/Model2DB/blob/main/desktop/README_es.md#abrirla-la-primera-vez',
   sourceCode: 'Código fuente',
   allTools: 'Todas las herramientas',
   mapperNote: '¿Dos modelos que todavía no encajan? Relaciónalos antes con Mapper.',

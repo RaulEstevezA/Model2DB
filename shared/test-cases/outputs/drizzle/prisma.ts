@@ -3,7 +3,7 @@ import { relations } from 'drizzle-orm'
 import { type AnyPgColumn, bigint, boolean, index, integer, pgTable, primaryKey, text, timestamp, unique, varchar } from 'drizzle-orm/pg-core'
 
 export const users = pgTable('users', {
-  id: text('id').primaryKey(),
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
   email: text('email').notNull(),
   name: text('name'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),

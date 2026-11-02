@@ -134,7 +134,7 @@ def _column_lines(attribute: dict, writer: dict) -> list[str]:
         decorator = "PrimaryGeneratedColumn"
         # A generated key takes only its type: TypeORM does not accept a precision there
         options = [options[0], _column_type(column["type"], engine, enums)[0]]
-    elif attribute["primaryKey"] and column.get("generated") == "uuid":
+    elif attribute["primaryKey"] and column.get("generated") == "uuid" and _is_uuid(column["type"]):
         writer["decorators"].add("PrimaryGeneratedColumn")
         return [
             f"@PrimaryGeneratedColumn('uuid', {{ name: {ts_string(column['name'])} }})",
@@ -144,10 +144,19 @@ def _column_lines(attribute: dict, writer: dict) -> list[str]:
         decorator = "PrimaryColumn"
     writer["decorators"].add(decorator)
     type_text = ts_type(column["type"], enums)
-    return [
+    lines = [
         f"@{decorator}({{ {', '.join(options)} }})",
         f"{attribute['name']}!: {type_text}{' | null' if column['nullable'] else ''}",
     ]
+    # A text column filled with a new UUID keeps its type
+    if column.get("generated") != "uuid":
+        return lines
+    writer["decorators"].add("Generated")
+    return [lines[0], "@Generated('uuid')", lines[1]]
+
+
+def _is_uuid(type_ref: dict) -> bool:
+    return type_ref["kind"] == "primitive" and type_ref["name"] == "uuid"
 
 
 def _referenced(view: dict, class_name: str, column: str) -> str:

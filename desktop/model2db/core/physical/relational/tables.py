@@ -1,6 +1,7 @@
 """The tables of the stored models, their keys and their scalar columns. Mirrors
 web/src/core/physical/relational/tables.ts."""
 
+from ...design.hints import declares_uuid_default
 from ...design.types import find_model_design
 from ...model.schema import all_fields
 from ..naming import column_name, constraint_name, free_name, table_name
@@ -111,6 +112,8 @@ def add_scalar_columns(build: RelationalBuild, key_fields: dict[str, str]) -> No
                 if is_key and column_type["name"] == "integer":
                     column["generated"] = "identity"
                 if is_key and column_type["name"] == "uuid":
+                    column["generated"] = "uuid"
+                if column_type["name"] == "string" and declares_uuid_default(field):
                     column["generated"] = "uuid"
                 if not is_key and column_type["name"] in ("datetime", "date"):
                     column["generated"] = "now"

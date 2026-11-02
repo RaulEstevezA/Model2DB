@@ -1,10 +1,11 @@
 // TypeORM entities written by Model2DB from User. Review them before using them.
-import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn, Unique } from 'typeorm'
+import { Column, Entity, Generated, Index, JoinColumn, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn, Unique } from 'typeorm'
 
 @Unique('uq_users_email', ['email'])
 @Entity({ name: 'users' })
 export class User {
   @PrimaryColumn({ name: 'id', type: 'text' })
+  @Generated('uuid')
   id!: string
 
   @Column({ name: 'email', type: 'text' })

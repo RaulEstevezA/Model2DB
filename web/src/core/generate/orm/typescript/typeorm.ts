@@ -114,13 +114,17 @@ function columnLines(attribute: Attribute, writer: Writer): string[] {
     decorator = 'PrimaryGeneratedColumn'
     // A generated key takes only its type: TypeORM does not accept a precision there
     options.splice(1, options.length - 1, columnType(column.type, writer.engine, writer.view.enums)[0])
-  } else if (attribute.primaryKey && column.generated === 'uuid') {
+  } else if (attribute.primaryKey && column.generated === 'uuid' && column.type.kind === 'primitive' && column.type.name === 'uuid') {
     writer.decorators.add('PrimaryGeneratedColumn')
     return [`@PrimaryGeneratedColumn('uuid', { name: ${tsString(column.name)} })`, `${attribute.name}!: string`]
   } else if (attribute.primaryKey || attribute.compositeKey) decorator = 'PrimaryColumn'
   writer.decorators.add(decorator)
   const type = tsType(column.type, writer.view.enums)
-  return [`@${decorator}({ ${options.join(', ')} })`, `${attribute.name}!: ${type}${column.nullable ? ' | null' : ''}`]
+  const lines = [`@${decorator}({ ${options.join(', ')} })`, `${attribute.name}!: ${type}${column.nullable ? ' | null' : ''}`]
+  // A text column filled with a new UUID keeps its type
+  if (column.generated !== 'uuid') return lines
+  writer.decorators.add('Generated')
+  return [lines[0], "@Generated('uuid')", lines[1]]
 }
 
 function relationLines(navigation: EntityClass['navigations'][number], item: EntityClass, writer: Writer): string[] {

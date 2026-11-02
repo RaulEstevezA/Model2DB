@@ -2,7 +2,7 @@
 -- Review it before running it: nothing here has been run.
 
 CREATE TABLE users (
-  id VARCHAR2(255 CHAR) NOT NULL,
+  id VARCHAR2(255 CHAR) DEFAULT SYS_GUID() NOT NULL,
   email VARCHAR2(255 CHAR) NOT NULL,
   name VARCHAR2(255 CHAR),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,

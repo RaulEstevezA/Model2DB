@@ -2,7 +2,7 @@
 import { DataTypes, Model, Sequelize, type CreationOptional, type InferAttributes, type InferCreationAttributes, type NonAttribute } from 'sequelize'
 
 export class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
-  declare id: string
+  declare id: CreationOptional<string>
   declare email: string
   declare name: CreationOptional<string | null>
   declare createdAt: CreationOptional<Date>
@@ -42,7 +42,7 @@ export class PostTag extends Model<InferAttributes<PostTag>, InferCreationAttrib
 export function initModels(sequelize: Sequelize): void {
   User.init(
     {
-      id: { type: DataTypes.TEXT, field: 'id', primaryKey: true, allowNull: false },
+      id: { type: DataTypes.TEXT, field: 'id', primaryKey: true, allowNull: false, defaultValue: DataTypes.UUIDV4 },
       email: { type: DataTypes.TEXT, field: 'email', allowNull: false },
       name: { type: DataTypes.TEXT, field: 'name', allowNull: true },
       createdAt: { type: DataTypes.DATE, field: 'created_at', allowNull: false, defaultValue: DataTypes.NOW },

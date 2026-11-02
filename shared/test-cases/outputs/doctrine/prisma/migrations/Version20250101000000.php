@@ -19,7 +19,7 @@ final class Version20250101000000 extends AbstractMigration
     {
         $this->addSql(<<<'SQL'
             CREATE TABLE users (
-              id TEXT NOT NULL,
+              id TEXT DEFAULT gen_random_uuid() NOT NULL,
               email TEXT NOT NULL,
               name TEXT,
               created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,

@@ -1,4 +1,5 @@
 import { allFields } from '../../model/schema.ts'
+import { declaresUuidDefault } from '../../design/hints.ts'
 import { findModelDesign, type KeyChoice } from '../../design/types.ts'
 import { columnName, constraintName, freeName, tableName } from '../naming.ts'
 import type { Column, ColumnType } from '../types.ts'
@@ -86,6 +87,7 @@ export function addScalarColumns(build: RelationalBuild, keyFields: Map<string, 
       if (field.generated && column.type.kind === 'primitive') {
         if (isKey && column.type.name === 'integer') column.generated = 'identity'
         if (isKey && column.type.name === 'uuid') column.generated = 'uuid'
+        if (column.type.name === 'string' && declaresUuidDefault(field)) column.generated = 'uuid'
         if (!isKey && (column.type.name === 'datetime' || column.type.name === 'date')) column.generated = 'now'
       }
       table.columns.push(column)

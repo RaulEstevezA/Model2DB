@@ -1,10 +1,12 @@
 """Django models written by Model2DB from User. Review them before using them."""
 
+import uuid
+
 from django.db import models
 
 
 class User(models.Model):
-    id = models.TextField(primary_key=True)
+    id = models.TextField(primary_key=True, default=uuid.uuid4)
     email = models.TextField(unique=True)
     name = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

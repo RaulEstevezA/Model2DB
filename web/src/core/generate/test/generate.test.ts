@@ -100,6 +100,16 @@ describe('names', () => {
     )
   })
 
+  it('fills a text key with a new UUID when the input says so', () => {
+    const jpa = schemaOf(
+      '@Entity public class Ticket { @Id @GeneratedValue(strategy = GenerationType.UUID) private String id; private String title; }',
+      'java',
+    )
+    expect(text(generate(jpa, proposeDesign(jpa, 'relational'), findOutput('postgresql'), settings))).toContain(
+      'id TEXT DEFAULT gen_random_uuid() NOT NULL',
+    )
+  })
+
   it('follows the naming chosen for tables and columns', () => {
     const design = proposeDesign(schema, 'relational')
     const content = text(generate(schema, design, findOutput('postgresql'), { ...settings, naming: { tables: 'model', columns: 'field' } }))

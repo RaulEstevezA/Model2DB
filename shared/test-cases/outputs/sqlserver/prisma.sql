@@ -2,7 +2,7 @@
 -- Review it before running it: nothing here has been run.
 
 CREATE TABLE users (
-  id NVARCHAR(255) NOT NULL,
+  id NVARCHAR(255) DEFAULT NEWID() NOT NULL,
   email NVARCHAR(255) NOT NULL,
   name NVARCHAR(255),
   created_at DATETIMEOFFSET DEFAULT CURRENT_TIMESTAMP NOT NULL,

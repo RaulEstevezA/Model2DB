@@ -229,7 +229,9 @@ function tableBlock(
       call += flavor === 'sqlite' && column.generated === 'identity' ? '.primaryKey({ autoIncrement: true })' : '.primaryKey()'
     }
     if (!column.nullable && !primary) call += '.notNull()'
-    if (column.generated === 'uuid') call += flavor === 'pg' ? '.defaultRandom()' : '.$defaultFn(() => crypto.randomUUID())'
+    // `defaultRandom()` only exists on uuid columns; a text one takes a new UUID from the application
+    if (column.generated === 'uuid')
+      call += flavor === 'pg' && isUuid(column.type) ? '.defaultRandom()' : '.$defaultFn(() => crypto.randomUUID())'
     if (column.generated === 'now') {
       call += rules.now
       if (rules.now.includes('sql`')) imports.orm.add('sql')
@@ -390,4 +392,8 @@ export const drizzleOutput: RelationalWriter = {
       },
     ]
   },
+}
+
+function isUuid(type: ColumnType): boolean {
+  return type.kind === 'primitive' && type.name === 'uuid'
 }

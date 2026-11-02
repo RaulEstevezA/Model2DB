@@ -18,7 +18,7 @@ public class UserDbContext(DbContextOptions<UserDbContext> options) : DbContext(
         {
             entity.ToTable("users");
             entity.HasKey(e => e.Id).HasName("pk_users");
-            entity.Property(e => e.Id).HasColumnName("id").HasColumnType("TEXT").IsRequired().ValueGeneratedNever();
+            entity.Property(e => e.Id).HasColumnName("id").HasColumnType("TEXT").IsRequired().ValueGeneratedOnAdd();
             entity.Property(e => e.Email).HasColumnName("email").HasColumnType("TEXT").IsRequired();
             entity.Property(e => e.Name).HasColumnName("name").HasColumnType("TEXT");
             entity.Property(e => e.CreatedAt).HasColumnName("created_at").HasColumnType("TIMESTAMPTZ").IsRequired().HasDefaultValueSql("CURRENT_TIMESTAMP");

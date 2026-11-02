@@ -217,8 +217,10 @@ def _table_block(table: dict, item: dict | None, view: dict, flavor: str, import
             )
         if not column["nullable"] and not primary:
             call += ".notNull()"
+        # `defaultRandom()` only exists on uuid columns; a text one takes a new UUID from the application
         if generated == "uuid":
-            call += ".defaultRandom()" if flavor == "pg" else ".$defaultFn(() => crypto.randomUUID())"
+            uuid_type = column["type"]["kind"] == "primitive" and column["type"]["name"] == "uuid"
+            call += ".defaultRandom()" if flavor == "pg" and uuid_type else ".$defaultFn(() => crypto.randomUUID())"
         if generated == "now":
             call += rules["now"]
             if "sql`" in rules["now"]:

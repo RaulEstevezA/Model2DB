@@ -15,7 +15,7 @@ class User
 {
     #[ORM\Id]
     #[ORM\Column(name: 'id', type: Types::TEXT)]
-    private string $id;
+    private ?string $id = null;
 
     #[ORM\Column(name: 'email', type: Types::TEXT)]
     private string $email;
@@ -40,12 +40,12 @@ class User
         $this->posts = new ArrayCollection();
     }
 
-    public function getId(): string
+    public function getId(): ?string
     {
         return $this->id;
     }
 
-    public function setId(string $id): static
+    public function setId(?string $id): static
     {
         $this->id = $id;
 

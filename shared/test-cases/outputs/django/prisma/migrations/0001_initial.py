@@ -3,6 +3,8 @@
 Rename the app label to yours, then run `python manage.py migrate`.
 """
 
+import uuid
+
 from django.db import migrations, models
 
 
@@ -15,7 +17,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="User",
             fields=[
-                ("id", models.TextField(primary_key=True, serialize=False)),
+                ("id", models.TextField(primary_key=True, serialize=False, default=uuid.uuid4)),
                 ("email", models.TextField(unique=True)),
                 ("name", models.TextField(null=True, blank=True)),
                 ("created_at", models.DateTimeField(auto_now_add=True)),

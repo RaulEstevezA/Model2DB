@@ -1,6 +1,7 @@
 """SQLModel models written by Model2DB from User. Review them before using them."""
 
 import datetime
+import uuid
 from typing import Optional
 
 from sqlalchemy import BigInteger, Boolean, Column, DateTime, ForeignKey, Integer, String, Text, func
@@ -10,7 +11,7 @@ from sqlmodel import Field, Relationship, SQLModel
 class User(SQLModel, table=True):
     __tablename__ = "users"
 
-    id: str = Field(sa_column=Column(Text, primary_key=True))
+    id: str = Field(default_factory=uuid.uuid4, sa_column=Column(Text, primary_key=True))
     email: str = Field(sa_column=Column(Text, unique=True, nullable=False))
     name: str | None = Field(default=None, sa_column=Column(Text, nullable=True))
     created_at: datetime.datetime | None = Field(default=None, sa_column=Column(DateTime(timezone=True), server_default=func.now(), nullable=False))

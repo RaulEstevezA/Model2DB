@@ -39,6 +39,17 @@ export function declaresUnique(field: FieldDef): boolean {
   return annotationsOf(field).some((annotation) => argIsTrue(annotation, 'unique') || argIsTrue(annotation, 'IsUnique'))
 }
 
+/** A text filled with a new UUID: Prisma's `@default(uuid())`, JPA's `@GeneratedValue(strategy =
+ * GenerationType.UUID)` and Hibernate's `@UuidGenerator`. */
+export function declaresUuidDefault(field: FieldDef): boolean {
+  return annotationsOf(field).some((annotation) => {
+    const name = simple(annotation.name)
+    if (name === 'default') return /^\s*uuid\(/.test(annotation.args ?? '')
+    if (name === 'generatedvalue') return /\bGenerationType\.UUID\b/.test(annotation.args ?? '')
+    return name === 'uuidgenerator'
+  })
+}
+
 export type DeclaredRelation = 'manyToOne' | 'oneToOne' | 'oneToMany' | 'manyToMany' | 'embedded' | 'elementCollection'
 
 const RELATIONS: Record<string, DeclaredRelation> = {

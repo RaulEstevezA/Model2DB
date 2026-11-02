@@ -64,6 +64,21 @@ _RELATIONS = {
 }
 
 
+def declares_uuid_default(field: dict) -> bool:
+    """A text filled with a new UUID: Prisma's `@default(uuid())`, JPA's `@GeneratedValue(strategy =
+    GenerationType.UUID)` and Hibernate's `@UuidGenerator`."""
+    for annotation in _annotations(field):
+        name = _simple(annotation["name"])
+        args = annotation.get("args") or ""
+        if name == "default" and re.match(r"\s*uuid\(", args):
+            return True
+        if name == "generatedvalue" and re.search(r"\bGenerationType\.UUID\b", args):
+            return True
+        if name == "uuidgenerator":
+            return True
+    return False
+
+
 def declared_relation(field: dict) -> str | None:
     for annotation in _annotations(field):
         relation = _RELATIONS.get(_simple(annotation["name"]))

@@ -8,7 +8,31 @@ What the tool does and its philosophy are in the [main README](../README_en.md).
 
 ## Download
 
-There are no packaged versions yet. To use it now, run it from the source code (below).
+| System | File |
+|---|---|
+| macOS (Apple Silicon) | [Model2DB-macOS.dmg](https://github.com/RaulEstevezA/Model2DB/releases/latest/download/Model2DB-macOS.dmg) |
+| Windows (x64) | [Model2DB-Windows.zip](https://github.com/RaulEstevezA/Model2DB/releases/latest/download/Model2DB-Windows.zip) |
+| Windows (ARM64) | [Model2DB-Windows-ARM64.zip](https://github.com/RaulEstevezA/Model2DB/releases/latest/download/Model2DB-Windows-ARM64.zip) |
+| Linux (x64) | [Model2DB-Linux.tar.gz](https://github.com/RaulEstevezA/Model2DB/releases/latest/download/Model2DB-Linux.tar.gz) |
+| Linux (ARM64, Ubuntu 24.04 or newer) | [Model2DB-Linux-ARM64.tar.gz](https://github.com/RaulEstevezA/Model2DB/releases/latest/download/Model2DB-Linux-ARM64.tar.gz) |
+
+Every version is in [Releases](https://github.com/RaulEstevezA/Model2DB/releases).
+
+> [!NOTE]
+> The packaged app has been built and checked on **macOS** (Apple Silicon). The Windows and Linux builds are compiled by GitHub Actions and pass the tests and an automatic start-up check, but nobody has used them on a real computer yet. If you find a problem, write to [contact.raulesteveza@gmail.com](mailto:contact.raulesteveza@gmail.com).
+
+- **macOS:** open the `.dmg` and drag Model2DB to Applications.
+- **Windows:** unzip the `.zip` and run `Model2DB.exe` inside the `Model2DB` folder.
+- **Linux:** extract with `tar -xzf Model2DB-Linux.tar.gz` (or `Model2DB-Linux-ARM64.tar.gz`) and run `Model2DB/Model2DB`. Some distributions need `libxcb-cursor0`. The ARM64 version needs a 2024 or newer distribution (glibc 2.39, like Ubuntu 24.04).
+
+### Opening it the first time
+
+The app is not signed (signing requires paid Apple and Microsoft accounts), so the system shows a warning the first time it is opened:
+
+- **macOS** says it could not verify that the app is free of malware. Click **Done**, go to **System Settings → Privacy & Security**, scroll down to **Security** and click **Open Anyway**. This is only needed once.
+- **Windows** shows "Windows protected your PC". Click **More info** and then **Run anyway**.
+
+The code is the one in this repository, and the files are built by GitHub Actions ([workflow](../.github/workflows/release-desktop.yml)).
 
 ## Differences with the web version
 

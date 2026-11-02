@@ -35,7 +35,11 @@ export function FieldRow({ design, model, field, decided, isKey, table, editing,
   const columns = table?.columns.filter((column) => column.source === `${model}.${field.name}`) ?? []
   const derivedColumn = columns[0]?.name ?? ''
   const relationLabel = (value: unknown) =>
-    !relational && value === 'reference' ? t.documentReference(shape === 'models') : t.relationOption(value as never, shape)
+    !relational && value === 'reference'
+      ? t.documentReference(shape === 'models')
+      : !relational && value === 'child'
+        ? t.documentOtherSide
+        : t.relationOption(value as never, shape)
 
   return (
     <li className={`field-row${decided.include ? '' : ' field-row--excluded'}`}>

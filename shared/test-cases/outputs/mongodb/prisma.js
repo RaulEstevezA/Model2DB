@@ -4,7 +4,7 @@
 db.createCollection("users", {
   validator: { $jsonSchema: {
     bsonType: "object",
-    required: ["_id", "email", "posts"],
+    required: ["_id", "email"],
     properties: {
       _id: {
         bsonType: "string",
@@ -26,12 +26,6 @@ db.createCollection("users", {
           },
         },
         additionalProperties: false,
-      },
-      posts: {
-        bsonType: "array",
-        items: {
-          bsonType: "int",
-        },
       },
       created_at: {
         bsonType: "date",

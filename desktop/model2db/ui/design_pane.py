@@ -404,6 +404,8 @@ class DesignPane(Pane):
         def relation_label(value) -> str:
             if not relational and value == "reference":
                 return t.document_reference(shape == "models")
+            if not relational and value == "child":
+                return t.document_other_side
             return t.relation_option(value, shape)
 
         row = QWidget()

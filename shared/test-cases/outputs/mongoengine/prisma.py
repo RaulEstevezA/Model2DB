@@ -19,7 +19,6 @@ class User(me.Document):
     email = me.StringField(required=True, unique=True)
     name = me.StringField()
     profile = me.EmbeddedDocumentField("Profile")
-    posts = me.ListField(me.ReferenceField("Post"))
     createdAt = me.DateTimeField(db_field="created_at")
 
     meta = {"collection": "users"}

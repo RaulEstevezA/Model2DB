@@ -4754,15 +4754,17 @@
         "confidence": "high",
         "reasons": [
          {
-          "code": "recursiveEmbed",
+          "code": "backReference",
           "params": {
-           "model": "Book"
+           "model": "Book",
+           "field": "author"
           }
          }
         ],
         "options": [
          "embed",
-         "reference"
+         "reference",
+         "child"
         ],
         "manual": true
        }

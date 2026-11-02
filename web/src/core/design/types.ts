@@ -87,6 +87,7 @@ export type SurrogateType = 'integer' | 'uuid' | 'objectId'
  * Document:
  * - `embed`: the value is stored inside the document
  * - `reference`: the document stores the other document's `_id` (or a list of them)
+ * - `child`: a list kept on the other side: the other documents store this one's `_id`, so it is not stored here
  */
 export type RelationChoice = 'reference' | 'flatten' | 'child' | 'join' | 'array' | 'json' | 'embed'
 

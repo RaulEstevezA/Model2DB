@@ -15,7 +15,6 @@ const userSchema = new Schema(
     email: { type: String, required: true },
     name: { type: String, default: null },
     profile: { type: profileSchema, default: null },
-    posts: [{ type: Number, ref: 'Post' }],
     created_at: Date,
   },
   { collection: 'users', versionKey: false },

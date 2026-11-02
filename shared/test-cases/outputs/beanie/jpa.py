@@ -30,7 +30,6 @@ class Author(Document):
     id: int = Field(alias="_id")
     name: str
     email: str
-    books: "list[Link[Book]]" = Field(default_factory=list)
 
     class Settings:
         name = "authors"

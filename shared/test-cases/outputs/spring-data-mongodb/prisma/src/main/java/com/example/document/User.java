@@ -4,11 +4,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.DocumentReference;
 import org.springframework.data.mongodb.core.mapping.Field;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 
 /** Document written by Model2DB from User. Review it before using it. */
 @Document(collection = "users")
@@ -22,9 +19,6 @@ public class User {
     private String name;
 
     private Profile profile;
-
-    @DocumentReference(lazy = true)
-    private List<Post> posts = new ArrayList<>();
 
     @Field("created_at")
     private Instant createdAt;
@@ -59,14 +53,6 @@ public class User {
 
     public void setProfile(Profile profile) {
         this.profile = profile;
-    }
-
-    public List<Post> getPosts() {
-        return posts;
-    }
-
-    public void setPosts(List<Post> posts) {
-        this.posts = posts;
     }
 
     public Instant getCreatedAt() {

@@ -1,5 +1,5 @@
 import { findModel, type FieldDef, type ModelDef } from '../../model/schema.ts'
-import { hasKey, isTopLevel, otherUsages, reaches, type SchemaContext, type Shape } from '../analysis.ts'
+import { backReference, hasKey, isTopLevel, otherUsages, reaches, type SchemaContext, type Shape } from '../analysis.ts'
 import { decision, reason } from '../decision.ts'
 import { declaredRelation, declaresEmbeddable } from '../hints.ts'
 import type { DesignStrategy } from '../strategy.ts'
@@ -30,6 +30,13 @@ function relation(context: SchemaContext, model: ModelDef, field: FieldDef, shap
   }
   const options: RelationChoice[] = ['embed', 'reference']
   const declared = declaredRelation(field)
+  // `User.posts` next to `Post.author`: each post already says its user, so the list is read from there
+  const back =
+    shape.kind === 'models' && shape.target !== model.name && hasKey(context, shape.target) && declared !== 'embedded'
+      ? backReference(context, model.name, shape.target)
+      : null
+  if (back)
+    return decision<RelationChoice>('child', 'high', [reason('backReference', { model: shape.target, field: back })], [...options, 'child'])
   if (reaches(context, shape.target, model.name))
     return decision<RelationChoice>(
       'reference',

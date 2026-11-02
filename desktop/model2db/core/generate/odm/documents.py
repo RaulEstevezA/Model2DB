@@ -46,7 +46,7 @@ def build_document_view(schema: dict, design: dict, physical: dict, naming: dict
             if decided and not decided["include"]:
                 continue
             relation = (decided or {}).get("relation")
-            if relation and relation["status"] == "pending":
+            if relation and (relation["status"] == "pending" or relation["value"] == "child"):
                 continue
             is_id = bool(role == "stored" and key and key["kind"] == "field" and key["field"] == field["name"])
             target = model_of(field["type"])

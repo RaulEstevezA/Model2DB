@@ -4,12 +4,19 @@ import { schemaOf } from '../../test/helpers.ts'
 import { decide, reconcile, setFieldInclude, setFieldOverride } from '../edit.ts'
 import { proposeDesign } from '../propose.ts'
 import { findFieldDesign, findModelDesign, type Design } from '../types.ts'
+import { findOutput, generate, type OutputSettings } from '../../generate/outputs.ts'
 
 const store = () => schemaOf(findExample('store')!.text, 'typescript')
 const jpa = () => schemaOf(findExample('jpa')!.text, 'java')
 
 const relation = (design: Design, model: string, field: string) => findFieldDesign(design, model, field)?.relation
 const key = (design: Design, model: string) => findModelDesign(design, model)?.key
+const mongoSettings: OutputSettings = {
+  naming: { tables: 'plural', columns: 'snake' },
+  strings: 'auto',
+  engine: 'postgresql',
+  migrations: false,
+}
 
 describe('keys', () => {
   it('takes a declared key as exact and a field named id as high', () => {
@@ -105,7 +112,20 @@ describe('relations in a document database', () => {
 
   it('embeds value objects and refers to documents that lead back', () => {
     expect(relation(prisma, 'User', 'profile')).toMatchObject({ value: 'embed', confidence: 'high' })
-    expect(relation(prisma, 'User', 'posts')).toMatchObject({ value: 'reference', reasons: [{ code: 'recursiveEmbed' }] })
+    expect(relation(prisma, 'Post', 'author')).toMatchObject({ value: 'reference', reasons: [{ code: 'recursiveEmbed' }] })
+  })
+
+  it('keeps a relation on one side only: the list is read from the documents that refer back', () => {
+    expect(relation(prisma, 'User', 'posts')).toMatchObject({
+      value: 'child',
+      status: 'active',
+      reasons: [{ code: 'backReference', params: { model: 'Post', field: 'author' } }],
+      options: ['embed', 'reference', 'child'],
+    })
+    const generated = generate(schemaOf(findExample('prisma')!.text, 'prisma'), prisma, findOutput('mongodb'), mongoSettings)
+    const script = generated.files[0].content
+    expect(script).not.toMatch(/posts: \{/)
+    expect(script).toContain('createIndex({ author_id: 1 }')
   })
 
   it('asks before embedding a document other models also use', () => {

@@ -7,7 +7,7 @@ from pymongo.database import Database
 VALIDATORS = {
     "users": {
         "bsonType": "object",
-        "required": ["_id", "email", "posts"],
+        "required": ["_id", "email"],
         "properties": {
             "_id": {
                 "bsonType": "string",
@@ -29,12 +29,6 @@ VALIDATORS = {
                     },
                 },
                 "additionalProperties": False,
-            },
-            "posts": {
-                "bsonType": "array",
-                "items": {
-                    "bsonType": "int",
-                },
             },
             "created_at": {
                 "bsonType": "date",

@@ -4,9 +4,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.DocumentReference;
-import java.util.ArrayList;
-import java.util.List;
 
 /** Document written by Model2DB from Author. Review it before using it. */
 @Document(collection = "authors")
@@ -18,9 +15,6 @@ public class Author {
     private String name;
 
     private String email;
-
-    @DocumentReference(lazy = true)
-    private List<Book> books = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -44,13 +38,5 @@ public class Author {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public List<Book> getBooks() {
-        return books;
-    }
-
-    public void setBooks(List<Book> books) {
-        this.books = books;
     }
 }

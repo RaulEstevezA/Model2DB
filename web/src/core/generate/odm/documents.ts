@@ -80,7 +80,7 @@ export function buildDocumentView(schema: ModelSchema, design: Design, physical:
       const decided = item.fields.find((candidate) => candidate.field === field.name)
       if (decided && !decided.include) continue
       const relation = decided?.relation
-      if (relation?.status === 'pending') continue
+      if (relation?.status === 'pending' || relation?.value === 'child') continue
       const id = role === 'stored' && key?.kind === 'field' && key.field === field.name
       const target = modelOf(field.type)
       const inner = innerType(field.type)

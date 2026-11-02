@@ -26,7 +26,6 @@ class Author(me.Document):
     id = me.LongField(primary_key=True)
     name = me.StringField(required=True)
     email = me.StringField(required=True, unique=True)
-    books = me.ListField(me.ReferenceField("Book"))
 
     meta = {"collection": "authors"}
 

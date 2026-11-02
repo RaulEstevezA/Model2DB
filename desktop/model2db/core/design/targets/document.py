@@ -2,7 +2,7 @@
 Mirrors web/src/core/design/targets/document.ts."""
 
 from ...model.schema import find_model
-from ..analysis import has_key, is_top_level, other_usages, reaches
+from ..analysis import back_reference, has_key, is_top_level, other_usages, reaches
 from ..decision import decision, reason
 from ..hints import declared_relation, declares_embeddable
 
@@ -27,6 +27,13 @@ def relation(context: dict, model: dict, field: dict, shape: dict) -> dict:
     target = shape["target"]
     options = ["embed", "reference"]
     declared = declared_relation(field)
+    # `User.posts` next to `Post.author`: each post already says its user, so the list is read from there
+    if kind == "models" and target != model["name"] and has_key(context, target) and declared != "embedded":
+        back = back_reference(context, model["name"], target)
+        if back:
+            return decision(
+                "child", "high", [reason("backReference", {"model": target, "field": back})], [*options, "child"]
+            )
     if reaches(context, target, model["name"]):
         confidence = "exact" if target == model["name"] else "high"
         return decision("reference", confidence, [reason("recursiveEmbed", {"model": target})], options)

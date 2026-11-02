@@ -6,7 +6,6 @@ const authorSchema = new Schema(
     _id: { type: Number, default: null },
     name: { type: String, required: true },
     email: { type: String, required: true },
-    books: [{ type: Number, ref: 'Book' }],
   },
   { collection: 'authors', versionKey: false },
 )

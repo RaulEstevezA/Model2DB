@@ -4,7 +4,7 @@
 db.createCollection("authors", {
   validator: { $jsonSchema: {
     bsonType: "object",
-    required: ["_id", "name", "email", "books"],
+    required: ["_id", "name", "email"],
     properties: {
       _id: {
         bsonType: "long",
@@ -14,12 +14,6 @@ db.createCollection("authors", {
       },
       email: {
         bsonType: "string",
-      },
-      books: {
-        bsonType: "array",
-        items: {
-          bsonType: "long",
-        },
       },
     },
     additionalProperties: false,

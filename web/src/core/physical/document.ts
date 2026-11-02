@@ -108,6 +108,8 @@ export function buildDocument(schema: ModelSchema, design: Design, naming: Namin
         scope.todos.push({ code: 'relationPending', params: { field: [...path, field.name].join('.') } })
         continue
       }
+      // Kept on the other side: the other collection stores this document's id (and indexes it)
+      if (relation?.value === 'child') continue
       let bson: BsonSchema
       if (relation?.value === 'reference') {
         const target = referenceTarget(field.type)

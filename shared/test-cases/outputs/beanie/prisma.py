@@ -2,7 +2,7 @@
 
 import datetime
 
-from beanie import Document, Link
+from beanie import Document
 from pydantic import BaseModel, Field
 from pymongo import ASCENDING, IndexModel
 
@@ -23,7 +23,6 @@ class User(Document):
     email: str
     name: str | None = Field(default=None)
     profile: "Profile | None" = Field(default=None)
-    posts: "list[Link[Post]]" = Field(default_factory=list)
     createdAt: datetime.datetime | None = Field(default=None, alias="created_at")
 
     class Settings:

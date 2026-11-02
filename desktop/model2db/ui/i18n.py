@@ -451,6 +451,7 @@ EN = SimpleNamespace(
     ),
     relation_option=_relation_option_en,
     document_reference=lambda many: "References (list of _id)" if many else "Reference (_id)",
+    document_other_side="Kept in the other collection (each one stores this _id)",
     key_option=_key_option_en,
     enum_option={
         "check": "Text with a CHECK constraint",
@@ -634,6 +635,7 @@ ES = SimpleNamespace(
     ),
     relation_option=_relation_option_es,
     document_reference=lambda many: "Referencias (lista de _id)" if many else "Referencia (_id)",
+    document_other_side="En la otra colección (cada uno guarda este _id)",
     key_option=_key_option_es,
     enum_option={
         "check": "Texto con restricción CHECK",

@@ -229,6 +229,7 @@ const en = {
     }
   },
   documentReference: (many: boolean): string => (many ? 'References (list of _id)' : 'Reference (_id)'),
+  documentOtherSide: 'Kept in the other collection (each one stores this _id)',
   keyOption: (choice: KeyChoice): string =>
     choice.kind === 'field'
       ? `Field “${choice.field}”`
@@ -583,6 +584,7 @@ const es: Messages = {
     }
   },
   documentReference: (many) => (many ? 'Referencias (lista de _id)' : 'Referencia (_id)'),
+  documentOtherSide: 'En la otra colección (cada uno guarda este _id)',
   keyOption: (choice) =>
     choice.kind === 'field'
       ? `Campo «${choice.field}»`

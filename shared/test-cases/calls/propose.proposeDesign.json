@@ -3005,20 +3005,22 @@
        "field": "books",
        "include": true,
        "relation": {
-        "value": "reference",
+        "value": "child",
         "status": "active",
         "confidence": "high",
         "reasons": [
          {
-          "code": "recursiveEmbed",
+          "code": "backReference",
           "params": {
-           "model": "Book"
+           "model": "Book",
+           "field": "author"
           }
          }
         ],
         "options": [
          "embed",
-         "reference"
+         "reference",
+         "child"
         ]
        }
       }
@@ -5435,20 +5437,22 @@
        "field": "posts",
        "include": true,
        "relation": {
-        "value": "reference",
+        "value": "child",
         "status": "active",
         "confidence": "high",
         "reasons": [
          {
-          "code": "recursiveEmbed",
+          "code": "backReference",
           "params": {
-           "model": "Post"
+           "model": "Post",
+           "field": "author"
           }
          }
         ],
         "options": [
          "embed",
-         "reference"
+         "reference",
+         "child"
         ]
        }
       },

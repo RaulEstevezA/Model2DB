@@ -137,6 +137,9 @@ def build_document(schema: dict, design: dict, naming: dict) -> dict:
                     {"code": "relationPending", "params": {"field": ".".join([*path, field["name"]])}}
                 )
                 continue
+            # Kept on the other side: the other collection stores this document's id (and indexes it)
+            if relation and relation["value"] == "child":
+                continue
             if relation and relation["value"] == "reference":
                 target = _reference_target(field["type"])
                 if not target or target not in names:

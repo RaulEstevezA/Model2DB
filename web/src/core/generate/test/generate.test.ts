@@ -133,6 +133,14 @@ describe('names', () => {
     })
   })
 
+  it('writes every output while the design still belongs to the previous model', () => {
+    // When the model changes, one render has the new model and the design of the previous one
+    const previous = schemaOf('export interface User {\n  id: number\n  email: string\n}', 'typescript')
+    const next = schemaOf('public final class SourceMapper { private SourceMapper() {} }', 'java')
+    for (const output of OUTPUTS)
+      expect(() => generate(next, proposeDesign(previous, output.target), output, settings), output.id).not.toThrow()
+  })
+
   it('follows the naming chosen for tables and columns', () => {
     const design = proposeDesign(schema, 'relational')
     const content = text(generate(schema, design, findOutput('postgresql'), { ...settings, naming: { tables: 'model', columns: 'field' } }))

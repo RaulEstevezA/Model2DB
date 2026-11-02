@@ -52,10 +52,11 @@ export function buildWideColumn(schema: ModelSchema, design: Design, naming: Nam
   const entities = new Map<string, CqlTable>()
 
   for (const model of schema.models) {
-    if (roles.get(model.name) !== 'stored') continue
     const item = findModelDesign(design, model.name)
+    // A model the design does not have yet (the model changed and the design follows a moment later) is left out
+    if (roles.get(model.name) !== 'stored' || !item) continue
     const table: CqlTable = {
-      name: freeName(item?.table ?? tableName(model.name, naming), tableNames),
+      name: freeName(item.table ?? tableName(model.name, naming), tableNames),
       model: model.name,
       kind: 'entity',
       columns: [],

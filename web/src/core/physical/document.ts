@@ -30,9 +30,10 @@ export function buildDocument(schema: ModelSchema, design: Design, naming: Namin
   const collections: Collection[] = []
   const names = new Map<string, string>()
   for (const model of schema.models) {
-    if (roles.get(model.name) !== 'stored') continue
     const item = findModelDesign(design, model.name)
-    names.set(model.name, freeName(item?.table ?? tableName(model.name, options.naming), used))
+    // A model the design does not have yet (the model changed and the design follows a moment later) is left out
+    if (roles.get(model.name) !== 'stored' || !item) continue
+    names.set(model.name, freeName(item.table ?? tableName(model.name, options.naming), used))
   }
 
   /** The type of the `_id` other documents store to refer to a model. */

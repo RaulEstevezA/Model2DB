@@ -33,9 +33,10 @@ def build_key_value(schema: dict, design: dict, naming: dict) -> dict:
     used: set[str] = set()
     prefixes: dict[str, str] = {}
     for model in schema["models"]:
-        if roles.get(model["name"]) != "stored":
-            continue
         item = find_model_design(design, model["name"])
+        # A model the design does not have yet (the model changed and the design follows a moment later) is left out
+        if roles.get(model["name"]) != "stored" or not item:
+            continue
         prefixes[model["name"]] = free_name(
             coalesce((item or {}).get("table"), table_name(model["name"], naming)), used
         )

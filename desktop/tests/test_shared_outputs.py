@@ -77,3 +77,11 @@ def test_selector_order():
         *("jpa", "hibernate", "spring-data-jpa", "efcore", "eloquent", "doctrine"),
         *("pymongo", "mongoengine", "beanie", "mongoose", "spring-data-mongodb"),
     ]
+
+
+def test_every_output_writes_while_the_design_belongs_to_the_previous_model():
+    """When the model changes, the design may still be the previous model's for a moment."""
+    previous = parse_input("export interface User {\n  id: number\n  email: string\n}", "typescript")["schema"]
+    following = parse_input("public final class SourceMapper { private SourceMapper() {} }", "java")["schema"]
+    for output in OUTPUTS:
+        generate(following, propose_design(previous, output.target), output, SETTINGS, "SourceMapper")

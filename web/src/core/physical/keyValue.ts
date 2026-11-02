@@ -16,8 +16,10 @@ export function buildKeyValue(schema: ModelSchema, design: Design, naming: Namin
   const used = new Set<string>()
   const prefixes = new Map<string, string>()
   for (const model of schema.models) {
-    if (roles.get(model.name) !== 'stored') continue
-    prefixes.set(model.name, freeName(findModelDesign(design, model.name)?.table ?? tableName(model.name, naming), used))
+    const item = findModelDesign(design, model.name)
+    // A model the design does not have yet (the model changed and the design follows a moment later) is left out
+    if (roles.get(model.name) !== 'stored' || !item) continue
+    prefixes.set(model.name, freeName(item.table ?? tableName(model.name, naming), used))
   }
 
   const holdsOf = (type: TypeRef): KeyValueHolds => {

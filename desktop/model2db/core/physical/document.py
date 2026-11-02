@@ -36,9 +36,10 @@ def build_document(schema: dict, design: dict, naming: dict) -> dict:
     collections: list[dict] = []
     names: dict[str, str] = {}
     for model in schema["models"]:
-        if roles.get(model["name"]) != "stored":
-            continue
         item = find_model_design(design, model["name"])
+        # A model the design does not have yet (the model changed and the design follows a moment later) is left out
+        if roles.get(model["name"]) != "stored" or not item:
+            continue
         names[model["name"]] = free_name(
             coalesce((item or {}).get("table"), table_name(model["name"], options["naming"])), used
         )

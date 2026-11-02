@@ -51,9 +51,10 @@ def build_wide_column(schema: dict, design: dict, naming: dict, database: str) -
     entities: dict[str, dict] = {}
 
     for model in schema["models"]:
-        if roles.get(model["name"]) != "stored":
-            continue
         item = find_model_design(design, model["name"])
+        # A model the design does not have yet (the model changed and the design follows a moment later) is left out
+        if roles.get(model["name"]) != "stored" or not item:
+            continue
         table = {
             "name": free_name(coalesce((item or {}).get("table"), table_name(model["name"], naming)), table_names),
             "model": model["name"],

@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from ..model.schema import default_root
 from ..physical.document import build_document
 from ..physical.relational.schema import build_relational
+from .couchbase.couchbase import CouchbaseOutput
 from .mongodb.mongodb import generate_mongo
 from .odm.mongoose import MongooseOutput
 from .odm.python.mongo import BeanieOutput, MongoEngineOutput, PyMongoOutput
@@ -103,6 +104,7 @@ OUTPUTS: tuple[Output, ...] = (
     _output(FlywayOutput(), "relational"),
     _output(LiquibaseOutput(), "relational"),
     _output(_MongoWriter(), "document"),
+    _output(CouchbaseOutput(), "document"),
     _output(DjangoOutput(), "relational"),
     _output(SqlAlchemyOutput(), "relational"),
     _output(SqlModelOutput(), "relational"),

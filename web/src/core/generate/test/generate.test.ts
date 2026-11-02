@@ -121,6 +121,18 @@ describe('names', () => {
     expect(changelog('postgresql')).toContain('--changeset model2db:create-table-players\n')
   })
 
+  it('indexes every item of a list in Couchbase, and leaves unique values to the application', () => {
+    const store = schemaOf(EXAMPLES.find((example) => example.id === 'store')!.text, 'typescript')
+    const design = decide(proposeDesign(store, 'document'), { kind: 'relation', model: 'OrderLine', field: 'product' }, 'reference')
+    const indexes = generate(store, design, findOutput('couchbase'), settings).files.find((file) => file.name === '2-indexes.sql')!
+    expect(indexes.content).toContain('ON `app`.`_default`.`orders`(DISTINCT ARRAY item.`product` FOR item IN `lines` END);')
+    const jpa = schemaOf(EXAMPLES.find((example) => example.id === 'jpa')!.text, 'java')
+    expect(generate(jpa, proposeDesign(jpa, 'document'), findOutput('couchbase'), settings).physical.notes).toContainEqual({
+      code: 'uniqueInApplication',
+      params: { database: 'Couchbase', field: 'Author.email' },
+    })
+  })
+
   it('follows the naming chosen for tables and columns', () => {
     const design = proposeDesign(schema, 'relational')
     const content = text(generate(schema, design, findOutput('postgresql'), { ...settings, naming: { tables: 'model', columns: 'field' } }))

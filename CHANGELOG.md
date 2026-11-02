@@ -12,6 +12,7 @@ Notable changes to Model2DB, the web and the desktop version together. The forma
 - Web: a text key filled with a new UUID (Prisma `@default(uuid())`, JPA `GenerationType.UUID`, Hibernate `@UuidGenerator`) gets the database's UUID default, and the ORMs fill it too.
 - Web: in MongoDB, a list whose documents already point back (`User.posts` next to `Post.author`) is kept on that side only, instead of storing the relation twice.
 - Web: Flyway and Liquibase outputs: the SQL schema of any of the six engines as a Flyway migration or a Liquibase changelog (one changeset per table, each with its rollback), with their settings files.
+- Web: Couchbase output: SQL++ that creates one collection per stored model and its indexes (lists are indexed item by item), with each document's fields as comments. Couchbase has no unique indexes: those fields get a plain index and a note.
 - Web: decisions to review are listed and never applied on their own; the result leaves a `TODO` where each one goes.
 - Web: every decision, name, column type, index and model or field left out can be changed, with undo, redo and reset. Editing the model keeps the decisions that still apply.
 - Web: 26 outputs: SQL for PostgreSQL, MySQL, MariaDB, SQLite, SQL Server and Oracle Database; a MongoDB script with validators and indexes; Django, SQLAlchemy, SQLModel, Tortoise, PyMongo, MongoEngine, Beanie, Prisma, TypeORM, Sequelize, Drizzle, Mongoose, JPA, Hibernate, Spring Data JPA, Spring Data MongoDB, Entity Framework Core, Laravel Eloquent and Doctrine, with migrations where the tool has them.

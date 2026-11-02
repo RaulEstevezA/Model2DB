@@ -1,0 +1,25 @@
+-- Couchbase collections written by Model2DB from Invoice. Run it with cbq or the Query Workbench.
+-- Review it before running it: nothing here has been run.
+-- The bucket “app” must exist: rename it here if yours is called otherwise.
+
+-- Each document of “invoices” is stored under a key: the value of the model's key field, written as text. Its fields:
+--   number: text
+--   issued_at: date (ISO 8601 text)
+--   currency: text
+--   paid: true or false
+--   customer: object
+--     customer_id: number
+--     name: text
+--     email: text
+--     billing_address: object
+--       street: text
+--       city: text
+--       zip_code: text
+--   lines: list of objects
+--     description: text
+--     qty: number
+--     unit_price: number
+--     tax_rate: number
+--   notes?: any value
+--   labels: list of text
+CREATE COLLECTION `app`.`_default`.`invoices` IF NOT EXISTS;

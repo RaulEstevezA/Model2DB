@@ -141,7 +141,7 @@ def _key_option_en(choice: dict) -> str:
     return {
         "integer": "New key: auto-increment number",
         "uuid": "New key: UUID",
-    }.get(choice["type"], "MongoDB ObjectId")
+    }.get(choice["type"], "New key: MongoDB ObjectId (a UUID in Couchbase)")
 
 
 def _key_option_es(choice: dict) -> str:
@@ -150,7 +150,7 @@ def _key_option_es(choice: dict) -> str:
     return {
         "integer": "Clave nueva: número autoincremental",
         "uuid": "Clave nueva: UUID",
-    }.get(choice["type"], "ObjectId de MongoDB")
+    }.get(choice["type"], "Clave nueva: ObjectId de MongoDB (un UUID en Couchbase)")
 
 
 def _reason_en(reason: dict) -> str:
@@ -175,7 +175,7 @@ def _reason_en(reason: dict) -> str:
         "keyCandidates": f"“{_p(params, 'fields')}” could identify each row, but that is not certain. "
         "A new key is suggested; choose the field if it never repeats or changes.",
         "keyMissing": "No field identifies each row: a new key is added.",
-        "keyMongo": "MongoDB gives every document an _id.",
+        "keyMongo": "Every document gets a key of its own: an ObjectId in MongoDB, a UUID in Couchbase.",
         "relationDeclared": "Declared in the input.",
         "selfReference": "The model refers to itself.",
         "targetHasKey": f"“{_p(params, 'model')}” has its own key: it is stored once and referred to.",
@@ -231,7 +231,7 @@ def _reason_es(reason: dict) -> str:
         "keyCandidates": f"«{_p(params, 'fields')}» podría identificar cada fila, pero no es seguro. "
         "Se sugiere una clave nueva; elige el campo si nunca se repite ni cambia.",
         "keyMissing": "Ningún campo identifica cada fila: se añade una clave nueva.",
-        "keyMongo": "MongoDB da a cada documento un _id.",
+        "keyMongo": "Cada documento recibe una clave propia: un ObjectId en MongoDB, un UUID en Couchbase.",
         "relationDeclared": "Declarado en la entrada.",
         "selfReference": "El modelo se refiere a sí mismo.",
         "targetHasKey": f"«{_p(params, 'model')}» tiene clave propia: se guarda una vez y se referencia.",
@@ -283,6 +283,8 @@ def _note_en(note: dict) -> str:
         "to its enum type: choose a CHECK constraint, or Hibernate.",
         "compositeKeyReadOnly": f"{_p(params, 'orm')} has no composite keys: rows of “{_p(params, 'table')}” are "
         "created and read with their model, and changed through their owner.",
+        "uniqueInApplication": f"{_p(params, 'database')} has no unique indexes: “{_p(params, 'field')}” gets a plain "
+        "index, and the application has to keep it unique.",
     }.get(note["code"], note["code"])
 
 
@@ -310,6 +312,8 @@ def _note_es(note: dict) -> str:
         "a su tipo enumerado: elige una restricción CHECK, o Hibernate.",
         "compositeKeyReadOnly": f"{_p(params, 'orm')} no admite claves compuestas: las filas de "
         f"«{_p(params, 'table')}» se crean y se leen con su modelo, y se cambian a través de su propietario.",
+        "uniqueInApplication": f"{_p(params, 'database')} no tiene índices únicos: «{_p(params, 'field')}» lleva un "
+        "índice normal, y la aplicación tiene que mantenerlo único.",
     }.get(note["code"], note["code"])
 
 

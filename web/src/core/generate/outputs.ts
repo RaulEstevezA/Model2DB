@@ -19,6 +19,7 @@ import { drizzleOutput } from './orm/typescript/drizzle.ts'
 import { prismaOutput } from './orm/typescript/prisma.ts'
 import { sequelizeOutput } from './orm/typescript/sequelize.ts'
 import { typeormOutput } from './orm/typescript/typeorm.ts'
+import { couchbaseOutput } from './couchbase/couchbase.ts'
 import { flywayOutput, liquibaseOutput } from './sql/migrationTools.ts'
 import { DIALECT_NAMES, generateSql } from './sql/sql.ts'
 import {
@@ -102,6 +103,7 @@ export const OUTPUTS: readonly Output[] = [
   relational(flywayOutput),
   relational(liquibaseOutput),
   documental(mongoWriter),
+  documental(couchbaseOutput),
   relational(djangoOutput),
   relational(sqlalchemyOutput),
   relational(sqlmodelOutput),

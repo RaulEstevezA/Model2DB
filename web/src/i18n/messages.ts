@@ -237,7 +237,7 @@ const en = {
         ? 'New key: auto-increment number'
         : choice.type === 'uuid'
           ? 'New key: UUID'
-          : 'MongoDB ObjectId',
+          : 'New key: MongoDB ObjectId (a UUID in Couchbase)',
   enumOption: {
     check: 'Text with a CHECK constraint',
     native: 'Enum type of the database',
@@ -259,7 +259,7 @@ const en = {
       case 'keyMissing':
         return 'No field identifies each row: a new key is added.'
       case 'keyMongo':
-        return 'MongoDB gives every document an _id.'
+        return 'Every document gets a key of its own: an ObjectId in MongoDB, a UUID in Couchbase.'
       case 'relationDeclared':
         return 'Declared in the input.'
       case 'selfReference':
@@ -370,6 +370,8 @@ const en = {
         return `${p(params, 'orm')} stores “${p(params, 'enum')}” with an enum type of the database, not with a CHECK constraint.`
       case 'enumNeedsCast':
         return `${p(params, 'orm')} sends “${p(params, 'enum')}” as text, and PostgreSQL does not cast it to its enum type: choose a CHECK constraint, or Hibernate.`
+      case 'uniqueInApplication':
+        return `${p(params, 'database')} has no unique indexes: “${p(params, 'field')}” gets a plain index, and the application has to keep it unique.`
       case 'compositeKeyReadOnly':
         return `${p(params, 'orm')} has no composite keys: rows of “${p(params, 'table')}” are created and read with their model, and changed through their owner.`
     }
@@ -592,7 +594,7 @@ const es: Messages = {
         ? 'Clave nueva: número autoincremental'
         : choice.type === 'uuid'
           ? 'Clave nueva: UUID'
-          : 'ObjectId de MongoDB',
+          : 'Clave nueva: ObjectId de MongoDB (un UUID en Couchbase)',
   enumOption: {
     check: 'Texto con restricción CHECK',
     native: 'Tipo enumerado de la base de datos',
@@ -614,7 +616,7 @@ const es: Messages = {
       case 'keyMissing':
         return 'Ningún campo identifica cada fila: se añade una clave nueva.'
       case 'keyMongo':
-        return 'MongoDB da a cada documento un _id.'
+        return 'Cada documento recibe una clave propia: un ObjectId en MongoDB, un UUID en Couchbase.'
       case 'relationDeclared':
         return 'Declarado en la entrada.'
       case 'selfReference':
@@ -724,6 +726,8 @@ const es: Messages = {
         return `${p(params, 'orm')} guarda «${p(params, 'enum')}» con un tipo enumerado de la base de datos, no con una restricción CHECK.`
       case 'enumNeedsCast':
         return `${p(params, 'orm')} envía «${p(params, 'enum')}» como texto, y PostgreSQL no lo convierte a su tipo enumerado: elige una restricción CHECK, o Hibernate.`
+      case 'uniqueInApplication':
+        return `${p(params, 'database')} no tiene índices únicos: «${p(params, 'field')}» lleva un índice normal, y la aplicación tiene que mantenerlo único.`
       case 'compositeKeyReadOnly':
         return `${p(params, 'orm')} no admite claves compuestas: las filas de «${p(params, 'table')}» se crean y se leen con su modelo, y se cambian a través de su propietario.`
     }

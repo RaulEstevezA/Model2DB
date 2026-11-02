@@ -107,6 +107,8 @@ export type NoteCode =
   | 'enumNeedsCast'
   /** Written by an output: the ORM has no composite keys, so it creates and reads those rows but does not update them */
   | 'compositeKeyReadOnly'
+  /** Written by an output: the database has no unique indexes, so the application keeps the value unique */
+  | 'uniqueInApplication'
 
 export interface RelationalSchema {
   kind: 'relational'

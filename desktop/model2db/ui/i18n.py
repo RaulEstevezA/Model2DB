@@ -417,8 +417,9 @@ EN = SimpleNamespace(
     tagline="Turn a data model into a database design you review before any code is written",
     intro_description="Paste or open your models (classes, DTOs, JSON, schemas) or receive them from Mapper. "
     "Model2DB proposes tables, keys, relations, embedded documents and indexes, explains each proposal and waits "
-    "for you where it is not sure. Then save the schema for PostgreSQL, MySQL, MariaDB, SQLite, SQL Server, Oracle "
-    "or MongoDB, or the models of your ORM.",
+    "for you where it is not sure. Then save the SQL schema or its migration, the scripts for MongoDB, Couchbase, "
+    "Redis, Cassandra or ScyllaDB, or the models of your ORM: Django, SQLAlchemy, Prisma, TypeORM, JPA, Entity "
+    "Framework and more.",
     privacy_short="Processed locally",
     privacy_points=[
         "What you paste or open never leaves your computer.",
@@ -622,8 +623,8 @@ ES = SimpleNamespace(
     tagline="Convierte un modelo de datos en un diseño de base de datos que revisas antes de generar código",
     intro_description="Pega o abre tus modelos (clases, DTOs, JSON, esquemas) o recíbelos de Mapper. Model2DB propone "
     "tablas, claves, relaciones, documentos embebidos e índices, explica cada propuesta y te espera donde no está "
-    "seguro. Después guarda el esquema para PostgreSQL, MySQL, MariaDB, SQLite, SQL Server, Oracle o MongoDB, o los "
-    "modelos de tu ORM.",
+    "seguro. Después guarda el esquema SQL o su migración, los scripts para MongoDB, Couchbase, Redis, Cassandra o "
+    "ScyllaDB, o los modelos de tu ORM: Django, SQLAlchemy, Prisma, TypeORM, JPA, Entity Framework y más.",
     privacy_short="Procesado en local",
     privacy_points=[
         "Lo que pegas o abres no sale de tu equipo.",

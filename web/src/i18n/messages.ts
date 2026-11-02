@@ -46,7 +46,7 @@ const JSON_DETAIL_ES: Record<string, string> = {
 const en = {
   tagline: 'Turn a data model into a database design you review before any code is written',
   introDescription:
-    'Paste or open your models (classes, DTOs, JSON, schemas) or receive them from Mapper. Model2DB proposes tables, keys, relations, embedded documents and indexes, explains each proposal and waits for you where it is not sure. Then copy the schema for PostgreSQL, MySQL, MariaDB, SQLite, SQL Server, Oracle or MongoDB.',
+    'Paste or open your models (classes, DTOs, JSON, schemas) or receive them from Mapper. Model2DB proposes tables, keys, relations, embedded documents and indexes, explains each proposal and waits for you where it is not sure. Then copy the SQL schema or its migration, the scripts for MongoDB, Couchbase, Redis, Cassandra or ScyllaDB, or the models of your ORM: Django, SQLAlchemy, Prisma, TypeORM, JPA, Entity Framework and more.',
   privacyShort: 'Processed locally',
   privacyTitle: 'Your models stay with you',
   privacyPoints: [
@@ -484,7 +484,7 @@ export type Messages = typeof en
 const es: Messages = {
   tagline: 'Convierte un modelo de datos en un diseño de base de datos que revisas antes de generar código',
   introDescription:
-    'Pega o abre tus modelos (clases, DTOs, JSON, esquemas) o recíbelos de Mapper. Model2DB propone tablas, claves, relaciones, documentos embebidos e índices, explica cada propuesta y te espera donde no está seguro. Después copia el esquema para PostgreSQL, MySQL, MariaDB, SQLite, SQL Server, Oracle o MongoDB.',
+    'Pega o abre tus modelos (clases, DTOs, JSON, esquemas) o recíbelos de Mapper. Model2DB propone tablas, claves, relaciones, documentos embebidos e índices, explica cada propuesta y te espera donde no está seguro. Después copia el esquema SQL o su migración, los scripts para MongoDB, Couchbase, Redis, Cassandra o ScyllaDB, o los modelos de tu ORM: Django, SQLAlchemy, Prisma, TypeORM, JPA, Entity Framework y más.',
   privacyShort: 'Procesado en local',
   privacyTitle: 'Tus modelos no salen de aquí',
   privacyPoints: [

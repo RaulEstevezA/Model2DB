@@ -4,6 +4,10 @@ Notable changes to Model2DB, the web and the desktop version together. The forma
 
 ## [Unreleased]
 
+### Added
+
+- Web: the tool's icon next to its name in the introduction.
+
 ## [0.1.0] - 2026-11-02
 
 ### Added

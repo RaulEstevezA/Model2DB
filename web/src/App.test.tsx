@@ -30,7 +30,7 @@ beforeAll(() => {
 beforeEach(() => {
   localStorage.clear()
   sessionStorage.clear()
-  localStorage.setItem('model2db.language', 'en')
+  localStorage.setItem('lang', 'en')
   vi.spyOn(window, 'confirm').mockReturnValue(true)
 })
 

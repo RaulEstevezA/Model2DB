@@ -63,7 +63,7 @@ describe('Model2DB', () => {
   it('waits for a model before proposing a design', async () => {
     await renderApp()
     expect(screen.getByText('The proposed design will appear here when the model can be read.')).toBeTruthy()
-    expect(screen.getByText(/what you paste is never sent anywhere/)).toBeTruthy()
+    expect(screen.getByText(/your data is never sent anywhere/)).toBeTruthy()
     expect(screen.getByRole('link', { name: /^Download for/ })).toBeTruthy()
     expect((screen.getByRole('button', { name: 'Save project' }) as HTMLButtonElement).disabled).toBe(true)
   })

@@ -1,0 +1,47 @@
+/* Fade in copied from personal_web_style/patterns/fade-in.md.
+   Model2DB renders in the correct language from React and has no dialogs,
+   so only page/language transitions and reduced motion apply here. */
+
+@view-transition {
+  navigation: auto;
+}
+
+.app-header {
+  view-transition-name: site-header;
+}
+
+::view-transition-old(root) {
+  animation: fade-out var(--fade-page-out) both;
+}
+
+::view-transition-new(root) {
+  animation: fade-in var(--fade-page-in) both;
+}
+
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: none;
+  }
+
+  *,
+  *::before,
+  *::after,
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,4 +1,5 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useState, type ReactNode } from 'react'
+import { flushSync } from 'react-dom'
 import { detectLanguage, SITE_LANGUAGE_KEY } from './detectLanguage.ts'
 import { I18nContext } from './I18nContext.ts'
 import { messages, type Language } from './messages.ts'
@@ -17,5 +18,15 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     }
   }, [language])
 
-  return <I18nContext.Provider value={{ language, setLanguage, t: messages[language] }}>{children}</I18nContext.Provider>
+  const switchLanguage = useCallback((next: Language) => {
+    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    if (!document.startViewTransition || reduceMotion) {
+      setLanguage(next)
+      return
+    }
+
+    document.startViewTransition(() => flushSync(() => setLanguage(next)))
+  }, [])
+
+  return <I18nContext.Provider value={{ language, setLanguage: switchLanguage, t: messages[language] }}>{children}</I18nContext.Provider>
 }

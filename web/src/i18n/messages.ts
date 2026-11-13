@@ -46,7 +46,7 @@ const JSON_DETAIL_ES: Record<string, string> = {
 const en = {
   tagline: 'Turn a data model into a database design you review before any code is written',
   introDescription:
-    'Paste or open your models in any of 23 formats (classes, DTOs, JSON, schemas) or receive them from Mapper. Model2DB proposes a design for a relational, document, key-value or wide-column database: tables or collections, keys, relations, embedded documents and indexes. It explains each proposal and how sure it is, and waits for you where it is not sure: nothing uncertain is applied until you decide. Then copy the SQL schema or its migration (Flyway, Liquibase), the scripts for MongoDB, Couchbase, Redis, Cassandra or ScyllaDB, or the models of your ORM: Django, SQLAlchemy, Prisma, TypeORM, JPA, Entity Framework and more. Everything happens in your browser: what you paste is never sent anywhere, and code is analyzed, never run.',
+    'Paste or open your models and Model2DB will propose a database design. Review the decisions it is unsure about, then copy the schema, migration, scripts or ORM models. Everything happens in your browser: your data is never sent anywhere, and code is analyzed, never run.',
   privacyShort: 'Processed locally',
   examplesLabel: 'Try an example',
   examples: {
@@ -484,7 +484,7 @@ export type Messages = typeof en
 const es: Messages = {
   tagline: 'Convierte un modelo de datos en un diseño de base de datos que revisas antes de generar código',
   introDescription:
-    'Pega o abre tus modelos en cualquiera de 23 formatos (clases, DTOs, JSON, esquemas) o recíbelos de Mapper. Model2DB propone un diseño para una base de datos relacional, de documentos, clave-valor o de columnas anchas: tablas o colecciones, claves, relaciones, documentos embebidos e índices. Explica cada propuesta y cuánto de seguro está, y te espera donde no lo está: nada dudoso se aplica hasta que decides. Después copia el esquema SQL o su migración (Flyway, Liquibase), los scripts para MongoDB, Couchbase, Redis, Cassandra o ScyllaDB, o los modelos de tu ORM: Django, SQLAlchemy, Prisma, TypeORM, JPA, Entity Framework y más. Todo ocurre en tu navegador: lo que pegas no se envía a ningún sitio, y el código se analiza, nunca se ejecuta.',
+    'Pega o abre tus modelos y Model2DB propondrá un diseño de base de datos. Revisa las decisiones sobre las que tenga dudas y copia el esquema, la migración, los scripts o los modelos del ORM. Todo ocurre en tu navegador: tus datos no se envían a ningún sitio y el código se analiza, nunca se ejecuta.',
   privacyShort: 'Procesado en local',
   examplesLabel: 'Prueba un ejemplo',
   examples: {

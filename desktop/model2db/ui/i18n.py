@@ -415,13 +415,9 @@ def _project_error_es(error: str, path: str | None = None) -> str:
 
 EN = SimpleNamespace(
     tagline="Turn a data model into a database design you review before any code is written",
-    intro_description="Paste or open your models in any of 23 formats (classes, DTOs, JSON, schemas) or receive them "
-    "from Mapper. Model2DB proposes a design for a relational, document, key-value or wide-column database: tables or "
-    "collections, keys, relations, embedded documents and indexes. It explains each proposal and how sure it is, and "
-    "waits for you where it is not sure: nothing uncertain is applied until you decide. Then save the SQL schema or "
-    "its migration (Flyway, Liquibase), the scripts for MongoDB, Couchbase, Redis, Cassandra or ScyllaDB, or the "
-    "models of your ORM: Django, SQLAlchemy, Prisma, TypeORM, JPA, Entity Framework and more. Everything happens on "
-    "your computer: what you paste is never sent anywhere, and code is analyzed, never run.",
+    intro_description="Paste or open your models and Model2DB will propose a database design. Review the decisions it "
+    "is unsure about, then save the schema, migration, scripts or ORM models. Everything happens on your computer: "
+    "your data is never sent anywhere, and code is analyzed, never run.",
     privacy_short="Processed locally",
     examples_label="Try an example",
     examples={"store": "Online shop", "jpa": "JPA entities", "json": "JSON response", "prisma": "Prisma to MongoDB"},
@@ -617,13 +613,9 @@ EN = SimpleNamespace(
 
 ES = SimpleNamespace(
     tagline="Convierte un modelo de datos en un diseño de base de datos que revisas antes de generar código",
-    intro_description="Pega o abre tus modelos en cualquiera de 23 formatos (clases, DTOs, JSON, esquemas) o recíbelos "
-    "de Mapper. Model2DB propone un diseño para una base de datos relacional, de documentos, clave-valor o de columnas "
-    "anchas: tablas o colecciones, claves, relaciones, documentos embebidos e índices. Explica cada propuesta y cuánto "
-    "de seguro está, y te espera donde no lo está: nada dudoso se aplica hasta que decides. Después guarda el esquema "
-    "SQL o su migración (Flyway, Liquibase), los scripts para MongoDB, Couchbase, Redis, Cassandra o ScyllaDB, o los "
-    "modelos de tu ORM: Django, SQLAlchemy, Prisma, TypeORM, JPA, Entity Framework y más. Todo ocurre en tu equipo: lo "
-    "que pegas no se envía a ningún sitio, y el código se analiza, nunca se ejecuta.",
+    intro_description="Pega o abre tus modelos y Model2DB propondrá un diseño de base de datos. Revisa las decisiones "
+    "sobre las que tenga dudas y guarda el esquema, la migración, los scripts o los modelos del ORM. Todo ocurre en tu "
+    "equipo: tus datos no se envían a ningún sitio y el código se analiza, nunca se ejecuta.",
     privacy_short="Procesado en local",
     examples_label="Prueba un ejemplo",
     examples={"store": "Tienda online", "jpa": "Entidades JPA", "json": "Respuesta JSON", "prisma": "Prisma a MongoDB"},

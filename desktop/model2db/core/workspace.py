@@ -31,14 +31,21 @@ def read_input(state: dict) -> dict:
 
 def pending_decisions(design: dict, roles: dict[str, str]) -> list[dict]:
     """Decisions waiting for the user that matter for what is stored: the keys of stored models and the fields of
-    the models whose fields reach the result. Each item has `ref` and `decision`."""
+    the models whose fields reach the result, and the proposed queries of stored models. Each item has `ref` and
+    `reasons`."""
     items = []
     for model in design["models"]:
         role = roles.get(model["model"])
         fields_matter = role == "stored" or (design["target"] in ("document", "widecolumn") and role == "embedded")
         key = model.get("key")
         if role == "stored" and key and key["status"] == "pending":
-            items.append({"ref": {"kind": "key", "model": model["model"]}, "decision": key})
+            items.append({"ref": {"kind": "key", "model": model["model"]}, "reasons": key["reasons"]})
+        if role == "stored":
+            for index, query in enumerate(model.get("queries") or []):
+                if query["status"] == "pending":
+                    items.append(
+                        {"ref": {"kind": "query", "model": model["model"], "index": index}, "reasons": query["reasons"]}
+                    )
         if not fields_matter:
             continue
         for field in model["fields"]:
@@ -48,10 +55,10 @@ def pending_decisions(design: dict, roles: dict[str, str]) -> list[dict]:
                 decision = field.get(kind)
                 if decision and decision["status"] == "pending":
                     ref = {"kind": kind, "model": model["model"], "field": field["field"]}
-                    items.append({"ref": ref, "decision": decision})
+                    items.append({"ref": ref, "reasons": decision["reasons"]})
     for item in design["enums"]:
         if item["storage"]["status"] == "pending":
-            items.append({"ref": {"kind": "enum", "enum": item["enum"]}, "decision": item["storage"]})
+            items.append({"ref": {"kind": "enum", "enum": item["enum"]}, "reasons": item["storage"]["reasons"]})
     return items
 
 

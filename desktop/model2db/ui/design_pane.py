@@ -271,7 +271,7 @@ class DesignPane(Pane):
                 link.setProperty("link", True)
                 link.clicked.connect(lambda _=False, ref=item["ref"]: self.focus_decision(ref))
                 row.addWidget(link)
-                row.addWidget(muted(" ".join(t.reason(reason) for reason in item["decision"]["reasons"])), 1)
+                row.addWidget(muted(" ".join(t.reason(reason) for reason in item["reasons"])), 1)
                 box_layout.addLayout(row)
             self._content.addWidget(box)
 

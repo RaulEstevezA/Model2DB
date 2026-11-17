@@ -17,4 +17,4 @@ The key is the value of `id`.
 
 ## Search
 
-`author-redis-search.redis` creates a search index for each hash, on the fields other keys point to and the ones chosen to be indexed. Run it with `redis-cli < author-redis-search.redis` on Redis 8, or Redis Stack.
+`author-redis-search.redis` creates a search index for each hash, on the fields other keys point to, the ones chosen to be indexed and the ones the queries search or sort by (`FT.SEARCH ... SORTBY`). Run it with `redis-cli < author-redis-search.redis` on Redis 8, or Redis Stack.

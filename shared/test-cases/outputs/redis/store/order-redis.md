@@ -23,6 +23,8 @@ The key is the value of `id`.
 
 > TODO: decide how "Order.lines" is stored (pending in the design).
 
+> TODO: does the application read "Order" by customer, ordered by placedAt desc? Accept the query in the design to index it.
+
 The key is the value of `id`.
 
 | Field | Holds |
@@ -39,4 +41,4 @@ Under the same key:
 
 ## Search
 
-`order-redis-search.redis` creates a search index for each hash, on the fields other keys point to and the ones chosen to be indexed. Run it with `redis-cli < order-redis-search.redis` on Redis 8, or Redis Stack.
+`order-redis-search.redis` creates a search index for each hash, on the fields other keys point to, the ones chosen to be indexed and the ones the queries search or sort by (`FT.SEARCH ... SORTBY`). Run it with `redis-cli < order-redis-search.redis` on Redis 8, or Redis Stack.

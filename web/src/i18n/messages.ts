@@ -485,6 +485,8 @@ const en = {
         return `${p(params, 'orm')} has no composite keys: rows of “${p(params, 'table')}” are created and read with their model, and changed through their owner.`
       case 'indexOrderIgnored':
         return `${p(params, 'orm')} cannot keep a column of an index in descending order: “${p(params, 'index')}” is ascending in the models${p(params, 'migration') ? ', and the migration creates it descending' : ''}. The database reads an index both ways, so this only matters when the order mixes ascending and descending columns.`
+      case 'querySortOne':
+        return `Redis sorts a search by one field: the query of “${p(params, 'model')}” ${p(params, 'query')} is sorted by “${p(params, 'field')}” only.`
       case 'queryTables':
         return `${p(params, 'database')} has no joins and no ordered indexes: each query reads a table of its own, a copy of the rows partitioned by the filter and ordered by the order. The application writes every row in each of them (a logged BATCH keeps them together).`
       case 'queryNeedsFilter':
@@ -961,6 +963,8 @@ const es: Messages = {
         return `${p(params, 'orm')} no admite claves compuestas: las filas de «${p(params, 'table')}» se crean y se leen con su modelo, y se cambian a través de su propietario.`
       case 'indexOrderIgnored':
         return `${p(params, 'orm')} no puede guardar una columna de un índice en orden descendente: «${p(params, 'index')}» es ascendente en los modelos${p(params, 'migration') ? ', y la migración lo crea descendente' : ''}. La base de datos lee un índice en los dos sentidos, así que solo importa cuando el orden mezcla columnas ascendentes y descendentes.`
+      case 'querySortOne':
+        return `Redis ordena una búsqueda por un solo campo: la consulta de «${p(params, 'model')}» ${p(params, 'query')} se ordena solo por «${p(params, 'field')}».`
       case 'queryTables':
         return `${p(params, 'database')} no tiene joins ni índices ordenados: cada consulta lee una tabla propia, una copia de las filas particionada por el filtro y ordenada por el orden. La aplicación escribe cada fila en todas ellas (un BATCH registrado las mantiene juntas).`
       case 'queryNeedsFilter':

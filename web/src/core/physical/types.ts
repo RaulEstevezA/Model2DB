@@ -115,6 +115,8 @@ export type NoteCode =
   | 'uniqueInApplication'
   /** Written by an output: the ORM cannot keep a column of an index in descending order */
   | 'indexOrderIgnored'
+  /** Redis: a search is sorted by one field, so a query ordered by several keeps the first */
+  | 'querySortOne'
   /** Wide columns: each query reads a table of its own, which the application keeps in step */
   | 'queryTables'
   /** Wide columns: a query without a filter cannot read rows in order */
@@ -184,6 +186,8 @@ export interface KeyStructure {
 export interface SearchField {
   field: string
   type: 'TAG' | 'NUMERIC'
+  /** A query orders its results by this field (`SORTBY`) */
+  sortable?: boolean
 }
 
 /** The keys of a stored model: a hash under `prefix:<key>`, and what hangs from it. */

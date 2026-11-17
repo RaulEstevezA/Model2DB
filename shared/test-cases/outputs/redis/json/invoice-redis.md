@@ -7,6 +7,8 @@ Redis keeps every value as text; the application writes and reads them as descri
 
 > TODO: decide how "Invoice.lines" is stored (pending in the design).
 
+> TODO: does the application read "Invoice" by customer, ordered by issued_at desc? Accept the query in the design to index it.
+
 The key is the value of `invoice_id`.
 
 | Field | Holds |
@@ -38,4 +40,4 @@ The key is the value of `customer_id`.
 
 ## Search
 
-`invoice-redis-search.redis` creates a search index for each hash, on the fields other keys point to and the ones chosen to be indexed. Run it with `redis-cli < invoice-redis-search.redis` on Redis 8, or Redis Stack.
+`invoice-redis-search.redis` creates a search index for each hash, on the fields other keys point to, the ones chosen to be indexed and the ones the queries search or sort by (`FT.SEARCH ... SORTBY`). Run it with `redis-cli < invoice-redis-search.redis` on Redis 8, or Redis Stack.

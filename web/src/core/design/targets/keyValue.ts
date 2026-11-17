@@ -29,8 +29,8 @@ export const keyValueStrategy: DesignStrategy = {
   relation,
   foreignKeys: true,
   wholeNumbers: false,
-  // Query tables and sortable fields come later
-  queries: false,
+  // Each query is a search on the hash fields (physical/keyValue.ts)
+  queries: true,
   enum: () => null,
 }
 

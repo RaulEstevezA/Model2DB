@@ -107,7 +107,16 @@ describe('query indexes in the MongoDB libraries', () => {
   })
 })
 
-describe('queries in Cassandra and ScyllaDB', () => {
+describe('queries in Redis, Cassandra and ScyllaDB', () => {
+  it('Redis searches by the filter and sorts by the first order field', () => {
+    const { code, notes } = write('redis', 'keyvalue')
+    expect(code).toContain('FT.CREATE idx:posts ON HASH PREFIX 1 posts: SCHEMA user_id TAG created_at TAG SORTABLE')
+    expect(notes).toContainEqual({
+      code: 'querySortOne',
+      params: { model: 'Post', query: 'ordered by createdAt desc, title asc', field: 'createdAt' },
+    })
+  })
+
   it('Cassandra and ScyllaDB read each query from a table of its own, ordered by its clustering', () => {
     for (const output of ['cassandra', 'scylladb']) {
       const { code, notes } = write(output, 'widecolumn')

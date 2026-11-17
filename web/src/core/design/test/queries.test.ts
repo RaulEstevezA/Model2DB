@@ -51,10 +51,9 @@ describe('proposed queries', () => {
     expect(queries(proposeDesign(schema, 'relational'))).toEqual([])
   })
 
-  it('is proposed for tables, documents and wide columns, and left out of Redis for now', () => {
-    for (const target of ['document', 'widecolumn'] as const)
+  it('is proposed for every kind of database', () => {
+    for (const target of ['document', 'keyvalue', 'widecolumn'] as const)
       expect(queries(proposeDesign(blog(), target))).toEqual(queries(proposeDesign(blog(), 'relational')))
-    expect(queries(proposeDesign(blog(), 'keyvalue'))).toBeUndefined()
   })
 
   it('appears in the review list and is accepted from there', () => {

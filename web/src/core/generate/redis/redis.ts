@@ -76,7 +76,7 @@ export function describeKeys(schema: KeyValueSchema, title: string, searchFile: 
       '',
       '## Search',
       '',
-      `\`${searchFile}\` creates a search index for each hash, on the fields other keys point to and the ones chosen to be indexed. Run it with \`redis-cli < ${searchFile}\` on Redis 8, or Redis Stack.`,
+      `\`${searchFile}\` creates a search index for each hash, on the fields other keys point to, the ones chosen to be indexed and the ones the queries search or sort by (\`FT.SEARCH ... SORTBY\`). Run it with \`redis-cli < ${searchFile}\` on Redis 8, or Redis Stack.`,
     )
   return out.join('\n') + '\n'
 }
@@ -87,7 +87,7 @@ export function searchCommands(schema: KeyValueSchema): string | null {
     .filter((entry) => entry.search.length > 0)
     .map(
       (entry) =>
-        `FT.CREATE idx:${entry.prefix} ON HASH PREFIX 1 ${entry.prefix}: SCHEMA ${entry.search.map((field) => `${field.field} ${field.type}`).join(' ')}`,
+        `FT.CREATE idx:${entry.prefix} ON HASH PREFIX 1 ${entry.prefix}: SCHEMA ${entry.search.map((field) => `${field.field} ${field.type}${field.sortable ? ' SORTABLE' : ''}`).join(' ')}`,
     )
   return lines.length > 0 ? lines.join('\n') + '\n' : null
 }

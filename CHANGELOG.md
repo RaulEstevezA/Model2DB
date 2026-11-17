@@ -7,6 +7,7 @@ Notable changes to Model2DB, the web and the desktop version together. The forma
 ### Added
 
 - Web: the tool's icon next to its name in the introduction.
+- Web: queries. Each stored model can list how the application reads it (rows filtered by some fields and ordered by others, ascending or descending), and each query becomes an index on the filter and then the order. Where a model points to an owner and has a creation date (`Post.userId` and `createdAt`), the query "by userId, newest first" is proposed and waits for review like any other decision. An index the key, a unique constraint or another index already serves is not added, and the plain index of a foreign key gives way to the query's. A note asks to check the indexes against the real queries and data. For now in SQL (6 engines, with `DESC`) and MongoDB (compound indexes); the ORMs write the index without the descending order yet.
 
 ## [0.1.0] - 2026-11-02
 

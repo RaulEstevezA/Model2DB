@@ -64,7 +64,7 @@ Mapper prepared this contract before Model2DB had its name, as "DBCreate": its "
 ```
 
 - `input.format` is an input format id, or `null` to detect it from the text when the project is opened. `fileName` is optional.
-- `designs` holds one design per kind of database ([design.md](design.md)), `null` for a kind not used yet, so going from PostgreSQL to MongoDB and back after opening the project keeps the decisions of both.
+- `designs` holds one design per kind of database ([design.md](design.md)), `null` for a kind not used yet, so going from PostgreSQL to MongoDB and back after opening the project keeps the decisions of both. Each model may hold its `queries` ([design.md](design.md#queries)); projects saved before queries existed have none and still open with version 1: the queries are proposed when the design is reconciled.
 - `output` is the chosen output and every setting of [outputs.md](outputs.md#options).
 
 The model schema is not stored: opening a project parses the text again and reconciles the saved designs with it (`reconcile`, as when the input is edited). A decision whose value the model no longer offers is proposed again; everything else is kept.

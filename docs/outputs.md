@@ -20,7 +20,7 @@ The settings are remembered in the browser as preferences; the names are kept se
 |---|---|
 | PostgreSQL, MySQL, MariaDB, SQLite, SQL Server, Oracle Database | `<model>-<engine>.sql` |
 
-One script per engine: tables in an order where each comes after the tables it refers to (references that close a cycle are added at the end with `ALTER TABLE`), keys, foreign keys, unique constraints, CHECK constraints, native enum types (PostgreSQL, MySQL, MariaDB) or lookup tables with their rows, and indexes. Names the engine reserves are quoted (`lines` in MySQL). A text key filled with a new UUID (Prisma `@default(uuid())`, JPA `GenerationType.UUID`) gets the engine's UUID default.
+One script per engine: tables in an order where each comes after the tables it refers to (references that close a cycle are added at the end with `ALTER TABLE`), keys, foreign keys, unique constraints, CHECK constraints, native enum types (PostgreSQL, MySQL, MariaDB) or lookup tables with their rows, and indexes, with `DESC` on the columns a query reads in descending order and a `-- Query:` comment that names it. Names the engine reserves are quoted (`lines` in MySQL). A text key filled with a new UUID (Prisma `@default(uuid())`, JPA `GenerationType.UUID`) gets the engine's UUID default.
 
 ### Flyway and Liquibase
 
@@ -35,22 +35,22 @@ The Liquibase changelog is formatted SQL with one changeset per table (with its 
 
 ## MongoDB
 
-`<model>-mongodb.js`, a `mongosh` script: `createCollection` with a `$jsonSchema` validator per collection (`additionalProperties: false`, required fields, enum values) and `createIndex` for unique fields, references and chosen indexes.
+`<model>-mongodb.js`, a `mongosh` script: `createCollection` with a `$jsonSchema` validator per collection (`additionalProperties: false`, required fields, enum values) and `createIndex` for unique fields, references, chosen indexes and the compound index of each query (`{ userId: 1, createdAt: -1 }`).
 
 ## Couchbase
 
-SQL++ for `cbq` or the Query Workbench, in two files, because Couchbase makes collections in the background: `1-collections.sql` creates one collection per stored model in the bucket's default scope, with each document's fields as comments (Couchbase checks no shape), and `2-indexes.sql`, run afterwards, creates the indexes. A path inside a list is indexed item by item (`DISTINCT ARRAY item.product FOR item IN lines END`). Couchbase has no unique indexes: those fields get a plain index and a note.
+SQL++ for `cbq` or the Query Workbench, in two files, because Couchbase makes collections in the background: `1-collections.sql` creates one collection per stored model in the bucket's default scope, with each document's fields as comments (Couchbase checks no shape), and `2-indexes.sql`, run afterwards, creates the indexes, those of the queries with `DESC` where they need it. A path inside a list is indexed item by item (`DISTINCT ARRAY item.product FOR item IN lines END`). Couchbase has no unique indexes: those fields get a plain index and a note.
 
 ## Redis
 
 Redis has no schema to create, so the output describes the keys and creates what can be created:
 
 - `<model>-redis.md`: for each stored model, its key (`order:<key>`) and how a new key is made (`INCR order:next_key` or a UUID), what each hash field holds, and the lists, sets and hashes under its key.
-- `<model>-redis-search.redis`: `FT.CREATE` for each hash with fields to search (the fields other keys point to and the chosen indexes), for `redis-cli` on Redis 8 or Redis Stack. `redis-cli` takes no comments, so this file has none.
+- `<model>-redis-search.redis`: `FT.CREATE` for each hash with fields to search (the fields other keys point to, the chosen indexes and the fields the queries search by, with the first order field of each query `SORTABLE` for `FT.SEARCH ... SORTBY`), for `redis-cli` on Redis 8 or Redis Stack. `redis-cli` takes no comments, so this file has none.
 
 ## Cassandra and ScyllaDB
 
-`<model>-cassandra.cql` or `<model>-scylladb.cql`, for `cqlsh -f`: the keyspace (one copy of each row, to raise for a cluster), the user-defined types in the order they can be created, the tables with their partition and clustering keys, and secondary indexes for unique and chosen fields (SAI in Cassandra). A table whose key is still pending is written as a comment, so the script still runs.
+`<model>-cassandra.cql` or `<model>-scylladb.cql`, for `cqlsh -f`: the keyspace (one copy of each row, to raise for a cluster), the user-defined types in the order they can be created, the tables with their partition and clustering keys, a table per query (`orders_by_customer_id`: a copy of the rows partitioned by the filter, `WITH CLUSTERING ORDER BY` for the order) that the application writes along with the model's table, and secondary indexes for unique and chosen fields (SAI in Cassandra). A table whose key is still pending is written as a comment, so the script still runs.
 
 ## ORM (relational)
 
@@ -73,6 +73,8 @@ All of them write from the same view of the tables (`generate/orm/entities.ts`):
 | Laravel Eloquent | MySQL, MariaDB, PostgreSQL, SQLite, SQL Server | `app/Models/*.php`, `app/Enums/*.php`, a migration under `database/migrations/` |
 | Doctrine ORM | All six | `src/Entity/*.php`, `src/Enum/*.php`, a Doctrine Migrations class |
 
+An index on several columns, or with a descending column, is written by each ORM in its own way: `@@index([userId, createdAt(sort: Desc)])` (Prisma), `columnList = "user_id, created_at DESC"` (JPA), `IsDescending(false, true)` (EF Core), `models.Index(fields=["user", "-created_at"])` in `Meta.indexes` with names of 30 characters at most (Django), `Index(..., Post.created_at.desc())` after the classes (SQLAlchemy, SQLModel) and `sa.text("created_at DESC")` in Alembic, `{ name, order: 'DESC' }` (Sequelize), `.desc().nullsFirst()` or `sql\`... desc\`` (Drizzle). TypeORM, Doctrine and Tortoise cannot keep a descending column in their models: a note says so, and the TypeORM and Doctrine migrations, written in SQL, keep it.
+
 ## ODM (documents)
 
 | Output | Files |
@@ -82,6 +84,8 @@ All of them write from the same view of the tables (`generate/orm/entities.ts`):
 | Beanie | `documents.py` (Pydantic models) |
 | Mongoose | `models/<model>.models.ts` |
 | Spring Data MongoDB | One class per document and enum under `src/main/java/com/example/document/`, a repository per collection |
+
+A descending key of an index is `-1` (Mongoose, Spring Data MongoDB), `DESCENDING` (PyMongo, Beanie) or `"-field"` (MongoEngine).
 
 ## Notes
 
@@ -101,6 +105,12 @@ When an output cannot store something exactly as designed, it says so next to th
 | ORM enum type | The ORM stores the enum with its own type instead of a CHECK (Prisma) |
 | Enum needs a cast | Values of a PostgreSQL enum type need a cast the ORM cannot write |
 | Unique in the application | The database has no unique indexes (Couchbase, Redis, Cassandra, ScyllaDB): the field gets a plain index |
+| Query indexes | Some query became an index: check the indexes against the real queries and data (EXPLAIN) |
+| Query without an index | A field of a query is not stored on its own |
+| Index order ignored | The ORM cannot keep a descending column in its models (TypeORM, Doctrine, Tortoise) |
+| Search sorted by one field | Redis sorts a search by one field and the query orders by more |
+| Query tables | Cassandra and ScyllaDB read each query from a table of its own, which the application writes too |
+| Query needs a filter | Cassandra and ScyllaDB read in order only inside a partition: a query without a filter gets no table |
 
 ## Pending decisions in the result
 
@@ -120,3 +130,5 @@ Scripts and projects for these checks live outside the repository (`local-data/`
 - Couchbase Community 7.6: every example runs on a fresh bucket, and queries use the indexes, also on a list.
 - Redis 8.2: every search file runs, and a search finds what it indexes.
 - Cassandra 5.0 and ScyllaDB 6.2: every example runs, as proposed and with every decision accepted; a query uses the secondary index.
+- Queries: with every query accepted and others ordered in mixed directions, every engine above creates the indexes, and reading them back shows the columns in order and descending where they should be (PostgreSQL, MySQL, MariaDB, SQL Server, Oracle, SQLite, MongoDB, and the schema each ORM creates). PostgreSQL's `EXPLAIN` on 200,000 rows uses the index without sorting, and reads it backwards for the opposite order; Couchbase's plan uses the descending index without an `Order` step; Cassandra and ScyllaDB return a query table's rows in order without `ORDER BY`; Redis sorts a search by the `SORTABLE` field.
+- Desktop: the same designs with queries write the same files and notes as the web for every output and engine (428 cases).

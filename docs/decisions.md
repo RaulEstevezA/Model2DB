@@ -17,4 +17,8 @@ Choices that shape the project, with the reason, so they are not undone by accid
 | Projects store the text, not the parsed schema | The designs are reconciled with what the text reads now, as when the input is edited |
 | Inputs are not stored unless the user turns on "Remember in this browser" | personal_web_style stores preferences, not user data; the option makes the exception explicit and reversible |
 | Handoff through `sessionStorage`, `postMessage` or a file, never the URL | Models can be large and would stay in the browser history (`patterns/tool-continuity.md`) |
+| The design keeps the queries the application runs, and indexes follow them | The fields say what is stored, not how it is read; an index only makes sense for a query (suggested after a comment on the first release) |
+| A query is proposed only for the rows of an owner by date, and always waits for review | It is the common case the model hints at (`userId` + `createdAt`); anything else would be a guess |
+| Cassandra and ScyllaDB get a table per query, not a materialized view | Materialized views are experimental and off by default in Cassandra 5; a table the application writes works on both |
+| A note asks to check the indexes with the real queries and data | Model2DB cannot know the volume or the real queries: the design organizes, the database confirms |
 | No deployment workflow yet | Publishing the tool is decided by the owner |

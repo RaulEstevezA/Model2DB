@@ -30,9 +30,9 @@ web/src/
 ├── core/                 No React: pure TypeScript, tested in Node
 │   ├── model/            ModelSchema, type helpers, naming
 │   ├── parsers/          Formats: data/, schema/, code/ and the registry (shared with Mapper)
-│   ├── design/           Analysis, hints, the proposal, one strategy per kind of database, edits
+│   ├── design/           Analysis, hints, the proposal, one strategy per kind of database, queries, edits
 │   ├── physical/         Model roles; tables (relational/), collections (document.ts), Redis keys (keyValue.ts),
-│   │                     Cassandra and ScyllaDB tables (wideColumn.ts)
+│   │                     Cassandra and ScyllaDB tables (wideColumn.ts), the indexes of the queries (queryIndexes.ts)
 │   ├── generate/         SQL (also Flyway and Liquibase), MongoDB, Couchbase, Redis, CQL, ORM (orm/) and ODM (odm/)
 │   │                     writers, and the output registry
 │   └── interop/          Handoff between tools and project files

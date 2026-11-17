@@ -23,7 +23,7 @@ A decision is a plain JSON value:
 - `options`: the values that make sense for this subject. The interface offers exactly these.
 - `manual`: set when the user made or confirmed the choice.
 
-A design has one entry per model (`include`, `key`, `table`, `fields`), one per field (`include`, `relation`, `foreignKey`, `unique`, `wholeNumber`, `index`, `column`, `type`) and one per enum (`storage`). The design is for one kind of database: `relational` (the SQL engines), `document` (MongoDB, Couchbase), `keyvalue` (Redis) or `widecolumn` (Cassandra, ScyllaDB). The kinds are listed in `STORAGE_TARGETS`; a project keeps one design per kind.
+A design has one entry per model (`include`, `key`, `table`, `fields`, `queries`), one per field (`include`, `relation`, `foreignKey`, `unique`, `wholeNumber`, `index`, `column`, `type`) and one per enum (`storage`). The design is for one kind of database: `relational` (the SQL engines), `document` (MongoDB, Couchbase), `keyvalue` (Redis) or `widecolumn` (Cassandra, ScyllaDB). The kinds are listed in `STORAGE_TARGETS`; a project keeps one design per kind.
 
 ## How proposals are made
 
@@ -97,9 +97,27 @@ Wide columns (Cassandra, ScyllaDB): a table per stored model, partitioned by its
 - **Enums** (relational): a CHECK constraint (high); the user can choose a native type (PostgreSQL, MySQL, MariaDB), a lookup table or plain text. Documents use the validator's `enum`.
 - **Models**: one only used as a base class is left out (its fields go to its children); one no other model uses can be left out by the user.
 
+### Queries
+
+The fields say what is stored, not how the application reads it, and that is what decides the indexes. Each model keeps the queries the application runs on it (`design/queries.ts`):
+
+```json
+{
+  "filter": ["userId"],
+  "sort": [{ "field": "createdAt", "direction": "desc" }],
+  "status": "pending",
+  "reasons": [{ "code": "queryByOwner", "params": { "field": "userId", "sort": "createdAt" } }]
+}
+```
+
+- `filter`: fields compared with a value; `sort`: fields the rows come back ordered by, each `asc` or `desc`. A query can use stored scalar fields and references to one other model (their key column).
+- One query is proposed per field that points to an owner (a foreign key, a reference, or a name like `userId` next to a `User` model with a key) when the model has a date to order by (`createdAt` first; never an update, deletion, expiry or birth date): the rows of that owner, newest first. It is always `pending`, with the reason `queryByOwner`.
+- The user accepts a proposal, changes it, removes it or writes new ones; those are `active` with no reasons.
+- `queries` is missing until the first proposal. Once there, even empty, it belongs to the user: `reconcile` keeps it (leaving out the fields that are gone) and never proposes again, so a removed proposal stays removed. Designs saved before queries existed get the proposals when they are reconciled.
+
 ## Edits and reconciling
 
-`design/edit.ts` returns a new design for each action: `decide` (choose an option, or accept the suggestion as it is), include or leave out a model or field, rename a table or column, write a column type, add an index. The interface keeps previous designs for undo and redo.
+`design/edit.ts` returns a new design for each action: `decide` (choose an option, or accept the suggestion as it is), include or leave out a model or field, rename a table or column, write a column type, add an index, and add, change, accept or remove a query (`addQuery`, `setQuery`, `acceptQuery`, `removeQuery`). A proposed query is a pending item of its own (`{ kind: 'query', model, index }`), and `decide` on it accepts it. The interface keeps previous designs for undo and redo.
 
 When the input changes, `reconcile` proposes again for the new schema and keeps every decision the user made (`manual`) whose value the new proposal still offers, plus names, types, indexes and fields left out. Editing the model never throws the review away. Projects use the same function when they are opened.
 
@@ -121,5 +139,13 @@ When the input changes, `reconcile` proposes again for the new schema and keeps 
 `physical/keyValue.ts` builds the Redis keys: a hash per stored model with what each field holds, the lists, sets and hashes under its key, and a search index on the fields other keys point to and the ones chosen to be indexed.
 
 `physical/wideColumn.ts` builds the Cassandra and ScyllaDB schema: the user-defined types in the order they can be created, a table per stored model with its partition key, a table partitioned by the owner's key for each list of other models, and secondary indexes.
+
+The queries of a model (`physical/queryIndexes.ts` for tables and collections) become:
+
+- **Tables and collections**: one index on the filter fields and then the order fields, with `descending` columns (`(user_id, created_at DESC)`, `{ userId: 1, createdAt: -1 }`). It is not added when the primary key, a unique constraint or another index already serves it (the direction of the filter columns does not matter, and an index is read both ways), and it replaces the plain indexes on its first columns, such as the index of a foreign key.
+- **Redis**: the filter fields join the hash's search index (TAG, or NUMERIC for numbers) and the first order field is `SORTABLE`; a search sorts by one field, so a note says when a query orders by more.
+- **Cassandra and ScyllaDB**: a table of its own (`orders_by_customer_id`), a copy of the model's columns partitioned by the filter, clustered by the order with `CLUSTERING ORDER BY` and with the model's key last. A query by the key needs none; one without a filter gets none, with a note. Another note says the application writes every row in each table.
+
+A field that is not stored on its own leaves the query without an index, with a note; a pending query leaves a `TODO`. A note asks to check the indexes against the real queries and data, which the model cannot say.
 
 A pending decision never becomes a column or a property: the physical schema keeps a `todo` in its place, which every output writes as a `TODO` comment (`generate/todos.ts`). What an output cannot store exactly as designed becomes a `note`, shown next to the result.

@@ -10,7 +10,7 @@ from ....model.naming import to_pascal_case
 from ...sql.sql import sql_column_type
 from ...todos import todo_text
 from ...types import generated_file
-from ..entities import build_entities, enum_members
+from ..entities import build_entities, enum_members, is_descending
 
 NAMESPACE = "Example.Data"
 
@@ -32,6 +32,14 @@ KEYWORDS = set(
     unsafe ushort using virtual void volatile while
     """.split()
 )
+
+
+def _is_descending(index: dict) -> str:
+    """`.IsDescending(false, true)`, one value per column, when some column is kept in descending order."""
+    if not index.get("descending"):
+        return ""
+    values = ", ".join("true" if is_descending(index, column) else "false" for column in index["columns"])
+    return f".IsDescending({values})"
 
 
 def cs_string(value: str) -> str:
@@ -233,7 +241,7 @@ def _configuration(item: dict, view: dict, engine: str) -> list[str]:
     for index in table["indexes"]:
         lines.append(
             f"    entity.HasIndex(e => new {{ {members(index['columns'])} }}){'.IsUnique()' if index['unique'] else ''}"
-            f".HasDatabaseName({cs_string(index['name'])});"
+            f"{_is_descending(index)}.HasDatabaseName({cs_string(index['name'])});"
         )
     for navigation in item["navigations"]:
         target = next((candidate for candidate in view["classes"] if candidate["name"] == navigation["target"]), None)

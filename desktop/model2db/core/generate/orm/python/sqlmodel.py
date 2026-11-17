@@ -9,7 +9,7 @@ from ...types import generated_file
 from ..entities import build_entities, enum_members
 from .alembic import migration_file
 from .python import py_identifier, py_string, python_enum
-from .sqlalchemy_types import column_settings, foreign_key_call, relationship_parts, type_parts
+from .sqlalchemy_types import column_settings, foreign_key_call, index_lines, relationship_parts, type_parts
 
 
 def _field_line(attribute: dict, view: dict, imports: dict) -> str:
@@ -142,6 +142,11 @@ def _models_file(view: dict, context) -> str:
                 body.append(f"    {_relationship_line(navigation, item, links)}")
     if links:
         imports["sqlalchemy"].add("ForeignKey")
+    # Indexes on several columns or in descending order, after the classes they refer to
+    indexes = index_lines(view, lambda item, attribute: f"col({item['name']}.{py_identifier(attribute)})")
+    if indexes:
+        imports["sqlalchemy"].add("Index")
+        body.extend(["", "", *indexes])
 
     typing = [*(["Optional"] if uses_relationships else []), *(["Any"] if "typing" in imports["modules"] else [])]
     header = [
@@ -151,7 +156,8 @@ def _models_file(view: dict, context) -> str:
         *([f"from typing import {', '.join(sorted(typing))}"] if typing else []),
         "",
         f"from sqlalchemy import {', '.join(sorted(imports['sqlalchemy']))}",
-        f"from sqlmodel import Field, {'Relationship, ' if uses_relationships else ''}SQLModel",
+        f"from sqlmodel import Field, {'Relationship, ' if uses_relationships else ''}SQLModel"
+        + (", col" if indexes else ""),
     ]
     return "\n".join([*header, *body, ""])
 

@@ -6,7 +6,7 @@ from ...types import generated_file
 from ..entities import build_entities, enum_members
 from .alembic import migration_file
 from .python import py_identifier, py_string, python_enum
-from .sqlalchemy_types import column_settings, foreign_key_call, relationship_line, type_parts
+from .sqlalchemy_types import column_settings, foreign_key_call, index_lines, relationship_line, type_parts
 
 
 def _models_file(view: dict, context) -> str:
@@ -90,6 +90,12 @@ def _models_file(view: dict, context) -> str:
             body.append("")
             for navigation in item["navigations"]:
                 body.append(f"    {relationship_line(navigation, item)}")
+
+    # Indexes on several columns or in descending order, after the classes they refer to
+    indexes = index_lines(view, lambda item, attribute: f"{item['name']}.{py_identifier(attribute)}")
+    if indexes:
+        imports.add("Index")
+        body.extend(["", "", *indexes])
 
     header = [
         f'"""SQLAlchemy models written by Model2DB from {context.title}. Review them before using them."""',

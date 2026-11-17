@@ -7,7 +7,7 @@ from ....js import is_number, js_string, json_string
 from ....physical.naming import pluralize
 from ...todos import todo_text
 from ...types import generated_file
-from ..entities import build_entities, enum_members
+from ..entities import build_entities, enum_members, is_descending
 from .typescript import camel_from_snake
 
 PROVIDERS = {
@@ -217,7 +217,10 @@ def _model_block(item: dict, view: dict, provider: str, context, back_fields: di
             )
             if attribute and attribute["unique"]:
                 continue
-        keys = ", ".join(_attribute_name(item, column) for column in index["columns"])
+        keys = ", ".join(
+            f"{_attribute_name(item, column)}{'(sort: Desc)' if is_descending(index, column) else ''}"
+            for column in index["columns"]
+        )
         attributes.append(f"@@index([{keys}], map: {json_string(index['name'])})")
     attributes.append(f"@@map({json_string(table['name'])})")
     return {"name": item["name"], "lines": lines, "attributes": attributes}

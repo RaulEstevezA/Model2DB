@@ -191,6 +191,15 @@ def _entity_file(item: dict, view: dict, context) -> str:
     for index in table["indexes"]:
         columns = ", ".join(php_string(column) for column in index["columns"])
         class_attributes.append(f"#[ORM\\Index(name: {php_string(index['name'])}, columns: [{columns}])]")
+        # Doctrine has no column order in an index: the migration, written in SQL, keeps it
+        if index.get("descending"):
+            migration = "yes" if context.settings["migrations"] else ""
+            context.note(
+                {
+                    "code": "indexOrderIgnored",
+                    "params": {"orm": "Doctrine", "index": index["name"], "migration": migration},
+                }
+            )
     for unique in table["uniques"]:
         columns = ", ".join(php_string(column) for column in unique["columns"])
         class_attributes.append(f"#[ORM\\UniqueConstraint(name: {php_string(unique['name'])}, columns: [{columns}])]")

@@ -14,6 +14,17 @@ from ...model.schema import find_enum
 from ...physical.naming import pluralize
 
 
+def own_index(index: dict) -> bool:
+    """An index the ORM writes on its own, not as a setting of one attribute (`index=True`): one on several
+    columns, or with a column in descending order."""
+    return len(index["columns"]) > 1 or bool(index.get("descending"))
+
+
+def is_descending(index: dict, column: str) -> bool:
+    """Whether a column of the index is kept in descending order."""
+    return column in (index.get("descending") or [])
+
+
 def _class_name(table: dict) -> str:
     """Class name of a table: the model for entities, model + field for lists (`OrderTag`), the enum for lookup
     tables (`OrderStatusOption`)."""
@@ -63,7 +74,7 @@ def build_entities(physical: dict, schema: dict, convention: str) -> dict:
                 len(unique["columns"]) == 1 and unique["columns"][0] == column["name"] for unique in table["uniques"]
             )
             attribute["indexed"] = any(
-                len(index["columns"]) == 1 and index["columns"][0] == column["name"] for index in table["indexes"]
+                not own_index(index) and index["columns"][0] == column["name"] for index in table["indexes"]
             )
             if enum_item:
                 attribute["enum"] = enum_item

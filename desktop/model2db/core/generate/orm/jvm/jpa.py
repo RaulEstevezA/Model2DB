@@ -10,7 +10,7 @@ from ....model.naming import to_screaming_snake_case
 from ...sql.sql import generate_sql
 from ...todos import todo_text
 from ...types import generated_file
-from ..entities import build_entities, enum_members
+from ..entities import build_entities, enum_members, is_descending
 
 PACKAGE = "com.example.model"
 REPOSITORY_PACKAGE = "com.example.repository"
@@ -23,6 +23,11 @@ KEYWORDS = set(
     var record yield
     """.split()
 )
+
+
+def _column_list(index: dict) -> str:
+    """The columns of an index as JPA writes them, with DESC where they are kept in descending order."""
+    return ", ".join(f"{column} DESC" if is_descending(index, column) else column for column in index["columns"])
 
 
 def java_string(value: str) -> str:
@@ -299,7 +304,7 @@ def _table_annotation(table: dict, file: _ClassFile) -> str:
     if table["indexes"]:
         file.persistence.add("Index")
         indexes = ", ".join(
-            f"@Index(name = {java_string(index['name'])}, columnList = {java_string(', '.join(index['columns']))}"
+            f"@Index(name = {java_string(index['name'])}, columnList = {java_string(_column_list(index))}"
             f"{', unique = true' if index['unique'] else ''})"
             for index in table["indexes"]
         )

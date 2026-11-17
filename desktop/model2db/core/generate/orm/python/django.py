@@ -4,9 +4,10 @@ for an app labelled `app`: rename it to yours in both files. Mirrors web/src/cor
 import re
 
 from ....js import is_number, js_string
+from ....physical.naming import short_name
 from ...todos import todo_text
 from ...types import generated_file
-from ..entities import build_entities, enum_members
+from ..entities import build_entities, enum_members, is_descending, own_index
 from .python import order_tables, py_identifier, py_string
 
 APP = "app"
@@ -215,7 +216,11 @@ def _through_fields(join: dict, view: dict) -> list[dict]:
     return fields
 
 
-def _meta_lines(table: dict) -> list[str]:
+# Django rejects longer index names (models.E034)
+DJANGO_INDEX_NAME = 30
+
+
+def _meta_lines(table: dict, fields: list[dict], item: dict | None) -> list[str]:
     lines = [f"db_table = {py_string(table['name'])}"]
     constraints = []
     for check in table["checks"]:
@@ -224,35 +229,48 @@ def _meta_lines(table: dict) -> list[str]:
             f"models.CheckConstraint(condition=models.Q({check['column']}__in=[{values}]), "
             f"name={py_string(check['name'])})"
         )
-    for index in table["indexes"]:
-        if len(index["columns"]) > 1:
-            columns = ", ".join(py_string(column) for column in index["columns"])
-            constraints.append(f"models.Index(fields=[{columns}], name={py_string(index['name'])})")
     if constraints:
         lines.append(f"constraints = [{', '.join(constraints)}]")
+    # Indexes name fields, not columns; a descending one starts with "-"
+    indexes = []
+    for index in table["indexes"]:
+        if not own_index(index):
+            continue
+        columns = ", ".join(
+            py_string(f"{'-' if is_descending(index, column) else ''}{_field_name(column, fields, item)}")
+            for column in index["columns"]
+        )
+        indexes.append(
+            f"models.Index(fields=[{columns}], name={py_string(short_name(index['name'], DJANGO_INDEX_NAME))})"
+        )
+    if indexes:
+        lines.append(f"indexes = [{', '.join(indexes)}]")
     return lines
+
+
+def _field_name(column: str, fields: list[dict], item: dict | None) -> str:
+    """The field of a column: its attribute, or the foreign key named after its navigation (`customer_id` →
+    `customer`)."""
+    attribute = (
+        next((candidate for candidate in item["attributes"] if candidate["column"]["name"] == column), None)
+        if item
+        else None
+    )
+    field = next(
+        (
+            candidate
+            for candidate in fields
+            if (attribute is not None and candidate["name"] == attribute["name"]) or f"{candidate['name']}_id" == column
+        ),
+        None,
+    )
+    return field["name"] if field else column
 
 
 def _composite_key(table: dict, fields: list[dict], item: dict | None, migration: bool = False) -> str | None:
     if len(table["primaryKey"]) < 2:
         return None
-    names = []
-    for column in table["primaryKey"]:
-        attribute = (
-            next((candidate for candidate in item["attributes"] if candidate["column"]["name"] == column), None)
-            if item
-            else None
-        )
-        field = next(
-            (
-                candidate
-                for candidate in fields
-                if (attribute is not None and candidate["name"] == attribute["name"])
-                or f"{candidate['name']}_id" == column
-            ),
-            None,
-        )
-        names.append(field["name"] if field else column)
+    names = [_field_name(column, fields, item) for column in table["primaryKey"]]
     # The migration states what Django fills in for a composite key
     settings = ", blank=True, editable=False, primary_key=True, serialize=False" if migration else ""
     return f"models.CompositePrimaryKey({', '.join(py_string(name) for name in names)}{settings})"
@@ -290,7 +308,7 @@ def _models_file(view: dict, context) -> str:
             if expression.startswith("ArrayField"):
                 modules.add("array")
             body.append(f"    {py_identifier(field['name'])} = {expression}")
-        body.extend(["", "    class Meta:", *(f"        {line}" for line in _meta_lines(table))])
+        body.extend(["", "    class Meta:", *(f"        {line}" for line in _meta_lines(table, fields, item))])
 
     for item in view["classes"]:
         write(item["name"], item["table"], _fields_of(item, view, False), item)
@@ -349,7 +367,7 @@ def _migration_file(physical: dict, view: dict, context) -> str:
         for todo in table["todos"]:
             operations.append(f"        # {todo_text(todo, table['model'], 'table')}")
         options = []
-        for line in _meta_lines(table):
+        for line in _meta_lines(table, fields, item):
             key, *value = line.split(" = ")
             options.append(f"{py_string(key)}: {' = '.join(value)}")
         operations.extend(

@@ -5,7 +5,7 @@ from ....js import is_number, js_string
 from ....model.naming import to_camel_case
 from ...todos import todo_text
 from ...types import file_base, generated_file
-from ..entities import build_entities
+from ..entities import build_entities, is_descending
 from .typescript import ts_key, ts_string
 
 FLAVORS = {"postgresql": "pg", "mysql": "mysql", "mariadb": "mysql", "sqlite": "sqlite"}
@@ -187,6 +187,17 @@ def _locale_key(name: str):
     return bare.lower(), [char.isupper() for char in bare]
 
 
+def _descending(index: dict, column: str, reference: str, flavor: str, imports: dict) -> str:
+    """A column of an index in its order. PostgreSQL columns order themselves, nulls first as PostgreSQL's own DESC
+    (Drizzle puts them last); the other flavors take the order as SQL."""
+    if not is_descending(index, column):
+        return reference
+    if flavor == "pg":
+        return f"{reference}.desc().nullsFirst()"
+    imports["orm"].add("sql")
+    return f"sql`${{{reference}}} desc`"
+
+
 def _table_block(table: dict, item: dict | None, view: dict, flavor: str, imports: dict, variables: dict) -> list[str]:
     rules = RULES[flavor]
     variable = variables[table["name"]]
@@ -272,7 +283,11 @@ def _table_block(table: dict, item: dict | None, view: dict, flavor: str, import
     for index in table["indexes"]:
         function = "uniqueIndex" if index["unique"] else "index"
         imports["core"].add(function)
-        extras.append(f"{function}({ts_string(index['name'])}).on({on(index['columns'])})")
+        columns = ", ".join(
+            _descending(index, column, f"table.{attribute_name(column)}", flavor, imports)
+            for column in index["columns"]
+        )
+        extras.append(f"{function}({ts_string(index['name'])}).on({columns})")
     for check in table["checks"]:
         imports["core"].add("check")
         imports["orm"].add("sql")

@@ -2,6 +2,7 @@
 by the Alembic migration. Mirrors web/src/core/generate/orm/python/sqlalchemyTypes.ts."""
 
 from ....js import is_number, js_string
+from ..entities import is_descending, own_index
 from .python import py_identifier, py_string
 
 
@@ -174,3 +175,24 @@ def relationship_line(navigation: dict, owner: dict) -> str:
 
 def primary_attribute(item: dict) -> str:
     return next((attribute["name"] for attribute in item["attributes"] if attribute["primaryKey"]), "id")
+
+
+def index_lines(view: dict, reference) -> list[str]:
+    """`Index("ix_orders_customer_id_placed_at", Order.customer_id, Order.placed_at.desc())` for each index on
+    several columns or in descending order; the others are `index=True` on their column. `reference(item,
+    attribute)` writes an attribute of a class as the ORM reads it."""
+    lines = []
+    for item in view["classes"]:
+        for index in item["table"]["indexes"]:
+            if not own_index(index):
+                continue
+            columns = []
+            for column in index["columns"]:
+                attribute = next(
+                    (candidate for candidate in item["attributes"] if candidate["column"]["name"] == column), None
+                )
+                expression = reference(item, attribute["name"] if attribute else column)
+                columns.append(f"{expression}.desc()" if is_descending(index, column) else expression)
+            unique = ", unique=True" if index["unique"] else ""
+            lines.append(f"Index({', '.join([py_string(index['name']), *columns])}{unique})")
+    return lines

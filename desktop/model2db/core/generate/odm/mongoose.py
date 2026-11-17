@@ -82,7 +82,10 @@ def _schema_block(item: dict, view: dict) -> list[str]:
     options = [f"collection: {ts_string(collection['name'])}", "versionKey: false"] if collection else ["_id: false"]
     lines.extend(["  },", f"  {{ {', '.join(options)} }},", ")"])
     for index in collection["indexes"] if collection else []:
-        keys = ", ".join(f"{ts_string(column)}: 1" for column in index["columns"])
+        keys = ", ".join(
+            f"{ts_string(column)}: {-1 if column in (index.get('descending') or []) else 1}"
+            for column in index["columns"]
+        )
         unique = ", unique: true" if index["unique"] else ""
         lines.append(f"{variable}.index({{ {keys} }}, {{ name: {ts_string(index['name'])}{unique} }})")
     return lines

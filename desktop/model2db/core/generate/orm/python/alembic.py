@@ -4,6 +4,7 @@ web/src/core/generate/orm/python/alembic.ts."""
 import re
 
 from ...todos import todo_text
+from ..entities import is_descending
 from .python import order_tables, py_string
 from .sqlalchemy_types import column_settings, type_parts
 
@@ -48,7 +49,10 @@ def migration_file(physical: dict, view: dict, context) -> str:
             lines.append(f"    # {todo_text(todo, table['model'], 'table')}")
         lines.extend(["    op.create_table(", f"        {py_string(table['name'])},", *columns, *constraints, "    )"])
         for index in table["indexes"]:
-            keys = ", ".join(py_string(name) for name in index["columns"])
+            keys = ", ".join(
+                f"sa.text({py_string(name + ' DESC')})" if is_descending(index, name) else py_string(name)
+                for name in index["columns"]
+            )
             unique = "True" if index["unique"] else "False"
             name, table_name = py_string(index["name"]), py_string(table["name"])
             lines.append(f"    op.create_index({name}, {table_name}, [{keys}], unique={unique})")

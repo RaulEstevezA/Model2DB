@@ -17,7 +17,14 @@ def _module_imports(modules: set[str]) -> list[str]:
 
 
 def _index_keys(index: dict) -> str:
-    return ", ".join(f"({py_string(column)}, ASCENDING)" for column in index["columns"])
+    descending = index.get("descending") or []
+    return ", ".join(
+        f"({py_string(column)}, {'DESCENDING' if column in descending else 'ASCENDING'})" for column in index["columns"]
+    )
+
+
+def _uses_descending(collections: list[dict]) -> bool:
+    return any(index.get("descending") for collection in collections for index in collection["indexes"])
 
 
 # ---------- PyMongo ----------
@@ -26,7 +33,7 @@ def _index_keys(index: dict) -> str:
 def _pymongo_file(physical: dict, context) -> str:
     out = [
         *_header(context.title, "PyMongo collections", "Run create_collections(db) once on an empty database."),
-        "from pymongo import ASCENDING",
+        f"from pymongo import {'ASCENDING, DESCENDING' if _uses_descending(physical['collections']) else 'ASCENDING'}",
         "from pymongo.database import Database",
         "",
     ]
@@ -162,8 +169,7 @@ def _mongoengine_file(view: dict, context) -> str:
         collection = item.get("collection")
         if collection:
             indexes = [
-                f'{{"fields": [{", ".join(py_string(_attribute_of(item, column)) for column in index["columns"])}], '
-                f'"name": {py_string(index["name"])}}}'
+                f'{{"fields": [{_index_fields(index, item)}], "name": {py_string(index["name"])}}}'
                 for index in collection["indexes"]
                 if not index["unique"]
             ]
@@ -266,6 +272,7 @@ def _beanie_file(view: dict, context) -> str:
     beanie = ["Document", *(["Link"] if uses_link else [])]
     pydantic = ["BaseModel", *(["Field"] if uses_field else [])]
     uses_indexes = any(item.get("collection") and item["collection"]["indexes"] for item in view["classes"])
+    uses_descending = _uses_descending([item["collection"] for item in view["classes"] if item.get("collection")])
     return "\n".join(
         [
             *_header(
@@ -278,7 +285,11 @@ def _beanie_file(view: dict, context) -> str:
             *([""] if modules else []),
             f"from beanie import {', '.join(beanie)}",
             f"from pydantic import {', '.join(pydantic)}",
-            *(["from pymongo import ASCENDING, IndexModel"] if uses_indexes else []),
+            *(
+                [f"from pymongo import ASCENDING, {'DESCENDING, ' if uses_descending else ''}IndexModel"]
+                if uses_indexes
+                else []
+            ),
             *body,
             "",
         ]
@@ -293,3 +304,12 @@ class BeanieOutput:
     def write(self, physical: dict, context) -> list[dict]:
         view = build_document_view(context.schema, context.design, physical, context.settings["naming"])
         return [generated_file("documents.py", _beanie_file(view, context), "python")]
+
+
+def _index_field(index: dict, item: dict, column: str) -> str:
+    """A field of a MongoEngine index, `-` first when it is kept in descending order."""
+    return f"{'-' if column in (index.get('descending') or []) else ''}{_attribute_of(item, column)}"
+
+
+def _index_fields(index: dict, item: dict) -> str:
+    return ", ".join(py_string(_index_field(index, item, column)) for column in index["columns"])

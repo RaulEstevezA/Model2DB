@@ -240,6 +240,15 @@ def _entities_file(view: dict, engine: str, context) -> str:
             body.append(f"@Unique({ts_string(unique['name'])}, [{columns}])")
         for index in table["indexes"]:
             writer["decorators"].add("Index")
+            # The decorator has no column order: the migration, written in SQL, keeps it
+            if index.get("descending"):
+                migration = "yes" if context.settings["migrations"] else ""
+                context.note(
+                    {
+                        "code": "indexOrderIgnored",
+                        "params": {"orm": "TypeORM", "index": index["name"], "migration": migration},
+                    }
+                )
             columns = ", ".join(ts_string(_referenced(view, item["name"], column)) for column in index["columns"])
             body.append(f"@Index({ts_string(index['name'])}, [{columns}])")
         body.extend([f"@Entity({{ name: {ts_string(table['name'])} }})", f"export class {item['name']} {{"])

@@ -7,7 +7,7 @@ import re
 from ....js import is_number, js_string
 from ...todos import todo_text
 from ...types import generated_file
-from ..entities import build_entities, enum_members
+from ..entities import build_entities, enum_members, own_index
 from .python import py_identifier, py_string, python_enum
 
 APP = "models"
@@ -202,6 +202,7 @@ def _models_file(view: dict, context) -> str:
         lines[0] = lines[0].replace("(enum.Enum)", "(enum.IntEnum)" if numeric else "(str, enum.Enum)", 1)
         body.extend(["", "", *lines])
         context.note({"code": "enumCheckedInCode", "params": {"enum": item["name"], "orm": "Tortoise ORM"}})
+    uses_index = False
     for item in view["classes"]:
         table = item["table"]
         body.extend(["", ""])
@@ -238,6 +239,33 @@ def _models_file(view: dict, context) -> str:
                     },
                 }
             )
+        # Tortoise has no descending columns in an index
+        indexes = [index for index in table["indexes"] if own_index(index)]
+        if indexes:
+            uses_index = True
+            written = []
+            for index in indexes:
+                # An index names the columns' own fields: `customer_id`, not the relation `customer`
+                names = ", ".join(
+                    py_string(
+                        next(
+                            (
+                                candidate["name"]
+                                for candidate in item["attributes"]
+                                if candidate["column"]["name"] == column
+                            ),
+                            column,
+                        )
+                    )
+                    for column in index["columns"]
+                )
+                written.append(f"Index(fields=({names}), name={py_string(index['name'])})")
+            body.append(f"        indexes = ({', '.join(written)},)")
+            for index in indexes:
+                if index.get("descending"):
+                    context.note(
+                        {"code": "indexOrderIgnored", "params": {"orm": "Tortoise ORM", "index": index["name"]}}
+                    )
     header = [
         f'"""Tortoise ORM models written by Model2DB from {context.title}. Register them as the "{APP}" app.',
         "",
@@ -247,6 +275,7 @@ def _models_file(view: dict, context) -> str:
         "",
         *(["import enum", ""] if enums else []),
         "from tortoise import fields",
+        *(["from tortoise.indexes import Index"] if uses_index else []),
         "from tortoise.models import Model",
     ]
     return "\n".join([*header, *body, ""])

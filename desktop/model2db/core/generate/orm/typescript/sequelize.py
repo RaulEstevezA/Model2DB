@@ -5,8 +5,13 @@ from ....js import is_number, js_string
 from ...sql.statements import schema_statements
 from ...todos import todo_text
 from ...types import file_base, generated_file
-from ..entities import build_entities, enum_members
+from ..entities import build_entities, enum_members, is_descending
 from .typescript import ts_enum, ts_key, ts_string, ts_type
+
+
+def _index_field(index: dict, column: str) -> str:
+    """A column of an index: its name, or `{ name, order: 'DESC' }` when it is kept in descending order."""
+    return f"{{ name: {ts_string(column)}, order: 'DESC' }}" if is_descending(index, column) else ts_string(column)
 
 
 def _enum_width(item: dict) -> int:
@@ -204,7 +209,7 @@ def _models_file(view: dict, engine: str, context) -> str:
         table = item["table"]
         indexes = [
             f"{{ name: {ts_string(index['name'])}, unique: {'true' if index['unique'] else 'false'}, "
-            f"fields: [{', '.join(ts_string(column) for column in index['columns'])}] }}"
+            f"fields: [{', '.join(_index_field(index, column) for column in index['columns'])}] }}"
             for index in table["indexes"]
         ]
         uniques = [

@@ -102,7 +102,12 @@ def _class_file(item: dict, context) -> str:
             )
             indexes = []
             for index in collection["indexes"]:
-                definition = "{" + ", ".join(f"'{column}': 1" for column in index["columns"]) + "}"
+                descending = index.get("descending") or []
+                definition = (
+                    "{"
+                    + ", ".join(f"'{column}': {-1 if column in descending else 1}" for column in index["columns"])
+                    + "}"
+                )
                 unique = ", unique = true" if index["unique"] else ""
                 indexes.append(
                     f"@CompoundIndex(name = {java_string(index['name'])}, def = {java_string(definition)}{unique})"

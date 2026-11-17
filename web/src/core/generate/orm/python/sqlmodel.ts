@@ -4,7 +4,7 @@ import type { GeneratedFile, RelationalWriter, WriteContext } from '../../types.
 import { buildEntities, enumMembers, type Attribute, type EntityClass, type EntityView } from '../entities.ts'
 import { migrationFile } from './alembic.ts'
 import { pyIdentifier, pyString, pythonEnum } from './python.ts'
-import { columnSettings, foreignKeyCall, relationshipParts, typeParts } from './sqlalchemyTypes.ts'
+import { columnSettings, foreignKeyCall, indexLines, relationshipParts, typeParts } from './sqlalchemyTypes.ts'
 
 /** SQLModel table models. Every column is written with `sa_column`, so it states exactly the type,
  * keys and constraints of the design; the migration is the same Alembic revision as for SQLAlchemy. */
@@ -119,6 +119,12 @@ function modelsFile(view: EntityView, context: WriteContext): string {
     }
   }
   if (links.size > 0) imports.sqlalchemy.add('ForeignKey')
+  // Indexes on several columns or in descending order, after the classes they refer to
+  const indexes = indexLines(view, (item, attribute) => `col(${item.name}.${pyIdentifier(attribute)})`)
+  if (indexes.length > 0) {
+    imports.sqlalchemy.add('Index')
+    body.push('', '', ...indexes)
+  }
 
   const typing = [...(usesRelationships ? ['Optional'] : []), ...(imports.modules.has('typing') ? ['Any'] : [])]
   const header = [
@@ -131,7 +137,7 @@ function modelsFile(view: EntityView, context: WriteContext): string {
     ...(typing.length > 0 ? [`from typing import ${typing.sort().join(', ')}`] : []),
     '',
     `from sqlalchemy import ${[...imports.sqlalchemy].sort().join(', ')}`,
-    `from sqlmodel import Field, ${usesRelationships ? 'Relationship, ' : ''}SQLModel`,
+    `from sqlmodel import Field, ${usesRelationships ? 'Relationship, ' : ''}SQLModel${indexes.length > 0 ? ', col' : ''}`,
   ]
   return [...header, ...body, ''].join('\n')
 }

@@ -483,6 +483,8 @@ const en = {
         return `${p(params, 'database')} has no unique indexes: “${p(params, 'field')}” gets a plain index, and the application has to keep it unique.`
       case 'compositeKeyReadOnly':
         return `${p(params, 'orm')} has no composite keys: rows of “${p(params, 'table')}” are created and read with their model, and changed through their owner.`
+      case 'indexOrderIgnored':
+        return `${p(params, 'orm')} cannot keep a column of an index in descending order: “${p(params, 'index')}” is ascending in the models${p(params, 'migration') ? ', and the migration creates it descending' : ''}. The database reads an index both ways, so this only matters when the order mixes ascending and descending columns.`
       case 'queryIndexes':
         return 'The query indexes follow the queries of the design. Check them against the real queries and the amount of data (with EXPLAIN): the model cannot say it.'
       case 'queryNotIndexed':
@@ -953,6 +955,8 @@ const es: Messages = {
         return `${p(params, 'database')} no tiene índices únicos: «${p(params, 'field')}» lleva un índice normal, y la aplicación tiene que mantenerlo único.`
       case 'compositeKeyReadOnly':
         return `${p(params, 'orm')} no admite claves compuestas: las filas de «${p(params, 'table')}» se crean y se leen con su modelo, y se cambian a través de su propietario.`
+      case 'indexOrderIgnored':
+        return `${p(params, 'orm')} no puede guardar una columna de un índice en orden descendente: «${p(params, 'index')}» es ascendente en los modelos${p(params, 'migration') ? ', y la migración lo crea descendente' : ''}. La base de datos lee un índice en los dos sentidos, así que solo importa cuando el orden mezcla columnas ascendentes y descendentes.`
       case 'queryIndexes':
         return 'Los índices de las consultas siguen las consultas del diseño. Compruébalos con las consultas reales y el volumen de datos (con EXPLAIN): el modelo no puede decirlo.'
       case 'queryNotIndexed':

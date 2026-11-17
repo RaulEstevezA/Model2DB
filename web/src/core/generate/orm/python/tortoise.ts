@@ -2,7 +2,7 @@ import type { Literal } from '../../../model/schema.ts'
 import type { Column, ColumnType, PhysicalEnum } from '../../../physical/types.ts'
 import { todoText } from '../../todos.ts'
 import type { GeneratedFile, RelationalWriter, WriteContext } from '../../types.ts'
-import { buildEntities, enumMembers, type Attribute, type EntityClass, type EntityView } from '../entities.ts'
+import { buildEntities, enumMembers, ownIndex, type Attribute, type EntityClass, type EntityView } from '../entities.ts'
 import { pyIdentifier, pyString, pythonEnum } from './python.ts'
 
 /** Tortoise ORM models. Tortoise has no composite primary keys and creates no CHECK for enums: both are
@@ -162,6 +162,7 @@ function modelsFile(view: EntityView, context: WriteContext): string {
     )
     context.note({ code: 'enumCheckedInCode', params: { enum: item.name, orm: 'Tortoise ORM' } })
   }
+  let usesIndex = false
   for (const item of view.classes) {
     const composite = item.table.primaryKey.length > 1
     body.push('', '')
@@ -173,17 +174,29 @@ function modelsFile(view: EntityView, context: WriteContext): string {
       '    class Meta:',
       `        table = ${pyString(item.table.name)}`,
     )
+    const fieldOf = (column: string) => {
+      const attribute = item.attributes.find((candidate) => candidate.column.name === column)!
+      const navigation = item.navigations.find((candidate) => candidate.kind === 'manyToOne' && candidate.attribute === attribute.name)
+      return navigation?.name ?? (attribute.foreignKey ? attribute.name.replace(/_id$/, '') : attribute.name)
+    }
     if (composite) {
-      const names = item.table.primaryKey.map((column) => {
-        const attribute = item.attributes.find((candidate) => candidate.column.name === column)!
-        const navigation = item.navigations.find((candidate) => candidate.kind === 'manyToOne' && candidate.attribute === attribute.name)
-        return navigation?.name ?? (attribute.foreignKey ? attribute.name.replace(/_id$/, '') : attribute.name)
-      })
+      const names = item.table.primaryKey.map(fieldOf)
       body.push(`        unique_together = ((${names.map(pyString).join(', ')}),)`)
       context.note({
         code: 'compositeKeyAsId',
         params: { orm: 'Tortoise ORM', table: item.table.name, columns: item.table.primaryKey.join(', ') },
       })
+    }
+    // Tortoise has no descending columns in an index
+    const indexes = item.table.indexes.filter(ownIndex)
+    if (indexes.length > 0) {
+      usesIndex = true
+      body.push(
+        // An index names the columns' own fields: `customer_id`, not the relation `customer`
+        `        indexes = (${indexes.map((index) => `Index(fields=(${index.columns.map((column) => pyString(item.attributes.find((candidate) => candidate.column.name === column)?.name ?? column)).join(', ')}), name=${pyString(index.name)})`).join(', ')},)`,
+      )
+      for (const index of indexes.filter((candidate) => (candidate.descending?.length ?? 0) > 0))
+        context.note({ code: 'indexOrderIgnored', params: { orm: 'Tortoise ORM', index: index.name } })
     }
   }
   const header = [
@@ -194,6 +207,7 @@ function modelsFile(view: EntityView, context: WriteContext): string {
     '',
     ...(enums.length > 0 ? ['import enum', ''] : []),
     'from tortoise import fields',
+    ...(usesIndex ? ['from tortoise.indexes import Index'] : []),
     'from tortoise.models import Model',
   ]
   return [...header, ...body, ''].join('\n')

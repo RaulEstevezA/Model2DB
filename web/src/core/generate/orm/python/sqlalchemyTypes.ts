@@ -1,6 +1,6 @@
 import type { Literal } from '../../../model/schema.ts'
 import type { Column, ColumnType, PhysicalEnum } from '../../../physical/types.ts'
-import type { Attribute, EntityClass, EntityView, Navigation } from '../entities.ts'
+import { isDescending, ownIndex, type Attribute, type EntityClass, type EntityView, type Navigation } from '../entities.ts'
 import { pyIdentifier, pyString } from './python.ts'
 
 /** SQLAlchemy column types, column settings and relationships, shared by the SQLAlchemy and SQLModel
@@ -160,4 +160,20 @@ export function relationshipLine(navigation: Navigation, owner: EntityClass): st
 
 export function primaryAttribute(item: EntityClass): string {
   return item.attributes.find((attribute) => attribute.primaryKey)?.name ?? 'id'
+}
+
+/** `Index("ix_orders_customer_id_placed_at", Order.customer_id, Order.placed_at.desc())` for each index on
+ * several columns or in descending order; the others are `index=True` on their column. `reference` writes an
+ * attribute of a class as the ORM reads it. */
+export function indexLines(view: EntityView, reference: (item: EntityClass, attribute: string) => string): string[] {
+  return view.classes.flatMap((item) =>
+    item.table.indexes.filter(ownIndex).map((index) => {
+      const columns = index.columns.map((column) => {
+        const attribute = item.attributes.find((candidate) => candidate.column.name === column)
+        const expression = reference(item, attribute?.name ?? column)
+        return isDescending(index, column) ? `${expression}.desc()` : expression
+      })
+      return `Index(${[pyString(index.name), ...columns].join(', ')}${index.unique ? ', unique=True' : ''})`
+    }),
+  )
 }

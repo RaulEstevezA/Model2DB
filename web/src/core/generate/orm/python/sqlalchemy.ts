@@ -3,7 +3,7 @@ import type { GeneratedFile, RelationalWriter, WriteContext } from '../../types.
 import { buildEntities, enumMembers, type EntityView } from '../entities.ts'
 import { migrationFile } from './alembic.ts'
 import { pyIdentifier, pyString, pythonEnum } from './python.ts'
-import { columnSettings, foreignKeyCall, relationshipLine, typeParts } from './sqlalchemyTypes.ts'
+import { columnSettings, foreignKeyCall, indexLines, relationshipLine, typeParts } from './sqlalchemyTypes.ts'
 
 /** SQLAlchemy 2.0 models in the typed declarative style, and the Alembic migration that creates them. */
 
@@ -66,6 +66,13 @@ function modelsFile(view: EntityView, context: WriteContext): string {
       body.push('')
       for (const navigation of item.navigations) body.push(`    ${relationshipLine(navigation, item)}`)
     }
+  }
+
+  // Indexes on several columns or in descending order, after the classes they refer to
+  const indexes = indexLines(view, (item, attribute) => `${item.name}.${pyIdentifier(attribute)}`)
+  if (indexes.length > 0) {
+    imports.add('Index')
+    body.push('', '', ...indexes)
   }
 
   const header = [

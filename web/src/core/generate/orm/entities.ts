@@ -2,7 +2,7 @@ import { convertCase, nameWords, toPascalCase, type NamingConvention } from '../
 import { singularField } from '../../design/analysis.ts'
 import { findEnum, type ModelSchema } from '../../model/schema.ts'
 import { pluralize } from '../../physical/naming.ts'
-import type { Column, ForeignKey, PhysicalEnum, RelationalSchema, Table } from '../../physical/types.ts'
+import type { Column, ForeignKey, Index, PhysicalEnum, RelationalSchema, Table } from '../../physical/types.ts'
 
 /** The tables of a relational schema seen as ORM classes: one class per table (join tables become
  * many-to-many relations), one attribute per column and the navigations between classes. Every ORM
@@ -55,6 +55,17 @@ export interface EntityView {
   enums: PhysicalEnum[]
 }
 
+/** An index the ORM writes on its own, not as a setting of one attribute (`index=True`): one on several
+ * columns, or with a column in descending order. */
+export function ownIndex(index: Index): boolean {
+  return index.columns.length > 1 || (index.descending?.length ?? 0) > 0
+}
+
+/** Whether a column of the index is kept in descending order. */
+export function isDescending(index: Index, column: string): boolean {
+  return index.descending?.includes(column) === true
+}
+
 /** Class name of a table: the model for entities, model + field for lists (`OrderTag`), the enum for
  * lookup tables (`OrderStatusOption`). */
 function className(table: Table): string {
@@ -88,7 +99,7 @@ export function buildEntities(physical: RelationalSchema, schema: ModelSchema, c
         compositeKey: table.primaryKey.length > 1 && table.primaryKey.includes(column.name),
         ...(foreignKey ? { foreignKey } : {}),
         unique: table.uniques.some((unique) => unique.columns.length === 1 && unique.columns[0] === column.name),
-        indexed: table.indexes.some((index) => index.columns.length === 1 && index.columns[0] === column.name),
+        indexed: table.indexes.some((index) => !ownIndex(index) && index.columns[0] === column.name),
         ...(enumItem ? { enum: enumItem } : {}),
       }
     }),

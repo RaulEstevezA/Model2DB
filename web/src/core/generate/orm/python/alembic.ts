@@ -1,7 +1,7 @@
 import type { Column, RelationalSchema, Table } from '../../../physical/types.ts'
 import { todoText } from '../../todos.ts'
 import type { WriteContext } from '../../types.ts'
-import type { Attribute, EntityView } from '../entities.ts'
+import { isDescending, type Attribute, type EntityView } from '../entities.ts'
 import { orderTables, pyString } from './python.ts'
 import { columnSettings, typeParts } from './sqlalchemyTypes.ts'
 
@@ -42,7 +42,7 @@ export function migrationFile(physical: RelationalSchema, view: EntityView, cont
     lines.push('    op.create_table(', `        ${pyString(table.name)},`, ...columns, ...constraints, '    )')
     for (const index of table.indexes)
       lines.push(
-        `    op.create_index(${pyString(index.name)}, ${pyString(table.name)}, [${index.columns.map(pyString).join(', ')}], unique=${index.unique ? 'True' : 'False'})`,
+        `    op.create_index(${pyString(index.name)}, ${pyString(table.name)}, [${index.columns.map((column) => (isDescending(index, column) ? `sa.text(${pyString(`${column} DESC`)})` : pyString(column))).join(', ')}], unique=${index.unique ? 'True' : 'False'})`,
       )
   }
   const drops = [...tables].reverse().map((table) => `    op.drop_table(${pyString(table.name)})`)

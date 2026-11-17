@@ -113,6 +113,8 @@ export type NoteCode =
   | 'compositeKeyReadOnly'
   /** Written by an output: the database has no unique indexes, so the application keeps the value unique */
   | 'uniqueInApplication'
+  /** Written by an output: the ORM cannot keep a column of an index in descending order */
+  | 'indexOrderIgnored'
   /** Indexes come from the queries of the design: check them with the real queries and data */
   | 'queryIndexes'
   /** A query uses a field that is not stored as a column of its own, so it has no index */

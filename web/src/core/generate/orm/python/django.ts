@@ -1,8 +1,9 @@
 import type { Literal } from '../../../model/schema.ts'
 import type { Column, ColumnType, PhysicalEnum, RelationalSchema, Table } from '../../../physical/types.ts'
+import { shortName } from '../../../physical/naming.ts'
 import { todoText } from '../../todos.ts'
 import type { GeneratedFile, RelationalWriter, WriteContext } from '../../types.ts'
-import { buildEntities, enumMembers, type EntityClass, type EntityView } from '../entities.ts'
+import { buildEntities, enumMembers, isDescending, ownIndex, type EntityClass, type EntityView } from '../entities.ts'
 import { orderTables, pyIdentifier, pyString } from './python.ts'
 
 /** Django models (5.2 or later, for composite primary keys) and the initial migration. The migration is
@@ -169,26 +170,38 @@ function throughFields(join: Table, view: EntityView): Field[] {
   })
 }
 
-function metaLines(table: Table): string[] {
+// Django rejects longer index names (models.E034)
+const DJANGO_INDEX_NAME = 30
+
+function metaLines(table: Table, fields: Field[], item: EntityClass | null): string[] {
   const lines = [`db_table = ${pyString(table.name)}`]
   const constraints: string[] = []
   for (const check of table.checks)
     constraints.push(
       `models.CheckConstraint(condition=models.Q(${check.column}__in=[${check.values.map((value) => (typeof value === 'number' ? value : pyString(value))).join(', ')}]), name=${pyString(check.name)})`,
     )
-  for (const index of table.indexes.filter((item) => item.columns.length > 1))
-    constraints.push(`models.Index(fields=[${index.columns.map(pyString).join(', ')}], name=${pyString(index.name)})`)
   if (constraints.length > 0) lines.push(`constraints = [${constraints.join(', ')}]`)
+  // Indexes name fields, not columns; a descending one starts with "-"
+  const indexes = table.indexes
+    .filter(ownIndex)
+    .map(
+      (index) =>
+        `models.Index(fields=[${index.columns.map((column) => pyString(`${isDescending(index, column) ? '-' : ''}${fieldName(column, fields, item)}`)).join(', ')}], name=${pyString(shortName(index.name, DJANGO_INDEX_NAME))})`,
+    )
+  if (indexes.length > 0) lines.push(`indexes = [${indexes.join(', ')}]`)
   return lines
+}
+
+/** The field of a column: its attribute, or the foreign key named after its navigation (`customer_id` → `customer`). */
+function fieldName(column: string, fields: Field[], item: EntityClass | null): string {
+  const attribute = item?.attributes.find((candidate) => candidate.column.name === column)
+  const field = fields.find((candidate) => candidate.name === attribute?.name || `${candidate.name}_id` === column)
+  return field?.name ?? column
 }
 
 function compositeKey(table: Table, fields: Field[], item: EntityClass | null, migration = false): string | null {
   if (table.primaryKey.length < 2) return null
-  const names = table.primaryKey.map((column) => {
-    const attribute = item?.attributes.find((candidate) => candidate.column.name === column)
-    const field = fields.find((candidate) => candidate.name === attribute?.name || `${candidate.name}_id` === column)
-    return field?.name ?? column
-  })
+  const names = table.primaryKey.map((column) => fieldName(column, fields, item))
   // The migration states what Django fills in for a composite key
   const settings = migration ? ', blank=True, editable=False, primary_key=True, serialize=False' : ''
   return `models.CompositePrimaryKey(${names.map(pyString).join(', ')}${settings})`
@@ -220,7 +233,7 @@ function modelsFile(view: EntityView, context: WriteContext): string {
       if (expression.startsWith('ArrayField')) modules.add('array')
       body.push(`    ${pyIdentifier(field.name)} = ${expression}`)
     }
-    body.push('', '    class Meta:', ...metaLines(table).map((line) => `        ${line}`))
+    body.push('', '    class Meta:', ...metaLines(table, fields, item).map((line) => `        ${line}`))
   }
   for (const item of view.classes) write(item.name, item.table, fieldsOf(item, view, false), item)
   for (const join of view.joins) write(throughName(join, view), join, throughFields(join, view), null)
@@ -272,7 +285,7 @@ function migrationFile(physical: RelationalSchema, view: EntityView, context: Wr
       '            fields=[',
       ...lines,
       '            ],',
-      `            options={${metaLines(table)
+      `            options={${metaLines(table, fields, item)
         .map((line) => {
           const [key, ...value] = line.split(' = ')
           return `${pyString(key)}: ${value.join(' = ')}`

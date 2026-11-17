@@ -14,12 +14,14 @@ interface QueryListProps {
   fields: FieldDef[]
   /** Indexes of the model's table or collection, to show which one each query turned into */
   indexes: Index[]
+  /** Each query turns into a table of its own (Cassandra, ScyllaDB), not an index */
+  tables?: boolean
   onChange: (design: Design) => void
 }
 
 /** How the application reads a model, which decides its indexes. A proposed query waits for the user
  * like any other decision; the user can also write, change and remove them. */
-export function QueryList({ design, model, fields, indexes, onChange }: QueryListProps) {
+export function QueryList({ design, model, fields, indexes, tables = false, onChange }: QueryListProps) {
   const { t } = useI18n()
   const titleId = useId()
   // The query being edited, or 'new' for one being written
@@ -99,7 +101,7 @@ export function QueryList({ design, model, fields, indexes, onChange }: QueryLis
                     )}
                     {!pending && index && (
                       <p className="decision__why">
-                        {t.queryIndex}: <span className="mono">{index.name}</span>
+                        {tables ? t.queryTable : t.queryIndex}: <span className="mono">{index.name}</span>
                       </p>
                     )}
                   </>

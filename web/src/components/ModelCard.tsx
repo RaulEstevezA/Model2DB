@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { decisionElementId } from '../app/workspace.ts'
 import { decide, setModelInclude, setTableName, type DecisionRef } from '../core/design/edit.ts'
+import { describeQuery } from '../core/design/queries.ts'
 import type { Design, ModelDesign } from '../core/design/types.ts'
 import type { FieldDef } from '../core/model/schema.ts'
 import type { PhysicalSchema } from '../core/physical/types.ts'
@@ -122,7 +123,21 @@ export function ModelCard({ design, model, fields, canExclude, physical, onChang
           design={design}
           model={model}
           fields={fields}
-          indexes={table?.indexes ?? collection?.indexes ?? []}
+          indexes={
+            physical?.kind === 'keyvalue' && entry && entry.search.length > 0
+              ? (model.queries ?? []).map((query) => ({
+                  name: `idx:${entry.prefix}`,
+                  columns: [],
+                  unique: false,
+                  query: `${model.model} ${describeQuery(query)}`,
+                }))
+              : physical?.kind === 'widecolumn'
+                ? physical.tables
+                    .filter((item) => item.kind === 'query' && item.model === model.model)
+                    .map((item) => ({ name: item.name, columns: [], unique: false, query: item.query }))
+                : (table?.indexes ?? collection?.indexes ?? [])
+          }
+          tables={physical?.kind === 'widecolumn'}
           onChange={onChange}
         />
       )}

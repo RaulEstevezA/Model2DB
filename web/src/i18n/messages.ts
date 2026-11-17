@@ -195,6 +195,7 @@ const en = {
       .filter(Boolean)
       .join(', '),
   queryIndex: 'Index',
+  queryTable: 'Table',
   addQuery: 'Add a query',
   editQuery: (query: string) => `Edit the query ${query}`,
   removeQuery: (query: string) => `Remove the query ${query}`,
@@ -674,6 +675,7 @@ const es: Messages = {
       .filter(Boolean)
       .join(', '),
   queryIndex: 'Índice',
+  queryTable: 'Tabla',
   addQuery: 'Añadir una consulta',
   editQuery: (query) => `Editar la consulta ${query}`,
   removeQuery: (query) => `Quitar la consulta ${query}`,

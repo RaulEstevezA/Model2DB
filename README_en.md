@@ -18,8 +18,9 @@ Paste or open the models  →  Review the proposed design  →  Choose the datab
    - lists and maps of plain values, enums (CHECK, native type or lookup table), unique columns and indexes.
 3. **Says how sure it is and why.** Every proposal has a confidence (exact, high, likely, review, conflict) and a reason in plain words: "“id” is named like an identifier", "“Address” has no key: it is a value that belongs to this model".
 4. **Never decides an ambiguity.** "Is `email` unique?" or "which field identifies a product when none is called `id`?" wait for you, listed at the top of the design. Until you decide, the result leaves a `TODO` where the decision goes.
-5. **Lets you change everything:** any decision, the table and column names, a column's type (`VARCHAR(80)`), indexes, fields or models left out; with undo, redo and reset.
-6. **Writes the result** for the chosen output, always in step with the design, with notes where the output cannot store something exactly as designed.
+5. **Asks how the data is read.** The fields alone do not say how the application filters and orders the rows, and that decides the indexes. Each stored model lists its queries: rows filtered by some fields and ordered by others, ascending or descending. Where a model points to an owner and has a creation date (`Post.userId` and `createdAt`), "by `userId`, newest first" is proposed and waits for review. Each query becomes an index on the filter and then the order (`(user_id, created_at DESC)`), a compound index in MongoDB and Couchbase, a search with a sortable field in Redis, or a table of its own in Cassandra and ScyllaDB. An index the key or another index already serves is not added, and a note asks to check them against the real queries and data.
+6. **Lets you change everything:** any decision, the table and column names, a column's type (`VARCHAR(80)`), indexes, queries, fields or models left out; with undo, redo and reset.
+7. **Writes the result** for the chosen output, always in step with the design, with notes where the output cannot store something exactly as designed.
 
 ## Outputs
 
@@ -30,7 +31,7 @@ Paste or open the models  →  Review the proposed design  →  Choose the datab
 | Documents | MongoDB (`mongosh` script: collections with `$jsonSchema` validators and indexes) | |
 | | Couchbase (SQL++: collections and indexes) | |
 | Key-value | Redis (the keys described, and the search indexes for `redis-cli`) | |
-| Wide-column | Cassandra, ScyllaDB (CQL: keyspace, user-defined types, tables and indexes) | |
+| Wide-column | Cassandra, ScyllaDB (CQL: keyspace, user-defined types, tables, a table per query and indexes) | |
 | Python | Django ORM, SQLAlchemy, SQLModel, Tortoise ORM | Django and Alembic |
 | | PyMongo, MongoEngine, Beanie | |
 | TypeScript / JavaScript | Prisma, TypeORM, Sequelize, Drizzle ORM | TypeORM and Sequelize |

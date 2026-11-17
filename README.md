@@ -21,7 +21,7 @@ Model2DB helps go from the models of an application to its database: paste or op
 - MongoDB, Couchbase, Redis, Cassandra or ScyllaDB: collections and validators, keys and search indexes, or CQL tables and types.
 - ORM and ODM models, with migrations where the tool has them: Django, SQLAlchemy, SQLModel, Tortoise, PyMongo, MongoEngine, Beanie, Prisma, TypeORM, Sequelize, Drizzle, Mongoose, JPA, Hibernate, Spring Data JPA, Spring Data MongoDB, Entity Framework Core, Laravel Eloquent and Doctrine.
 
-It proposes, but never decides an ambiguity: decisions to review wait for the user, and the result leaves a `TODO` where each one goes.
+It proposes, but never decides an ambiguity: decisions to review wait for the user, and the result leaves a `TODO` where each one goes. It also asks how the application reads each model (the fields it filters and orders by) and turns those queries into indexes, or into query tables in Cassandra and ScyllaDB.
 
 There are two versions, checked by shared test cases:
 

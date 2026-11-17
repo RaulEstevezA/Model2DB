@@ -18,8 +18,9 @@ Pegar o abrir los modelos  →  Revisar el diseño propuesto  →  Elegir la bas
    - listas y mapas de valores simples, enums (CHECK, tipo nativo o tabla de consulta), columnas únicas e índices.
 3. **Dice cuánto de seguro está y por qué.** Cada propuesta tiene una confianza (Exacta, Alta, Probable, Revisar, Conflicto) y una razón en palabras sencillas: «“id” tiene nombre de identificador», «“Address” no tiene clave: es un valor que pertenece a este modelo».
 4. **Nunca decide una ambigüedad.** «¿`email` es único?» o «¿qué campo identifica un producto si ninguno se llama `id`?» te esperan, en una lista al principio del diseño. Mientras no decides, el resultado deja un `TODO` donde va la decisión.
-5. **Te deja cambiarlo todo:** cualquier decisión, los nombres de tablas y columnas, el tipo de una columna (`VARCHAR(80)`), índices, campos o modelos que se dejan fuera; con deshacer, rehacer y restablecer.
-6. **Escribe el resultado** para la salida elegida, siempre al día con el diseño, con notas donde la salida no puede guardar algo exactamente como está diseñado.
+5. **Pregunta cómo se leen los datos.** Los campos solos no dicen cómo filtra y ordena la aplicación las filas, y eso decide los índices. Cada modelo guardado lista sus consultas: filas filtradas por unos campos y ordenadas por otros, en sentido ascendente o descendente. Si un modelo apunta a un propietario y tiene fecha de creación (`Post.userId` y `createdAt`), se propone «por `userId`, la más reciente primero», que espera tu revisión. Cada consulta se convierte en un índice sobre el filtro y después el orden (`(user_id, created_at DESC)`), un índice compuesto en MongoDB y Couchbase, una búsqueda con un campo ordenable en Redis o una tabla propia en Cassandra y ScyllaDB. No se añade un índice que ya sirven la clave u otro índice, y una nota pide comprobarlos con las consultas y los datos reales.
+6. **Te deja cambiarlo todo:** cualquier decisión, los nombres de tablas y columnas, el tipo de una columna (`VARCHAR(80)`), índices, consultas, campos o modelos que se dejan fuera; con deshacer, rehacer y restablecer.
+7. **Escribe el resultado** para la salida elegida, siempre al día con el diseño, con notas donde la salida no puede guardar algo exactamente como está diseñado.
 
 ## Salidas
 
@@ -30,7 +31,7 @@ Pegar o abrir los modelos  →  Revisar el diseño propuesto  →  Elegir la bas
 | Documentos | MongoDB (script de `mongosh`: colecciones con validadores `$jsonSchema` e índices) | |
 | | Couchbase (SQL++: colecciones e índices) | |
 | Clave-valor | Redis (las claves descritas y los índices de búsqueda para `redis-cli`) | |
-| Columnas anchas | Cassandra, ScyllaDB (CQL: keyspace, tipos definidos por el usuario, tablas e índices) | |
+| Columnas anchas | Cassandra, ScyllaDB (CQL: keyspace, tipos definidos por el usuario, tablas, una tabla por consulta e índices) | |
 | Python | Django ORM, SQLAlchemy, SQLModel, Tortoise ORM | Django y Alembic |
 | | PyMongo, MongoEngine, Beanie | |
 | TypeScript / JavaScript | Prisma, TypeORM, Sequelize, Drizzle ORM | TypeORM y Sequelize |

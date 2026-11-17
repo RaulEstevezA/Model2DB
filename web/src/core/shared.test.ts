@@ -7,7 +7,7 @@
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { decide, reconcile } from './design/edit.ts'
+import { acceptQuery, addQuery, decide, reconcile, removeQuery, setQuery } from './design/edit.ts'
 import { proposeDesign } from './design/propose.ts'
 import { readHandoff } from './interop/handoff.ts'
 import { readProject } from './interop/project.ts'
@@ -35,6 +35,10 @@ const FUNCTIONS: Record<string, AnyFunction> = {
   'propose.proposeDesign': proposeDesign,
   'edit.decide': decide,
   'edit.reconcile': reconcile,
+  'edit.addQuery': addQuery,
+  'edit.setQuery': setQuery,
+  'edit.acceptQuery': acceptQuery,
+  'edit.removeQuery': removeQuery,
   // A Map does not survive JSON: the roles are written as an object
   'roles.modelRoles': (schema, design) => Object.fromEntries(modelRoles(schema, design)),
 }

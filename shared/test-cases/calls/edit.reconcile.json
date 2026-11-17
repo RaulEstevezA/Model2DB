@@ -6552,5 +6552,860 @@
    ],
    "enums": []
   }
+ },
+ {
+  "args": [
+   {
+    "target": "relational",
+    "models": [
+     {
+      "model": "User",
+      "include": true,
+      "key": {
+       "value": {
+        "kind": "field",
+        "field": "id"
+       },
+       "status": "active",
+       "confidence": "high",
+       "reasons": [
+        {
+         "code": "keyNamed",
+         "params": {
+          "field": "id"
+         }
+        }
+       ],
+       "options": [
+        {
+         "kind": "field",
+         "field": "id"
+        },
+        {
+         "kind": "field",
+         "field": "email"
+        },
+        {
+         "kind": "surrogate",
+         "type": "integer"
+        },
+        {
+         "kind": "surrogate",
+         "type": "uuid"
+        }
+       ]
+      },
+      "fields": [
+       {
+        "field": "id",
+        "include": true
+       },
+       {
+        "field": "email",
+        "include": true,
+        "unique": {
+         "value": true,
+         "status": "pending",
+         "confidence": "review",
+         "reasons": [
+          {
+           "code": "uniqueNamed",
+           "params": {
+            "field": "email"
+           }
+          }
+         ],
+         "options": [
+          true,
+          false
+         ]
+        }
+       }
+      ],
+      "queries": []
+     },
+     {
+      "model": "Post",
+      "include": true,
+      "key": {
+       "value": {
+        "kind": "field",
+        "field": "id"
+       },
+       "status": "active",
+       "confidence": "high",
+       "reasons": [
+        {
+         "code": "keyNamed",
+         "params": {
+          "field": "id"
+         }
+        }
+       ],
+       "options": [
+        {
+         "kind": "field",
+         "field": "id"
+        },
+        {
+         "kind": "field",
+         "field": "userId"
+        },
+        {
+         "kind": "field",
+         "field": "title"
+        },
+        {
+         "kind": "surrogate",
+         "type": "integer"
+        },
+        {
+         "kind": "surrogate",
+         "type": "uuid"
+        }
+       ]
+      },
+      "fields": [
+       {
+        "field": "id",
+        "include": true
+       },
+       {
+        "field": "userId",
+        "include": true,
+        "foreignKey": {
+         "value": "User",
+         "status": "active",
+         "confidence": "high",
+         "reasons": [
+          {
+           "code": "foreignKeyNamed",
+           "params": {
+            "model": "User"
+           }
+          }
+         ],
+         "options": [
+          "User",
+          null
+         ]
+        }
+       },
+       {
+        "field": "title",
+        "include": true
+       },
+       {
+        "field": "createdAt",
+        "include": true
+       },
+       {
+        "field": "updatedAt",
+        "include": true
+       }
+      ],
+      "queries": []
+     }
+    ],
+    "enums": []
+   },
+   {
+    "format": "model-schema",
+    "version": 1,
+    "origin": {
+     "format": "typescript",
+     "language": "typescript"
+    },
+    "models": [
+     {
+      "name": "User",
+      "kind": "interface",
+      "fields": [
+       {
+        "name": "id",
+        "type": {
+         "kind": "primitive",
+         "name": "float"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "number"
+       },
+       {
+        "name": "email",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "string"
+       }
+      ]
+     },
+     {
+      "name": "Post",
+      "kind": "interface",
+      "fields": [
+       {
+        "name": "id",
+        "type": {
+         "kind": "primitive",
+         "name": "float"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "number"
+       },
+       {
+        "name": "userId",
+        "type": {
+         "kind": "primitive",
+         "name": "float"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "number"
+       },
+       {
+        "name": "title",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "string"
+       },
+       {
+        "name": "createdAt",
+        "type": {
+         "kind": "primitive",
+         "name": "datetime"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "Date"
+       },
+       {
+        "name": "updatedAt",
+        "type": {
+         "kind": "primitive",
+         "name": "datetime"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "Date"
+       }
+      ]
+     }
+    ],
+    "enums": []
+   },
+   "relational"
+  ],
+  "result": {
+   "target": "relational",
+   "models": [
+    {
+     "model": "User",
+     "include": true,
+     "key": {
+      "value": {
+       "kind": "field",
+       "field": "id"
+      },
+      "status": "active",
+      "confidence": "high",
+      "reasons": [
+       {
+        "code": "keyNamed",
+        "params": {
+         "field": "id"
+        }
+       }
+      ],
+      "options": [
+       {
+        "kind": "field",
+        "field": "id"
+       },
+       {
+        "kind": "field",
+        "field": "email"
+       },
+       {
+        "kind": "surrogate",
+        "type": "integer"
+       },
+       {
+        "kind": "surrogate",
+        "type": "uuid"
+       }
+      ]
+     },
+     "fields": [
+      {
+       "field": "id",
+       "include": true
+      },
+      {
+       "field": "email",
+       "include": true,
+       "unique": {
+        "value": true,
+        "status": "pending",
+        "confidence": "review",
+        "reasons": [
+         {
+          "code": "uniqueNamed",
+          "params": {
+           "field": "email"
+          }
+         }
+        ],
+        "options": [
+         true,
+         false
+        ]
+       }
+      }
+     ],
+     "queries": []
+    },
+    {
+     "model": "Post",
+     "include": true,
+     "key": {
+      "value": {
+       "kind": "field",
+       "field": "id"
+      },
+      "status": "active",
+      "confidence": "high",
+      "reasons": [
+       {
+        "code": "keyNamed",
+        "params": {
+         "field": "id"
+        }
+       }
+      ],
+      "options": [
+       {
+        "kind": "field",
+        "field": "id"
+       },
+       {
+        "kind": "field",
+        "field": "userId"
+       },
+       {
+        "kind": "field",
+        "field": "title"
+       },
+       {
+        "kind": "surrogate",
+        "type": "integer"
+       },
+       {
+        "kind": "surrogate",
+        "type": "uuid"
+       }
+      ]
+     },
+     "fields": [
+      {
+       "field": "id",
+       "include": true
+      },
+      {
+       "field": "userId",
+       "include": true,
+       "foreignKey": {
+        "value": "User",
+        "status": "active",
+        "confidence": "high",
+        "reasons": [
+         {
+          "code": "foreignKeyNamed",
+          "params": {
+           "model": "User"
+          }
+         }
+        ],
+        "options": [
+         "User",
+         null
+        ]
+       }
+      },
+      {
+       "field": "title",
+       "include": true
+      },
+      {
+       "field": "createdAt",
+       "include": true
+      },
+      {
+       "field": "updatedAt",
+       "include": true
+      }
+     ],
+     "queries": []
+    }
+   ],
+   "enums": []
+  }
+ },
+ {
+  "args": [
+   {
+    "target": "relational",
+    "models": [
+     {
+      "model": "User",
+      "include": true,
+      "key": {
+       "value": {
+        "kind": "field",
+        "field": "id"
+       },
+       "status": "active",
+       "confidence": "high",
+       "reasons": [
+        {
+         "code": "keyNamed",
+         "params": {
+          "field": "id"
+         }
+        }
+       ],
+       "options": [
+        {
+         "kind": "field",
+         "field": "id"
+        },
+        {
+         "kind": "field",
+         "field": "email"
+        },
+        {
+         "kind": "surrogate",
+         "type": "integer"
+        },
+        {
+         "kind": "surrogate",
+         "type": "uuid"
+        }
+       ]
+      },
+      "fields": [
+       {
+        "field": "id",
+        "include": true
+       },
+       {
+        "field": "email",
+        "include": true,
+        "unique": {
+         "value": true,
+         "status": "pending",
+         "confidence": "review",
+         "reasons": [
+          {
+           "code": "uniqueNamed",
+           "params": {
+            "field": "email"
+           }
+          }
+         ],
+         "options": [
+          true,
+          false
+         ]
+        }
+       }
+      ],
+      "queries": []
+     },
+     {
+      "model": "Post",
+      "include": true,
+      "key": {
+       "value": {
+        "kind": "field",
+        "field": "id"
+       },
+       "status": "active",
+       "confidence": "high",
+       "reasons": [
+        {
+         "code": "keyNamed",
+         "params": {
+          "field": "id"
+         }
+        }
+       ],
+       "options": [
+        {
+         "kind": "field",
+         "field": "id"
+        },
+        {
+         "kind": "field",
+         "field": "userId"
+        },
+        {
+         "kind": "field",
+         "field": "title"
+        },
+        {
+         "kind": "surrogate",
+         "type": "integer"
+        },
+        {
+         "kind": "surrogate",
+         "type": "uuid"
+        }
+       ]
+      },
+      "fields": [
+       {
+        "field": "id",
+        "include": true
+       },
+       {
+        "field": "userId",
+        "include": true,
+        "foreignKey": {
+         "value": "User",
+         "status": "active",
+         "confidence": "high",
+         "reasons": [
+          {
+           "code": "foreignKeyNamed",
+           "params": {
+            "model": "User"
+           }
+          }
+         ],
+         "options": [
+          "User",
+          null
+         ]
+        }
+       },
+       {
+        "field": "title",
+        "include": true
+       },
+       {
+        "field": "createdAt",
+        "include": true
+       },
+       {
+        "field": "updatedAt",
+        "include": true
+       }
+      ],
+      "queries": [
+       {
+        "filter": [
+         "userId"
+        ],
+        "sort": [
+         {
+          "field": "createdAt",
+          "direction": "desc"
+         }
+        ],
+        "status": "pending",
+        "reasons": [
+         {
+          "code": "queryByOwner",
+          "params": {
+           "field": "userId",
+           "sort": "createdAt"
+          }
+         }
+        ]
+       },
+       {
+        "filter": [
+         "userId",
+         "title"
+        ],
+        "sort": [],
+        "status": "active",
+        "reasons": []
+       }
+      ]
+     }
+    ],
+    "enums": []
+   },
+   {
+    "format": "model-schema",
+    "version": 1,
+    "origin": {
+     "format": "typescript",
+     "language": "typescript"
+    },
+    "models": [
+     {
+      "name": "User",
+      "kind": "interface",
+      "fields": [
+       {
+        "name": "id",
+        "type": {
+         "kind": "primitive",
+         "name": "float"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "number"
+       },
+       {
+        "name": "email",
+        "type": {
+         "kind": "primitive",
+         "name": "string"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "string"
+       }
+      ]
+     },
+     {
+      "name": "Post",
+      "kind": "interface",
+      "fields": [
+       {
+        "name": "id",
+        "type": {
+         "kind": "primitive",
+         "name": "float"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "number"
+       },
+       {
+        "name": "userId",
+        "type": {
+         "kind": "primitive",
+         "name": "float"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "number"
+       },
+       {
+        "name": "createdAt",
+        "type": {
+         "kind": "primitive",
+         "name": "datetime"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "Date"
+       },
+       {
+        "name": "updatedAt",
+        "type": {
+         "kind": "primitive",
+         "name": "datetime"
+        },
+        "nullable": false,
+        "optional": false,
+        "originalType": "Date"
+       }
+      ]
+     }
+    ],
+    "enums": []
+   },
+   "relational"
+  ],
+  "result": {
+   "target": "relational",
+   "models": [
+    {
+     "model": "User",
+     "include": true,
+     "key": {
+      "value": {
+       "kind": "field",
+       "field": "id"
+      },
+      "status": "active",
+      "confidence": "high",
+      "reasons": [
+       {
+        "code": "keyNamed",
+        "params": {
+         "field": "id"
+        }
+       }
+      ],
+      "options": [
+       {
+        "kind": "field",
+        "field": "id"
+       },
+       {
+        "kind": "field",
+        "field": "email"
+       },
+       {
+        "kind": "surrogate",
+        "type": "integer"
+       },
+       {
+        "kind": "surrogate",
+        "type": "uuid"
+       }
+      ]
+     },
+     "fields": [
+      {
+       "field": "id",
+       "include": true
+      },
+      {
+       "field": "email",
+       "include": true,
+       "unique": {
+        "value": true,
+        "status": "pending",
+        "confidence": "review",
+        "reasons": [
+         {
+          "code": "uniqueNamed",
+          "params": {
+           "field": "email"
+          }
+         }
+        ],
+        "options": [
+         true,
+         false
+        ]
+       }
+      }
+     ],
+     "queries": []
+    },
+    {
+     "model": "Post",
+     "include": true,
+     "key": {
+      "value": {
+       "kind": "field",
+       "field": "id"
+      },
+      "status": "active",
+      "confidence": "high",
+      "reasons": [
+       {
+        "code": "keyNamed",
+        "params": {
+         "field": "id"
+        }
+       }
+      ],
+      "options": [
+       {
+        "kind": "field",
+        "field": "id"
+       },
+       {
+        "kind": "field",
+        "field": "userId"
+       },
+       {
+        "kind": "surrogate",
+        "type": "integer"
+       },
+       {
+        "kind": "surrogate",
+        "type": "uuid"
+       }
+      ]
+     },
+     "fields": [
+      {
+       "field": "id",
+       "include": true
+      },
+      {
+       "field": "userId",
+       "include": true,
+       "foreignKey": {
+        "value": "User",
+        "status": "active",
+        "confidence": "high",
+        "reasons": [
+         {
+          "code": "foreignKeyNamed",
+          "params": {
+           "model": "User"
+          }
+         }
+        ],
+        "options": [
+         "User",
+         null
+        ]
+       }
+      },
+      {
+       "field": "createdAt",
+       "include": true
+      },
+      {
+       "field": "updatedAt",
+       "include": true
+      }
+     ],
+     "queries": [
+      {
+       "filter": [
+        "userId"
+       ],
+       "sort": [
+        {
+         "field": "createdAt",
+         "direction": "desc"
+        }
+       ],
+       "status": "pending",
+       "reasons": [
+        {
+         "code": "queryByOwner",
+         "params": {
+          "field": "userId",
+          "sort": "createdAt"
+         }
+        }
+       ]
+      },
+      {
+       "filter": [
+        "userId"
+       ],
+       "sort": [],
+       "status": "active",
+       "reasons": []
+      }
+     ]
+    }
+   ],
+   "enums": []
+  }
  }
 ]

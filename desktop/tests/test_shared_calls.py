@@ -22,6 +22,10 @@ FUNCTIONS = {
     "propose.proposeDesign": "design.propose.propose_design",
     "edit.decide": "design.edit.decide",
     "edit.reconcile": "design.edit.reconcile",
+    "edit.addQuery": "design.edit.add_query",
+    "edit.setQuery": "design.edit.set_query",
+    "edit.acceptQuery": "design.edit.accept_query",
+    "edit.removeQuery": "design.edit.remove_query",
     "roles.modelRoles": "physical.roles.model_roles",
 }
 

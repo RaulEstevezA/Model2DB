@@ -203,6 +203,17 @@ def _key_option_es(choice: dict) -> str:
     }.get(choice["type"], "Clave nueva: ObjectId de MongoDB (un UUID en Couchbase)")
 
 
+def _query_text(query: dict, by: str, ordered_by: str, desc: str, asc: str) -> str:
+    """A query in words: `by userId, ordered by createdAt descending`."""
+    parts = []
+    if query["filter"]:
+        parts.append(f"{by} {', '.join(query['filter'])}")
+    if query["sort"]:
+        order = ", ".join(f"{item['field']} {desc if item['direction'] == 'desc' else asc}" for item in query["sort"])
+        parts.append(f"{ordered_by} {order}")
+    return ", ".join(parts)
+
+
 def _reason_en(reason: dict) -> str:
     params = reason.get("params")
     code = reason["code"]
@@ -260,6 +271,8 @@ def _reason_en(reason: dict) -> str:
         "foreignKeyNamed": f"Named after “{_p(params, 'model')}”: it most likely holds its key.",
         "uniqueDeclared": "Declared unique in the input.",
         "uniqueNamed": f"“{_p(params, 'field')}” is usually unique. Confirm it if two rows can never share it.",
+        "queryByOwner": f"Rows like these are usually read by “{_p(params, 'field')}”, newest “{_p(params, 'sort')}” "
+        "first: one index on both finds them already in order. Accept it if the application reads them like this.",
         "wholeNumberNamed": f"“{_p(params, 'field')}” counts things: stored as a whole number. "
         "Choose decimals if it can have them.",
         "enumCheck": "A CHECK constraint keeps the allowed values without a type of its own and is easy to change.",
@@ -332,6 +345,9 @@ def _reason_es(reason: dict) -> str:
         "foreignKeyNamed": f"Lleva el nombre de «{_p(params, 'model')}»: lo más probable es que guarde su clave.",
         "uniqueDeclared": "Declarado único en la entrada.",
         "uniqueNamed": f"«{_p(params, 'field')}» suele ser único. Confírmalo si dos filas nunca pueden compartirlo.",
+        "queryByOwner": f"Filas como estas se suelen leer por «{_p(params, 'field')}», con el «{_p(params, 'sort')}» "
+        "más reciente primero: un índice sobre los dos las encuentra ya ordenadas. "
+        "Acéptala si la aplicación las lee así.",
         "wholeNumberNamed": f"«{_p(params, 'field')}» cuenta cosas: se guarda como número entero. "
         "Elige decimales si puede tenerlos.",
         "enumCheck": "Una restricción CHECK limita los valores sin un tipo propio y es fácil de cambiar.",
@@ -365,6 +381,21 @@ def _note_en(note: dict) -> str:
         "created and read with their model, and changed through their owner.",
         "uniqueInApplication": f"{_p(params, 'database')} has no unique indexes: “{_p(params, 'field')}” gets a plain "
         "index, and the application has to keep it unique.",
+        "indexOrderIgnored": f"{_p(params, 'orm')} cannot keep a column of an index in descending order: "
+        f"“{_p(params, 'index')}” is ascending in the models"
+        f"{', and the migration creates it descending' if _p(params, 'migration') else ''}. The database reads an "
+        "index both ways, so this only matters when the order mixes ascending and descending columns.",
+        "querySortOne": f"Redis sorts a search by one field: the query of “{_p(params, 'model')}” "
+        f"{_p(params, 'query')} is sorted by “{_p(params, 'field')}” only.",
+        "queryTables": f"{_p(params, 'database')} has no joins and no ordered indexes: each query reads a table of "
+        "its own, a copy of the rows partitioned by the filter and ordered by the order. The application writes "
+        "every row in each of them (a logged BATCH keeps them together).",
+        "queryNeedsFilter": f"{_p(params, 'database')} reads rows in order only inside one partition: the query of "
+        f"“{_p(params, 'model')}” {_p(params, 'query')} needs a field to filter by, so it gets no table.",
+        "queryIndexes": "The query indexes follow the queries of the design. Check them against the real queries "
+        "and the amount of data (with EXPLAIN): the model cannot say it.",
+        "queryNotIndexed": f"The query of “{_p(params, 'model')}” {_p(params, 'query')} has no index: one of its "
+        "fields is not stored on its own.",
     }.get(note["code"], note["code"])
 
 
@@ -394,6 +425,22 @@ def _note_es(note: dict) -> str:
         f"«{_p(params, 'table')}» se crean y se leen con su modelo, y se cambian a través de su propietario.",
         "uniqueInApplication": f"{_p(params, 'database')} no tiene índices únicos: «{_p(params, 'field')}» lleva un "
         "índice normal, y la aplicación tiene que mantenerlo único.",
+        "indexOrderIgnored": f"{_p(params, 'orm')} no puede guardar una columna de un índice en orden descendente: "
+        f"«{_p(params, 'index')}» es ascendente en los modelos"
+        f"{', y la migración lo crea descendente' if _p(params, 'migration') else ''}. La base de datos lee un "
+        "índice en los dos sentidos, así que solo importa cuando el orden mezcla columnas ascendentes y descendentes.",
+        "querySortOne": f"Redis ordena una búsqueda por un solo campo: la consulta de «{_p(params, 'model')}» "
+        f"{_p(params, 'query')} se ordena solo por «{_p(params, 'field')}».",
+        "queryTables": f"{_p(params, 'database')} no tiene joins ni índices ordenados: cada consulta lee una tabla "
+        "propia, una copia de las filas particionada por el filtro y ordenada por el orden. La aplicación escribe "
+        "cada fila en todas ellas (un BATCH registrado las mantiene juntas).",
+        "queryNeedsFilter": f"{_p(params, 'database')} solo lee filas en orden dentro de una partición: la consulta "
+        f"de «{_p(params, 'model')}» {_p(params, 'query')} necesita un campo por el que filtrar, "
+        "así que no tiene tabla.",
+        "queryIndexes": "Los índices de las consultas siguen las consultas del diseño. Compruébalos con las "
+        "consultas reales y el volumen de datos (con EXPLAIN): el modelo no puede decirlo.",
+        "queryNotIndexed": f"La consulta de «{_p(params, 'model')}» {_p(params, 'query')} no tiene índice: uno de sus "
+        "campos no se guarda por separado.",
     }.get(note["code"], note["code"])
 
 
@@ -493,6 +540,27 @@ EN = SimpleNamespace(
     column_type="Type in the database",
     column_type_help="Written as it is in the result, for every database. Leave it empty to use the derived type.",
     add_index="Add an index",
+    queries_title="Queries",
+    queries_help="How the application reads this model. Each query becomes an index: the fields alone do not say it.",
+    no_queries="No queries yet: only keys, foreign keys and the indexes you add are indexed.",
+    query_text=lambda query: _query_text(query, "by", "ordered by", "descending", "ascending"),
+    query_index="Index",
+    query_table="Table",
+    add_query="Add a query",
+    edit_query=lambda query: f"Edit the query {query}",
+    remove_query=lambda query: f"Remove the query {query}",
+    remove="Remove",
+    filter_by="Filter by (equal to a value)",
+    sort_by="Order by",
+    add_sort="Add an order",
+    remove_sort=lambda field: f"Remove the order by {field}",
+    sort_field=lambda position: f"Order field {position}",
+    sort_direction=lambda position: f"Direction of order field {position}",
+    ascending="Ascending",
+    descending="Descending",
+    save_query="Save the query",
+    cancel="Cancel",
+    query_empty="Choose at least one field to filter or order by.",
     derived="derived",
     not_stored="not stored",
     primary_key="primary key",
@@ -539,6 +607,7 @@ EN = SimpleNamespace(
         unique=lambda model, field: f"unique {model}.{field}",
         whole_number=lambda model, field: f"number type of {model}.{field}",
         enum=lambda name: f"enum {name}",
+        query=lambda model, query: f"query {model} {query}",
     ),
     relation_option=_relation_option_en,
     document_reference=lambda many: "References (list of _id)" if many else "Reference (_id)",
@@ -692,6 +761,28 @@ ES = SimpleNamespace(
     column_type_help="Se escribe tal cual en el resultado, para cualquier base de datos. "
     "Déjalo vacío para usar el tipo deducido.",
     add_index="Añadir un índice",
+    queries_title="Consultas",
+    queries_help="Cómo lee la aplicación este modelo. Cada consulta se convierte en un índice: los campos solos no lo "
+    "dicen.",
+    no_queries="Aún no hay consultas: solo se indexan las claves, las claves ajenas y los índices que añadas.",
+    query_text=lambda query: _query_text(query, "por", "ordenada por", "descendente", "ascendente"),
+    query_index="Índice",
+    query_table="Tabla",
+    add_query="Añadir una consulta",
+    edit_query=lambda query: f"Editar la consulta {query}",
+    remove_query=lambda query: f"Quitar la consulta {query}",
+    remove="Quitar",
+    filter_by="Filtrar por (igual a un valor)",
+    sort_by="Ordenar por",
+    add_sort="Añadir un orden",
+    remove_sort=lambda field: f"Quitar el orden por {field}",
+    sort_field=lambda position: f"Campo de orden {position}",
+    sort_direction=lambda position: f"Sentido del campo de orden {position}",
+    ascending="Ascendente",
+    descending="Descendente",
+    save_query="Guardar la consulta",
+    cancel="Cancelar",
+    query_empty="Elige al menos un campo por el que filtrar u ordenar.",
     derived="deducido",
     not_stored="no se guarda",
     primary_key="clave primaria",
@@ -738,6 +829,7 @@ ES = SimpleNamespace(
         unique=lambda model, field: f"única {model}.{field}",
         whole_number=lambda model, field: f"tipo de número de {model}.{field}",
         enum=lambda name: f"enumeración {name}",
+        query=lambda model, query: f"consulta {model} {query}",
     ),
     relation_option=_relation_option_es,
     document_reference=lambda many: "Referencias (lista de _id)" if many else "Referencia (_id)",

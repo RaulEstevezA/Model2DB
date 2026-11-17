@@ -30,6 +30,7 @@ from ..core.design.edit import (
 from ..core.design.types import same_value
 from ..core.model.schema import all_fields, describe_type
 from .pane import Pane
+from .query_list import query_section
 from .widgets import badge, clear_layout, confidence_badge, mono, muted, small_button
 
 
@@ -50,6 +51,8 @@ def ref_key(ref: dict) -> str:
         return f"enum:{ref['enum']}"
     if ref["kind"] == "key":
         return f"key:{ref['model']}"
+    if ref["kind"] == "query":
+        return f"query:{ref['model']}#{ref['index']}"
     return f"{ref['kind']}:{ref['model']}.{ref['field']}"
 
 
@@ -136,6 +139,10 @@ class DesignPane(Pane):
         # The decision that keeps the focus after the pane is rebuilt (accepting removes its button)
         self._focus: str | None = None
         self.controls: dict[str, DecisionControl] = {}
+        # (model, position) of the query being edited, or (model, "new") for one being written
+        self.query_editing: tuple[str, object] | None = None
+        self.i18n = i18n
+        self.session = session
 
         self.undo_button = QPushButton()
         self.undo_button.clicked.connect(session.undo)
@@ -182,6 +189,17 @@ class DesignPane(Pane):
     def _change(self, design: dict) -> None:
         self._session.change(design)
 
+    # Used by the queries of each model card (query_list.py)
+
+    def change(self, design: dict) -> None:
+        self._session.change(design)
+
+    def keep_focus(self, ref: dict) -> None:
+        self._focus = ref_key(ref)
+
+    def register(self, ref: dict, widget) -> None:
+        self.controls[ref_key(ref)] = widget
+
     def focus_decision(self, ref: dict) -> None:
         control = self.controls.get(ref_key(ref))
         if control:
@@ -204,6 +222,15 @@ class DesignPane(Pane):
             return subjects.whole_number(ref["model"], ref["field"])
         if ref["kind"] == "enum":
             return subjects.enum(ref["enum"])
+        if ref["kind"] == "query":
+            design = self._session.design
+            item = (
+                next((entry for entry in design["models"] if entry["model"] == ref["model"]), None) if design else None
+            )
+            queries = (item or {}).get("queries") or []
+            if ref["index"] < len(queries):
+                return subjects.query(ref["model"], self._i18n.t.query_text(queries[ref["index"]]))
+            return ref["model"]
         return subjects.field(ref["model"], ref["field"])
 
     def _control(self, ref: dict, decision: dict, option_label) -> DecisionControl:
@@ -267,7 +294,13 @@ class DesignPane(Pane):
             box_layout.addWidget(muted(t.review_help))
             for item in pending:
                 row = QHBoxLayout()
-                link = QPushButton(self._subject(item["ref"]))
+                ref = item["ref"]
+                subject = self._subject(ref)
+                # A button does not wrap: a query is named by its position, and its fields go in the name read aloud
+                short = t.subjects.query(ref["model"], str(ref["index"] + 1)) if ref["kind"] == "query" else subject
+                link = QPushButton(short)
+                link.setAccessibleName(subject)
+                link.setToolTip(subject)
                 link.setProperty("link", True)
                 link.clicked.connect(lambda _=False, ref=item["ref"]: self.focus_decision(ref))
                 row.addWidget(link)
@@ -404,6 +437,8 @@ class DesignPane(Pane):
             decided = next((entry for entry in item["fields"] if entry["field"] == field["name"]), None)
             if decided:
                 layout.addWidget(self._field_row(design, model, field, decided, field["name"] == key_field, table))
+        if "queries" in item:
+            layout.addWidget(query_section(self, design, item, fields, physical))
         return card
 
     def _field_row(self, design: dict, model: str, field: dict, decided: dict, is_key: bool, table: dict | None):

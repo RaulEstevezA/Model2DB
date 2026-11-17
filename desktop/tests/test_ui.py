@@ -8,8 +8,10 @@ from PySide6.QtCore import Qt
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication
 
+from model2db.core.design.edit import remove_query
 from model2db.core.generate.outputs import OUTPUTS
 from model2db.examples import EXAMPLES
+from model2db.ui.query_list import QueryEditor
 
 
 def test_every_example_gives_a_design_and_a_result(window):
@@ -221,3 +223,61 @@ def test_the_language_can_be_switched(window):
     assert window.design_pane.title.text() == ES.design_title
     window._i18n.set_language("en")
     assert window.design_pane.title.text() == EN.design_title
+
+
+def test_a_proposed_query_is_accepted_from_the_review_list_and_becomes_an_index(window):
+    window.load_example("store")
+    pane = window.design_pane
+    session = window.session
+    ref = next(item["ref"] for item in session.pending if item["ref"]["kind"] == "query")
+    assert ref == {"kind": "query", "model": "Order", "index": 0}
+    assert 'TODO: does the application read "Order"' in window.result_pane.code.toPlainText()
+    pane.focus_decision(ref)
+    row = pane.controls["query:Order#0"]
+    assert row.accept is not None
+    row.accept.click()
+    QApplication.processEvents()
+    assert all(item["ref"]["kind"] != "query" for item in session.pending)
+    assert "(customer_id, placed_at DESC)" in window.result_pane.code.toPlainText()
+    # The accept button is gone: the focus stays on the query
+    assert QApplication.focusWidget() is pane.controls["query:Order#0"].edit
+
+
+def test_a_query_is_written_in_the_editor_and_removed(window):
+    window.load_example("store")
+    pane = window.design_pane
+    session = window.session
+    pane.query_editing = ("Order", "new")
+    pane.refresh()
+    editor = next(widget for widget in pane.findChildren(QueryEditor))
+    editor._toggle_filter("status", True)
+    editor._add_sort("placedAt")
+    editor._change_sort(0, "direction", "desc")
+    editor._on_save(editor._filter, editor._sort)
+    QApplication.processEvents()
+    order = next(item for item in session.design["models"] if item["model"] == "Order")
+    assert order["queries"][-1] == {
+        "filter": ["status"],
+        "sort": [{"field": "placedAt", "direction": "desc"}],
+        "status": "active",
+        "reasons": [],
+    }
+    assert "(status, placed_at DESC)" in window.result_pane.code.toPlainText()
+    position = len(order["queries"]) - 1
+    session.change(remove_query(session.design, "Order", position))
+    assert "(status, placed_at DESC)" not in window.result_pane.code.toPlainText()
+
+
+def test_cassandra_shows_the_table_of_each_query(window):
+    window.load_example("store")
+    session = window.session
+    session.set_output("cassandra")
+    ref = next(item["ref"] for item in session.pending if item["ref"]["kind"] == "query")
+    window.design_pane.controls["query:Order#0"].accept.click()
+    QApplication.processEvents()
+    assert "CREATE TABLE IF NOT EXISTS orders_by_customer_id" in window.result_pane.code.toPlainText()
+    texts = [label.text() for label in window.design_pane.findChildren(type(window.design_pane.status))]
+    assert any(
+        text.startswith("Table: orders_by_customer_id") or text.startswith("Tabla: orders_by_customer_id")
+        for text in texts
+    ), ref

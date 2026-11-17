@@ -8,6 +8,7 @@ import { useI18n } from '../i18n/useI18n.ts'
 import { CommitInput } from './CommitInput.tsx'
 import { DecisionControl } from './DecisionControl.tsx'
 import { FieldRow } from './FieldRow.tsx'
+import { QueryList } from './QueryList.tsx'
 
 interface ModelCardProps {
   design: Design
@@ -116,6 +117,15 @@ export function ModelCard({ design, model, fields, canExclude, physical, onChang
           )
         })}
       </ul>
+      {model.queries && (
+        <QueryList
+          design={design}
+          model={model}
+          fields={fields}
+          indexes={table?.indexes ?? collection?.indexes ?? []}
+          onChange={onChange}
+        />
+      )}
     </section>
   )
 }

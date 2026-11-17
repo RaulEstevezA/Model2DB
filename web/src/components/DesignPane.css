@@ -282,3 +282,78 @@
   outline-offset: 4px;
   border-radius: var(--radius-xs);
 }
+
+/* How the application reads a model: each query becomes an index */
+.queries {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding-top: var(--space-8);
+  border-top: var(--border-line);
+}
+
+.queries__title {
+  color: var(--muted);
+  font-size: var(--font-label);
+  font-weight: var(--weight-semibold);
+}
+
+.queries__empty {
+  color: var(--muted);
+  font-size: var(--font-small);
+}
+
+.queries__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.queries__list .decision__value {
+  overflow-wrap: anywhere;
+}
+
+.query-editor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  padding: var(--space-8) var(--space-12);
+  border-left: 2px solid var(--border);
+}
+
+.query-editor__group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.query-editor__legend {
+  margin-bottom: var(--space-6);
+  padding: 0;
+  color: var(--muted);
+  font-size: var(--font-label);
+}
+
+.query-editor__checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6) var(--space-16);
+}
+
+.query-editor__sort {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-6) var(--space-8);
+}
+
+.query-editor__sort .select {
+  max-width: 100%;
+}

@@ -50,6 +50,10 @@ export function DesignPane({
         return t.subjects.wholeNumber(ref.model, ref.field)
       case 'enum':
         return t.subjects.enum(ref.enum)
+      case 'query': {
+        const query = design?.models.find((item) => item.model === ref.model)?.queries?.[ref.index]
+        return query ? t.subjects.query(ref.model, t.queryText(query)) : ref.model
+      }
       default:
         return t.subjects.field(ref.model, ref.field)
     }
@@ -117,7 +121,7 @@ export function DesignPane({
                       {subject(item.ref)}
                     </button>
                     {' · '}
-                    {item.decision.reasons.map((reason) => t.reason(reason)).join(' ')}
+                    {item.reasons.map((reason) => t.reason(reason)).join(' ')}
                   </li>
                 ))}
               </ul>

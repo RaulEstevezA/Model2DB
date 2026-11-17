@@ -1,4 +1,4 @@
-import type { EnumChoice, KeyChoice, Reason, RelationChoice, StorageTarget } from '../core/design/types.ts'
+import type { EnumChoice, KeyChoice, QueryDesign, Reason, RelationChoice, StorageTarget } from '../core/design/types.ts'
 import type { OutputGroup } from '../core/generate/outputs.ts'
 import type { Note } from '../core/physical/types.ts'
 import type { ModelRole } from '../core/physical/roles.ts'
@@ -182,6 +182,15 @@ const en = {
   columnType: 'Type in the database',
   columnTypeHelp: 'Written as it is in the result, for every database. Leave it empty to use the derived type.',
   addIndex: 'Add an index',
+  queryText: (query: Pick<QueryDesign, 'filter' | 'sort'>): string =>
+    [
+      query.filter.length > 0 ? `by ${query.filter.join(', ')}` : '',
+      query.sort.length > 0
+        ? `ordered by ${query.sort.map((item) => `${item.field} ${item.direction === 'desc' ? 'descending' : 'ascending'}`).join(', ')}`
+        : '',
+    ]
+      .filter(Boolean)
+      .join(', '),
   derived: 'derived',
   fieldHeader: 'Field',
   storageHeader: 'Stored as',
@@ -231,6 +240,7 @@ const en = {
     unique: (model: string, field: string) => `unique ${model}.${field}`,
     wholeNumber: (model: string, field: string) => `number type of ${model}.${field}`,
     enum: (name: string) => `enum ${name}`,
+    query: (model: string, query: string) => `query ${model} ${query}`,
   },
   relationOption: (choice: RelationChoice, shape: RelationShape): string => {
     switch (choice) {
@@ -376,6 +386,8 @@ const en = {
         return `“${p(params, 'field')}” is usually unique. Confirm it if two rows can never share it.`
       case 'wholeNumberNamed':
         return `“${p(params, 'field')}” counts things: stored as a whole number. Choose decimals if it can have them.`
+      case 'queryByOwner':
+        return `Rows like these are usually read by “${p(params, 'field')}”, newest “${p(params, 'sort')}” first: one index on both finds them already in order. Accept it if the application reads them like this.`
       case 'enumCheck':
         return 'A CHECK constraint keeps the allowed values without a type of its own and is easy to change.'
       case 'enumDocument':
@@ -618,6 +630,15 @@ const es: Messages = {
   columnType: 'Tipo en la base de datos',
   columnTypeHelp: 'Se escribe tal cual en el resultado, para cualquier base de datos. Déjalo vacío para usar el tipo deducido.',
   addIndex: 'Añadir un índice',
+  queryText: (query) =>
+    [
+      query.filter.length > 0 ? `por ${query.filter.join(', ')}` : '',
+      query.sort.length > 0
+        ? `ordenada por ${query.sort.map((item) => `${item.field} ${item.direction === 'desc' ? 'descendente' : 'ascendente'}`).join(', ')}`
+        : '',
+    ]
+      .filter(Boolean)
+      .join(', '),
   derived: 'deducido',
   fieldHeader: 'Campo',
   storageHeader: 'Se guarda como',
@@ -667,6 +688,7 @@ const es: Messages = {
     unique: (model, field) => `única ${model}.${field}`,
     wholeNumber: (model, field) => `tipo de número de ${model}.${field}`,
     enum: (name) => `enumeración ${name}`,
+    query: (model, query) => `consulta ${model} ${query}`,
   },
   relationOption: (choice, shape) => {
     switch (choice) {
@@ -812,6 +834,8 @@ const es: Messages = {
         return `«${p(params, 'field')}» suele ser único. Confírmalo si dos filas nunca pueden compartirlo.`
       case 'wholeNumberNamed':
         return `«${p(params, 'field')}» cuenta cosas: se guarda como número entero. Elige decimales si puede tenerlos.`
+      case 'queryByOwner':
+        return `Filas como estas se suelen leer por «${p(params, 'field')}», con el «${p(params, 'sort')}» más reciente primero: un índice sobre los dos las encuentra ya ordenadas. Acéptala si la aplicación las lee así.`
       case 'enumCheck':
         return 'Una restricción CHECK limita los valores sin un tipo propio y es fácil de cambiar.'
       case 'enumDocument':

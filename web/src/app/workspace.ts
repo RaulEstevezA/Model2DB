@@ -1,6 +1,6 @@
 import type { DecisionRef } from '../core/design/edit.ts'
 import { analyze, isTopLevel } from '../core/design/analysis.ts'
-import { FIELD_DECISIONS, type Decision, type Design } from '../core/design/types.ts'
+import { FIELD_DECISIONS, type Decision, type Design, type Reason } from '../core/design/types.ts'
 import type { ModelRole } from '../core/physical/roles.ts'
 import { allFields, type ModelSchema } from '../core/model/schema.ts'
 import { detectFormat, parseInput } from '../core/parsers/registry.ts'
@@ -37,7 +37,8 @@ export function readInput(input: InputState): ReadInput {
 
 export interface PendingItem {
   ref: DecisionRef
-  decision: Decision<unknown>
+  /** Why it was proposed */
+  reasons: Reason[]
 }
 
 /** Decisions waiting for the user that matter for what is stored: the keys of stored models and the
@@ -48,18 +49,23 @@ export function pendingDecisions(design: Design, roles: Map<string, ModelRole>):
   for (const model of design.models) {
     const role = roles.get(model.model)
     const fieldsMatter = role === 'stored' || ((design.target === 'document' || design.target === 'widecolumn') && role === 'embedded')
-    if (role === 'stored' && model.key?.status === 'pending') items.push({ ref: { kind: 'key', model: model.model }, decision: model.key })
+    if (role === 'stored' && model.key?.status === 'pending')
+      items.push({ ref: { kind: 'key', model: model.model }, reasons: model.key.reasons })
     if (!fieldsMatter) continue
     for (const field of model.fields) {
       if (!field.include) continue
       for (const kind of FIELD_DECISIONS) {
         const decision = field[kind] as Decision<unknown> | undefined
-        if (decision?.status === 'pending') items.push({ ref: { kind, model: model.model, field: field.field }, decision })
+        if (decision?.status === 'pending') items.push({ ref: { kind, model: model.model, field: field.field }, reasons: decision.reasons })
       }
     }
+    if (role === 'stored')
+      model.queries?.forEach((query, index) => {
+        if (query.status === 'pending') items.push({ ref: { kind: 'query', model: model.model, index }, reasons: query.reasons })
+      })
   }
   for (const item of design.enums)
-    if (item.storage.status === 'pending') items.push({ ref: { kind: 'enum', enum: item.enum }, decision: item.storage })
+    if (item.storage.status === 'pending') items.push({ ref: { kind: 'enum', enum: item.enum }, reasons: item.storage.reasons })
   return items
 }
 
@@ -75,6 +81,13 @@ export function fieldCount(schema: ModelSchema): number {
 
 /** Id of the element of a decision in the design pane, to move the focus to it from the review list. */
 export function decisionElementId(ref: DecisionRef): string {
-  const raw = ref.kind === 'enum' ? `enum-${ref.enum}` : ref.kind === 'key' ? `key-${ref.model}` : `${ref.kind}-${ref.model}-${ref.field}`
+  const raw =
+    ref.kind === 'enum'
+      ? `enum-${ref.enum}`
+      : ref.kind === 'key'
+        ? `key-${ref.model}`
+        : ref.kind === 'query'
+          ? `query-${ref.model}-${ref.index}`
+          : `${ref.kind}-${ref.model}-${ref.field}`
   return `decision-${raw.replace(/[^\w-]/g, '_')}`
 }

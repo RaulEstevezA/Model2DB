@@ -29,6 +29,8 @@ export const keyValueStrategy: DesignStrategy = {
   relation,
   foreignKeys: true,
   wholeNumbers: false,
+  // Query tables and sortable fields come later
+  queries: false,
   enum: () => null,
 }
 

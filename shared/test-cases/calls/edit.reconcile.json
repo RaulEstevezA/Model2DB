@@ -1060,7 +1060,8 @@
        "field": "createdAt",
        "include": true
       }
-     ]
+     ],
+     "queries": []
     },
     {
      "model": "Address",
@@ -1121,7 +1122,8 @@
        "field": "country",
        "include": true
       }
-     ]
+     ],
+     "queries": []
     },
     {
      "model": "Order",
@@ -1236,6 +1238,29 @@
        "field": "placedAt",
        "include": true
       }
+     ],
+     "queries": [
+      {
+       "filter": [
+        "customer"
+       ],
+       "sort": [
+        {
+         "field": "placedAt",
+         "direction": "desc"
+        }
+       ],
+       "status": "pending",
+       "reasons": [
+        {
+         "code": "queryByOwner",
+         "params": {
+          "field": "customer",
+          "sort": "placedAt"
+         }
+        }
+       ]
+      }
      ]
     },
     {
@@ -1319,7 +1344,8 @@
        "field": "unitPrice",
        "include": true
       }
-     ]
+     ],
+     "queries": []
     },
     {
      "model": "Product",
@@ -1441,7 +1467,8 @@
         ]
        }
       }
-     ]
+     ],
+     "queries": []
     },
     {
      "model": "Category",
@@ -1512,7 +1539,8 @@
         ]
        }
       }
-     ]
+     ],
+     "queries": []
     }
    ],
    "enums": [
@@ -2541,7 +2569,8 @@
        "field": "createdAt",
        "include": true
       }
-     ]
+     ],
+     "queries": []
     },
     {
      "model": "Address",
@@ -2598,7 +2627,8 @@
        "field": "country",
        "include": true
       }
-     ]
+     ],
+     "queries": []
     },
     {
      "model": "Order",
@@ -2705,7 +2735,8 @@
        "field": "placedAt",
        "include": true
       }
-     ]
+     ],
+     "queries": []
     },
     {
      "model": "OrderLine",
@@ -2768,7 +2799,8 @@
        "field": "unitPrice",
        "include": true
       }
-     ]
+     ],
+     "queries": []
     },
     {
      "model": "Product",
@@ -2883,7 +2915,8 @@
         ]
        }
       }
-     ]
+     ],
+     "queries": []
     },
     {
      "model": "Category",
@@ -2948,7 +2981,8 @@
         ]
        }
       }
-     ]
+     ],
+     "queries": []
     }
    ],
    "enums": []
@@ -3750,7 +3784,8 @@
         "manual": true
        }
       }
-     ]
+     ],
+     "queries": []
     },
     {
      "model": "Book",
@@ -3888,6 +3923,29 @@
         ]
        }
       }
+     ],
+     "queries": [
+      {
+       "filter": [
+        "author"
+       ],
+       "sort": [
+        {
+         "field": "publishedOn",
+         "direction": "desc"
+        }
+       ],
+       "status": "pending",
+       "reasons": [
+        {
+         "code": "queryByOwner",
+         "params": {
+          "field": "author",
+          "sort": "publishedOn"
+         }
+        }
+       ]
+      }
      ]
     },
     {
@@ -3929,7 +3987,8 @@
        "field": "row",
        "include": true
       }
-     ]
+     ],
+     "queries": []
     },
     {
      "model": "Tag",
@@ -3977,7 +4036,8 @@
        "field": "label",
        "include": true
       }
-     ]
+     ],
+     "queries": []
     }
    ],
    "enums": [
@@ -4769,7 +4829,8 @@
         "manual": true
        }
       }
-     ]
+     ],
+     "queries": []
     },
     {
      "model": "Book",
@@ -4907,6 +4968,29 @@
         ]
        }
       }
+     ],
+     "queries": [
+      {
+       "filter": [
+        "author"
+       ],
+       "sort": [
+        {
+         "field": "publishedOn",
+         "direction": "desc"
+        }
+       ],
+       "status": "pending",
+       "reasons": [
+        {
+         "code": "queryByOwner",
+         "params": {
+          "field": "author",
+          "sort": "publishedOn"
+         }
+        }
+       ]
+      }
      ]
     },
     {
@@ -4944,7 +5028,8 @@
        "field": "row",
        "include": true
       }
-     ]
+     ],
+     "queries": []
     },
     {
      "model": "Tag",
@@ -4988,7 +5073,8 @@
        "field": "label",
        "include": true
       }
-     ]
+     ],
+     "queries": []
     }
    ],
    "enums": []
@@ -6048,7 +6134,8 @@
        "field": "createdAt",
        "include": true
       }
-     ]
+     ],
+     "queries": []
     },
     {
      "model": "Address",
@@ -6105,7 +6192,8 @@
        "field": "country",
        "include": true
       }
-     ]
+     ],
+     "queries": []
     },
     {
      "model": "Order",
@@ -6212,7 +6300,8 @@
        "field": "placedAt",
        "include": true
       }
-     ]
+     ],
+     "queries": []
     },
     {
      "model": "OrderLine",
@@ -6275,7 +6364,8 @@
        "field": "unitPrice",
        "include": true
       }
-     ]
+     ],
+     "queries": []
     },
     {
      "model": "Product",
@@ -6390,7 +6480,8 @@
         ]
        }
       }
-     ]
+     ],
+     "queries": []
     },
     {
      "model": "Category",
@@ -6455,7 +6546,8 @@
         ]
        }
       }
-     ]
+     ],
+     "queries": []
     }
    ],
    "enums": []

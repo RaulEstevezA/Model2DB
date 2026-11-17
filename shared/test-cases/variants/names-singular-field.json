@@ -11,6 +11,13 @@
   },
   {
    "ref": {
+    "kind": "query",
+    "model": "Order",
+    "index": 0
+   }
+  },
+  {
+   "ref": {
     "kind": "unique",
     "model": "Product",
     "field": "sku"

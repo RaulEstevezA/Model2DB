@@ -67,11 +67,15 @@ export function generateCql(schema: WideColumnSchema, engine: 'cassandra' | 'scy
   for (const table of schema.tables) {
     out.push('')
     for (const todo of table.todos) out.push(`-- ${todoText(todo, table.model, 'table')}`)
+    if (table.query) out.push(`-- Query: ${table.query}. A copy of the rows: write each one here too (in the same logged BATCH).`)
+    const order = (table.descending?.length ?? 0) > 0
     const lines = [
       `CREATE TABLE IF NOT EXISTS ${cqlName(table.name)} (`,
       ...table.columns.map((column) => `  ${cqlName(column.name)} ${cqlType(column.type)},`),
       `  ${primaryKey(table)}`,
-      ');',
+      order
+        ? `) WITH CLUSTERING ORDER BY (${table.clusteringKey.map((column) => `${cqlName(column)} ${table.descending?.includes(column) ? 'DESC' : 'ASC'}`).join(', ')});`
+        : ');',
     ]
     // A table needs its key: until it is chosen, the table is written as a comment
     if (table.partitionKey.length === 0) out.push(...lines.map((line) => `-- ${line}`))

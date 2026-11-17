@@ -12,6 +12,7 @@ CREATE TYPE IF NOT EXISTS billing_address (
 );
 
 -- TODO: decide how "Invoice.lines" is stored (pending in the design).
+-- TODO: does the application read "Invoice" by customer, ordered by issued_at desc? Accept the query in the design to index it.
 CREATE TABLE IF NOT EXISTS invoices (
   invoice_id int,
   number text,

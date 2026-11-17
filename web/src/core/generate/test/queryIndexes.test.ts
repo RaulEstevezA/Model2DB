@@ -106,3 +106,24 @@ describe('query indexes in the MongoDB libraries', () => {
     expect(write('spring-data-mongodb', 'document').code).toContain(`def = "{'userId': 1, 'createdAt': -1}"`)
   })
 })
+
+describe('queries in Cassandra and ScyllaDB', () => {
+  it('Cassandra and ScyllaDB read each query from a table of its own, ordered by its clustering', () => {
+    for (const output of ['cassandra', 'scylladb']) {
+      const { code, notes } = write(output, 'widecolumn')
+      expect(code).toContain('-- Query: Post by userId, ordered by createdAt desc.')
+      expect(code).toMatch(
+        /CREATE TABLE IF NOT EXISTS posts_by_user_id \([^;]*PRIMARY KEY \(\(user_id\), created_at, id\)\n\) WITH CLUSTERING ORDER BY \(created_at DESC, id ASC\);/,
+      )
+      expect(notes).toContainEqual({
+        code: 'queryNeedsFilter',
+        params: {
+          database: output === 'cassandra' ? 'Cassandra' : 'ScyllaDB',
+          model: 'Post',
+          query: 'ordered by createdAt desc, title asc',
+        },
+      })
+      expect(notes).toContainEqual({ code: 'queryTables', params: { database: output === 'cassandra' ? 'Cassandra' : 'ScyllaDB' } })
+    }
+  })
+})

@@ -12966,7 +12966,8 @@
        "field": "createdAt",
        "include": true
       }
-     ]
+     ],
+     "queries": []
     },
     {
      "model": "Address",
@@ -13023,7 +13024,8 @@
        "field": "country",
        "include": true
       }
-     ]
+     ],
+     "queries": []
     },
     {
      "model": "Order",
@@ -13134,6 +13136,29 @@
        "field": "placedAt",
        "include": true
       }
+     ],
+     "queries": [
+      {
+       "filter": [
+        "customer"
+       ],
+       "sort": [
+        {
+         "field": "placedAt",
+         "direction": "desc"
+        }
+       ],
+       "status": "pending",
+       "reasons": [
+        {
+         "code": "queryByOwner",
+         "params": {
+          "field": "customer",
+          "sort": "placedAt"
+         }
+        }
+       ]
+      }
      ]
     },
     {
@@ -13197,7 +13222,8 @@
        "field": "unitPrice",
        "include": true
       }
-     ]
+     ],
+     "queries": []
     },
     {
      "model": "Product",
@@ -13313,7 +13339,8 @@
         ]
        }
       }
-     ]
+     ],
+     "queries": []
     },
     {
      "model": "Category",
@@ -13378,7 +13405,8 @@
         ]
        }
       }
-     ]
+     ],
+     "queries": []
     }
    ],
    "enums": []
@@ -13834,7 +13862,8 @@
         ]
        }
       }
-     ]
+     ],
+     "queries": []
     },
     {
      "model": "Book",
@@ -13975,6 +14004,29 @@
         ]
        }
       }
+     ],
+     "queries": [
+      {
+       "filter": [
+        "author"
+       ],
+       "sort": [
+        {
+         "field": "publishedOn",
+         "direction": "desc"
+        }
+       ],
+       "status": "pending",
+       "reasons": [
+        {
+         "code": "queryByOwner",
+         "params": {
+          "field": "author",
+          "sort": "publishedOn"
+         }
+        }
+       ]
+      }
      ]
     },
     {
@@ -14012,7 +14064,8 @@
        "field": "row",
        "include": true
       }
-     ]
+     ],
+     "queries": []
     },
     {
      "model": "Tag",
@@ -14056,7 +14109,8 @@
        "field": "label",
        "include": true
       }
-     ]
+     ],
+     "queries": []
     }
    ],
    "enums": []
@@ -14431,6 +14485,29 @@
         ]
        }
       }
+     ],
+     "queries": [
+      {
+       "filter": [
+        "customer"
+       ],
+       "sort": [
+        {
+         "field": "issued_at",
+         "direction": "desc"
+        }
+       ],
+       "status": "pending",
+       "reasons": [
+        {
+         "code": "queryByOwner",
+         "params": {
+          "field": "customer",
+          "sort": "issued_at"
+         }
+        }
+       ]
+      }
      ]
     },
     {
@@ -14523,7 +14600,8 @@
         ]
        }
       }
-     ]
+     ],
+     "queries": []
     },
     {
      "model": "BillingAddress",
@@ -14572,7 +14650,8 @@
        "field": "zip_code",
        "include": true
       }
-     ]
+     ],
+     "queries": []
     },
     {
      "model": "Line",
@@ -14629,7 +14708,8 @@
        "field": "tax_rate",
        "include": true
       }
-     ]
+     ],
+     "queries": []
     }
    ],
    "enums": []
@@ -15053,7 +15133,8 @@
        "field": "createdAt",
        "include": true
       }
-     ]
+     ],
+     "queries": []
     },
     {
      "model": "Profile",
@@ -15086,7 +15167,8 @@
        "field": "website",
        "include": true
       }
-     ]
+     ],
+     "queries": []
     },
     {
      "model": "Post",
@@ -15211,7 +15293,8 @@
         ]
        }
       }
-     ]
+     ],
+     "queries": []
     },
     {
      "model": "Comment",
@@ -15252,7 +15335,8 @@
        "field": "rating",
        "include": true
       }
-     ]
+     ],
+     "queries": []
     }
    ],
    "enums": []
@@ -15344,7 +15428,8 @@
        "field": "name",
        "include": true
       }
-     ]
+     ],
+     "queries": []
     }
    ],
    "enums": []
@@ -15433,7 +15518,8 @@
        "field": "city",
        "include": true
       }
-     ]
+     ],
+     "queries": []
     }
    ],
    "enums": []
@@ -15583,7 +15669,8 @@
        "field": "name",
        "include": true
       }
-     ]
+     ],
+     "queries": []
     },
     {
      "model": "Cart",
@@ -15641,7 +15728,8 @@
         ]
        }
       }
-     ]
+     ],
+     "queries": []
     },
     {
      "model": "Wishlist",
@@ -15699,7 +15787,8 @@
         ]
        }
       }
-     ]
+     ],
+     "queries": []
     }
    ],
    "enums": []
@@ -15843,7 +15932,8 @@
        "field": "name",
        "include": true
       }
-     ]
+     ],
+     "queries": []
     },
     {
      "model": "Order",
@@ -15902,7 +15992,8 @@
         ]
        }
       }
-     ]
+     ],
+     "queries": []
     },
     {
      "model": "Invoice",
@@ -15961,7 +16052,8 @@
         ]
        }
       }
-     ]
+     ],
+     "queries": []
     }
    ],
    "enums": []
@@ -16092,7 +16184,8 @@
         ]
        }
       }
-     ]
+     ],
+     "queries": []
     },
     {
      "model": "Person",
@@ -16149,7 +16242,8 @@
         ]
        }
       }
-     ]
+     ],
+     "queries": []
     }
    ],
    "enums": []
@@ -16303,7 +16397,8 @@
         ]
        }
       }
-     ]
+     ],
+     "queries": []
     }
    ],
    "enums": []
@@ -16429,7 +16524,8 @@
        "field": "createdAt",
        "include": true
       }
-     ]
+     ],
+     "queries": []
     },
     {
      "model": "Note",
@@ -16495,7 +16591,8 @@
         ]
        }
       }
-     ]
+     ],
+     "queries": []
     }
    ],
    "enums": []

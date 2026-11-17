@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS customers (
 );
 
 -- TODO: decide how "Order.lines" is stored (pending in the design).
+-- TODO: does the application read "Order" by customer, ordered by placedAt desc? Accept the query in the design to index it.
 CREATE TABLE IF NOT EXISTS orders (
   id bigint,
   customer_id bigint,

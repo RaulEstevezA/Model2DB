@@ -51,8 +51,9 @@ describe('proposed queries', () => {
     expect(queries(proposeDesign(schema, 'relational'))).toEqual([])
   })
 
-  it('is left out where the database has no query indexes yet', () => {
-    expect(queries(proposeDesign(blog(), 'widecolumn'))).toBeUndefined()
+  it('is proposed for tables, documents and wide columns, and left out of Redis for now', () => {
+    for (const target of ['document', 'widecolumn'] as const)
+      expect(queries(proposeDesign(blog(), target))).toEqual(queries(proposeDesign(blog(), 'relational')))
     expect(queries(proposeDesign(blog(), 'keyvalue'))).toBeUndefined()
   })
 

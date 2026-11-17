@@ -179,8 +179,15 @@ function entityFile(item: EntityClass, view: EntityView, context: WriteContext):
   }
   const tableSettings = [`name: ${phpString(item.table.name)}`]
   const classAttributes = [`#[ORM\\Entity]`, `#[ORM\\Table(${tableSettings.join(', ')})]`]
-  for (const index of item.table.indexes)
+  for (const index of item.table.indexes) {
     classAttributes.push(`#[ORM\\Index(name: ${phpString(index.name)}, columns: [${index.columns.map(phpString).join(', ')}])]`)
+    // Doctrine has no column order in an index: the migration, written in SQL, keeps it
+    if ((index.descending?.length ?? 0) > 0)
+      context.note({
+        code: 'indexOrderIgnored',
+        params: { orm: 'Doctrine', index: index.name, migration: context.settings.migrations ? 'yes' : '' },
+      })
+  }
   for (const unique of item.table.uniques)
     classAttributes.push(
       `#[ORM\\UniqueConstraint(name: ${phpString(unique.name)}, columns: [${unique.columns.map(phpString).join(', ')}])]`,

@@ -4,7 +4,7 @@ import type { Column, ColumnType, Dialect, PhysicalEnum, RelationalSchema, Table
 import { generateSql } from '../../sql/sql.ts'
 import { todoText } from '../../todos.ts'
 import type { GeneratedFile, RelationalWriter, WriteContext } from '../../types.ts'
-import { buildEntities, enumMembers, type Attribute, type EntityClass, type EntityView } from '../entities.ts'
+import { buildEntities, enumMembers, isDescending, type Attribute, type EntityClass, type EntityView } from '../entities.ts'
 
 /** Jakarta Persistence entities in Java, in three flavors: plain JPA, Hibernate (its own types for JSON,
  * arrays and creation times) and Spring Data JPA (plus a repository per entity). The migration is a
@@ -286,7 +286,7 @@ function tableAnnotation(table: Table, file: ClassFile): string {
   if (table.indexes.length > 0) {
     file.persistence.add('Index')
     settings.push(
-      `indexes = { ${table.indexes.map((index) => `@Index(name = ${javaString(index.name)}, columnList = ${javaString(index.columns.join(', '))}${index.unique ? ', unique = true' : ''})`).join(', ')} }`,
+      `indexes = { ${table.indexes.map((index) => `@Index(name = ${javaString(index.name)}, columnList = ${javaString(index.columns.map((column) => (isDescending(index, column) ? `${column} DESC` : column)).join(', '))}${index.unique ? ', unique = true' : ''})`).join(', ')} }`,
     )
   }
   if (table.checks.length > 0) {

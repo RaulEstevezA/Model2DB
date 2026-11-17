@@ -4,7 +4,7 @@ import type { Column, ColumnType, Dialect, PhysicalEnum } from '../../../physica
 import { sqlColumnType } from '../../sql/sql.ts'
 import { todoText } from '../../todos.ts'
 import type { GeneratedFile, RelationalWriter, WriteContext } from '../../types.ts'
-import { buildEntities, enumMembers, type Attribute, type EntityClass, type EntityView } from '../entities.ts'
+import { buildEntities, enumMembers, isDescending, type Attribute, type EntityClass, type EntityView } from '../entities.ts'
 
 /** Entity Framework Core: entity classes and a DbContext that configures every table, column type, key,
  * index, check and relation with the Fluent API. The column types are the ones the SQL output writes
@@ -215,7 +215,7 @@ function configuration(item: EntityClass, view: EntityView, engine: Dialect): st
     )
   for (const index of item.table.indexes)
     lines.push(
-      `    entity.HasIndex(e => new { ${index.columns.map((column) => `e.${propertyName(byColumn(column).name, item.name)}`).join(', ')} })${index.unique ? '.IsUnique()' : ''}.HasDatabaseName(${csString(index.name)});`,
+      `    entity.HasIndex(e => new { ${index.columns.map((column) => `e.${propertyName(byColumn(column).name, item.name)}`).join(', ')} })${index.unique ? '.IsUnique()' : ''}${(index.descending?.length ?? 0) > 0 ? `.IsDescending(${index.columns.map((column) => String(isDescending(index, column))).join(', ')})` : ''}.HasDatabaseName(${csString(index.name)});`,
     )
   for (const navigation of item.navigations) {
     if (navigation.kind === 'manyToOne') {

@@ -72,3 +72,21 @@ describe('query indexes in the TypeScript ORMs', () => {
     })
   })
 })
+
+describe('query indexes in JPA, EF Core and Doctrine', () => {
+  it('JPA and EF Core keep the descending order', () => {
+    expect(write('jpa').code).toContain('@Index(name = "ix_posts_user_id_created_at", columnList = "user_id, created_at DESC")')
+    expect(write('efcore').code).toContain(
+      'entity.HasIndex(e => new { e.UserId, e.CreatedAt }).IsDescending(false, true).HasDatabaseName("ix_posts_user_id_created_at");',
+    )
+  })
+
+  it('Doctrine keeps it in the migration and says the mapping cannot', () => {
+    const { code, notes } = write('doctrine')
+    expect(code).toContain('CREATE INDEX ix_posts_user_id_created_at ON posts (user_id, created_at DESC)')
+    expect(notes).toContainEqual({
+      code: 'indexOrderIgnored',
+      params: { orm: 'Doctrine', index: 'ix_posts_user_id_created_at', migration: 'yes' },
+    })
+  })
+})

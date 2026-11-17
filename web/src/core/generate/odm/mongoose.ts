@@ -84,7 +84,7 @@ function schemaBlock(item: DocumentClass, view: DocumentView): string[] {
   lines.push('  },', `  { ${options.join(', ')} },`, ')')
   for (const index of item.collection?.indexes ?? [])
     lines.push(
-      `${schemaVariable(item.name)}.index({ ${index.columns.map((column) => `${tsString(column)}: 1`).join(', ')} }, { name: ${tsString(index.name)}${index.unique ? ', unique: true' : ''} })`,
+      `${schemaVariable(item.name)}.index({ ${index.columns.map((column) => `${tsString(column)}: ${index.descending?.includes(column) ? -1 : 1}`).join(', ')} }, { name: ${tsString(index.name)}${index.unique ? ', unique: true' : ''} })`,
     )
   return lines
 }

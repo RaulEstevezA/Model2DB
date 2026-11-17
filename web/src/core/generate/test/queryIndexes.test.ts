@@ -90,3 +90,19 @@ describe('query indexes in JPA, EF Core and Doctrine', () => {
     })
   })
 })
+
+describe('query indexes in the MongoDB libraries', () => {
+  it('writes -1 or DESCENDING for a descending key', () => {
+    expect(write('mongoose', 'document').code).toContain(
+      "postSchema.index({ 'userId': 1, 'createdAt': -1 }, { name: 'ix_posts_userId_createdAt' })",
+    )
+    expect(write('pymongo', 'document').code).toContain(
+      '([("userId", ASCENDING), ("createdAt", DESCENDING)], "ix_posts_userId_createdAt", False)',
+    )
+    expect(write('beanie', 'document').code).toContain(
+      'IndexModel([("userId", ASCENDING), ("createdAt", DESCENDING)], name="ix_posts_userId_createdAt")',
+    )
+    expect(write('mongoengine', 'document').code).toContain('{"fields": ["userId", "-createdAt"], "name": "ix_posts_userId_createdAt"}')
+    expect(write('spring-data-mongodb', 'document').code).toContain(`def = "{'userId': 1, 'createdAt': -1}"`)
+  })
+})

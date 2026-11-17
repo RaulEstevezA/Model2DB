@@ -25,7 +25,7 @@ function moduleImports(modules: Set<string>): string[] {
 function pymongoFile(physical: DocumentSchema, context: WriteContext): string {
   const out = [
     ...header(context.title, 'PyMongo collections', 'Run create_collections(db) once on an empty database.'),
-    'from pymongo import ASCENDING',
+    `from pymongo import ${physical.collections.some((collection) => collection.indexes.some((index) => (index.descending?.length ?? 0) > 0)) ? 'ASCENDING, DESCENDING' : 'ASCENDING'}`,
     'from pymongo.database import Database',
     '',
   ]
@@ -35,7 +35,7 @@ function pymongoFile(physical: DocumentSchema, context: WriteContext): string {
   out.push('}', '', '# (fields, name, unique) of each collection', 'INDEXES = {')
   for (const collection of physical.collections)
     out.push(
-      `    ${pyString(collection.name)}: [${collection.indexes.map((index) => `([${index.columns.map((column) => `(${pyString(column)}, ASCENDING)`).join(', ')}], ${pyString(index.name)}, ${index.unique ? 'True' : 'False'})`).join(', ')}],`,
+      `    ${pyString(collection.name)}: [${collection.indexes.map((index) => `([${index.columns.map((column) => `(${pyString(column)}, ${index.descending?.includes(column) ? 'DESCENDING' : 'ASCENDING'})`).join(', ')}], ${pyString(index.name)}, ${index.unique ? 'True' : 'False'})`).join(', ')}],`,
     )
   out.push('}', '', '')
   for (const collection of physical.collections)
@@ -148,7 +148,7 @@ function mongoengineFile(view: DocumentView, context: WriteContext): string {
         .filter((index) => !index.unique)
         .map(
           (index) =>
-            `{"fields": [${index.columns.map((column) => pyString(attributeOf(item, column))).join(', ')}], "name": ${pyString(index.name)}}`,
+            `{"fields": [${index.columns.map((column) => pyString(`${index.descending?.includes(column) ? '-' : ''}${attributeOf(item, column)}`)).join(', ')}], "name": ${pyString(index.name)}}`,
         )
       body.push(
         '',
@@ -229,7 +229,7 @@ function beanieFile(view: DocumentView, context: WriteContext): string {
     if (item.collection) {
       const indexes = item.collection.indexes.map(
         (index) =>
-          `IndexModel([${index.columns.map((column) => `(${pyString(column)}, ASCENDING)`).join(', ')}], name=${pyString(index.name)}${index.unique ? ', unique=True' : ''})`,
+          `IndexModel([${index.columns.map((column) => `(${pyString(column)}, ${index.descending?.includes(column) ? 'DESCENDING' : 'ASCENDING'})`).join(', ')}], name=${pyString(index.name)}${index.unique ? ', unique=True' : ''})`,
       )
       body.push('', '    class Settings:', `        name = ${pyString(item.collection.name)}`)
       if (indexes.length > 0) body.push(`        indexes = [${indexes.join(', ')}]`)
@@ -238,6 +238,7 @@ function beanieFile(view: DocumentView, context: WriteContext): string {
   const beanie = ['Document', ...(usesLink ? ['Link'] : [])]
   const pydantic = ['BaseModel', ...(usesField ? ['Field'] : [])]
   const usesIndexes = view.classes.some((item) => (item.collection?.indexes.length ?? 0) > 0)
+  const usesDescending = view.classes.some((item) => item.collection?.indexes.some((index) => (index.descending?.length ?? 0) > 0))
   return [
     ...header(context.title, 'Beanie documents', 'Pass the Document classes to init_beanie(). Review them before using them.'),
     ...moduleImports(modules),
@@ -245,7 +246,7 @@ function beanieFile(view: DocumentView, context: WriteContext): string {
     ...(modules.size > 0 ? [''] : []),
     `from beanie import ${beanie.join(', ')}`,
     `from pydantic import ${pydantic.join(', ')}`,
-    ...(usesIndexes ? ['from pymongo import ASCENDING, IndexModel'] : []),
+    ...(usesIndexes ? [`from pymongo import ASCENDING, ${usesDescending ? 'DESCENDING, ' : ''}IndexModel`] : []),
     ...body,
     '',
   ].join('\n')

@@ -112,7 +112,7 @@ function classFile(item: DocumentClass, context: WriteContext): string {
         .add('org.springframework.data.mongodb.core.index.CompoundIndexes')
       const indexes = item.collection.indexes.map(
         (index) =>
-          `@CompoundIndex(name = ${javaString(index.name)}, def = ${javaString(`{${index.columns.map((column) => `'${column}': 1`).join(', ')}}`)}${index.unique ? ', unique = true' : ''})`,
+          `@CompoundIndex(name = ${javaString(index.name)}, def = ${javaString(`{${index.columns.map((column) => `'${column}': ${index.descending?.includes(column) ? -1 : 1}`).join(', ')}}`)}${index.unique ? ', unique = true' : ''})`,
       )
       head.push(`@CompoundIndexes({ ${indexes.join(', ')} })`)
     }

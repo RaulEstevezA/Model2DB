@@ -42,6 +42,7 @@ public class Author
     public List<Book> Books { get; set; } = new();
 }
 
+// TODO: does the application read "Book" by author, ordered by publishedOn desc? Accept the query in the design to index it.
 public class Book
 {
     public long Id { get; set; }

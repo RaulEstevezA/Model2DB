@@ -1,6 +1,7 @@
 // Sequelize models written by Model2DB from Invoice. Review them before using them.
 import { DataTypes, Model, Sequelize, type CreationOptional, type InferAttributes, type InferCreationAttributes, type NonAttribute } from 'sequelize'
 
+// TODO: does the application read "Invoice" by customer, ordered by issued_at desc? Accept the query in the design to index it.
 export class Invoice extends Model<InferAttributes<Invoice>, InferCreationAttributes<Invoice>> {
   declare invoiceId: number
   declare number: string

@@ -9,6 +9,7 @@ CREATE TABLE authors (
   CONSTRAINT uq_authors_email UNIQUE (email)
 );
 
+-- TODO: does the application read "Book" by author, ordered by publishedOn desc? Accept the query in the design to index it.
 CREATE TABLE books (
   id BIGINT IDENTITY(1, 1) NOT NULL,
   isbn NVARCHAR(13) NOT NULL,

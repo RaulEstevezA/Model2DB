@@ -25,6 +25,7 @@ class Customer(models.Model):
         db_table = "customers"
 
 
+# TODO: does the application read "Order" by customer, ordered by placedAt desc? Accept the query in the design to index it.
 class Order(models.Model):
     id = models.BigIntegerField(primary_key=True)
     status = models.CharField(max_length=20, choices=OrderStatus.choices)

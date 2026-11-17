@@ -464,6 +464,10 @@ const en = {
         return `${p(params, 'database')} has no unique indexes: “${p(params, 'field')}” gets a plain index, and the application has to keep it unique.`
       case 'compositeKeyReadOnly':
         return `${p(params, 'orm')} has no composite keys: rows of “${p(params, 'table')}” are created and read with their model, and changed through their owner.`
+      case 'queryIndexes':
+        return 'The query indexes follow the queries of the design. Check them against the real queries and the amount of data (with EXPLAIN): the model cannot say it.'
+      case 'queryNotIndexed':
+        return `The query of “${p(params, 'model')}” ${p(params, 'query')} has no index: one of its fields is not stored on its own.`
     }
   },
   // Project
@@ -911,6 +915,10 @@ const es: Messages = {
         return `${p(params, 'database')} no tiene índices únicos: «${p(params, 'field')}» lleva un índice normal, y la aplicación tiene que mantenerlo único.`
       case 'compositeKeyReadOnly':
         return `${p(params, 'orm')} no admite claves compuestas: las filas de «${p(params, 'table')}» se crean y se leen con su modelo, y se cambian a través de su propietario.`
+      case 'queryIndexes':
+        return 'Los índices de las consultas siguen las consultas del diseño. Compruébalos con las consultas reales y el volumen de datos (con EXPLAIN): el modelo no puede decirlo.'
+      case 'queryNotIndexed':
+        return `La consulta de «${p(params, 'model')}» ${p(params, 'query')} no tiene índice: uno de sus campos no se guarda por separado.`
     }
   },
   // Proyecto

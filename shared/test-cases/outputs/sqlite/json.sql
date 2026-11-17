@@ -13,6 +13,7 @@ CREATE TABLE customers (
   CONSTRAINT pk_customers PRIMARY KEY (customer_id)
 );
 
+-- TODO: does the application read "Invoice" by customer, ordered by issued_at desc? Accept the query in the design to index it.
 CREATE TABLE invoices (
   invoice_id INTEGER NOT NULL,
   number TEXT NOT NULL,

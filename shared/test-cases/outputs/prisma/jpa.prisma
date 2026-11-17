@@ -26,6 +26,7 @@ model Author {
   @@map("authors")
 }
 
+// TODO: does the application read "Book" by author, ordered by publishedOn desc? Accept the query in the design to index it.
 model Book {
   id          BigInt @id(map: "pk_books") @default(autoincrement())
   isbn        String @unique(map: "uq_books_isbn") @db.VarChar(13)

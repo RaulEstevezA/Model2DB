@@ -1,6 +1,7 @@
 // TypeORM entities written by Model2DB from Invoice. Review them before using them.
 import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm'
 
+// TODO: does the application read "Invoice" by customer, ordered by issued_at desc? Accept the query in the design to index it.
 @Index('ix_invoices_customer_id', ['customerId'])
 @Entity({ name: 'invoices' })
 export class Invoice {

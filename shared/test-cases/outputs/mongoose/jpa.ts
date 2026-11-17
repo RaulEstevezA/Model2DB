@@ -27,6 +27,7 @@ const tagSchema = new Schema(
   { _id: false },
 )
 
+// TODO: does the application read "Book" by author, ordered by publishedOn desc? Accept the query in the design to index it.
 const bookSchema = new Schema(
   {
     _id: { type: Number, default: null },

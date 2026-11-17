@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** Entity written by Model2DB from Order. Review it before using it. */
+// TODO: does the application read "Order" by customer, ordered by placedAt desc? Accept the query in the design to index it.
 @Entity
 @Table(name = "orders", indexes = { @Index(name = "ix_orders_customer_id", columnList = "customer_id") }, check = { @CheckConstraint(name = "ck_orders_status", constraint = "status IN ('draft', 'paid', 'shipped', 'cancelled')") })
 public class Order {

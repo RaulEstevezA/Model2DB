@@ -33,7 +33,9 @@ export function generateMongo(schema: DocumentSchema, options: { title?: string 
     const name = JSON.stringify(collection.name)
     out.push(`db.createCollection(${name}, {`, `  validator: { $jsonSchema: ${toJs(collection.validator, '  ')} },`, '})')
     for (const index of collection.indexes) {
-      const keys = `{ ${index.columns.map((column) => `${identifier.test(column) ? column : JSON.stringify(column)}: 1`).join(', ')} }`
+      const direction = (column: string) => (index.descending?.includes(column) ? -1 : 1)
+      const keys = `{ ${index.columns.map((column) => `${identifier.test(column) ? column : JSON.stringify(column)}: ${direction(column)}`).join(', ')} }`
+      if (index.query) out.push(`// Query: ${index.query}`)
       const settings = `{ name: ${JSON.stringify(index.name)}${index.unique ? ', unique: true' : ''} }`
       out.push(`db.getCollection(${name}).createIndex(${keys}, ${settings})`)
     }

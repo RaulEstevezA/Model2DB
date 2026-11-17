@@ -16,6 +16,7 @@ CREATE TABLE customers (
 --rollback DROP TABLE customers;
 
 --changeset model2db:create-table-invoices
+-- TODO: does the application read "Invoice" by customer, ordered by issued_at desc? Accept the query in the design to index it.
 CREATE TABLE invoices (
   invoice_id INTEGER NOT NULL,
   number TEXT NOT NULL,

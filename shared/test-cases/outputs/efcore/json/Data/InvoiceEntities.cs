@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 namespace Example.Data;
 
+// TODO: does the application read "Invoice" by customer, ordered by issued_at desc? Accept the query in the design to index it.
 public class Invoice
 {
     public int InvoiceId { get; set; }

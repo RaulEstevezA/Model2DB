@@ -41,6 +41,7 @@ class Customer(SQLModel, table=True):
     shipping_address_country: str = Field(sa_column=Column(Text, nullable=False))
 
 
+# TODO: does the application read "Order" by customer, ordered by placedAt desc? Accept the query in the design to index it.
 class Order(SQLModel, table=True):
     __tablename__ = "orders"
 

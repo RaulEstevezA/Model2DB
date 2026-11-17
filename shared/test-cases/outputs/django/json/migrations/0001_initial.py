@@ -24,6 +24,7 @@ class Migration(migrations.Migration):
             ],
             options={"db_table": "customers"},
         ),
+        # TODO: does the application read "Invoice" by customer, ordered by issued_at desc? Accept the query in the design to index it.
         migrations.CreateModel(
             name="Invoice",
             fields=[

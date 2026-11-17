@@ -32,6 +32,7 @@ model Customer {
   @@map("customers")
 }
 
+// TODO: does the application read "Order" by customer, ordered by placedAt desc? Accept the query in the design to index it.
 model Order {
   id         BigInt @id(map: "pk_orders")
   status     OrderStatus

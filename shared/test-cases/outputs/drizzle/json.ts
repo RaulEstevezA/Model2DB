@@ -2,6 +2,7 @@
 import { relations } from 'drizzle-orm'
 import { type AnyPgColumn, bigint, boolean, doublePrecision, index, integer, jsonb, pgTable, primaryKey, text, timestamp } from 'drizzle-orm/pg-core'
 
+// TODO: does the application read "Invoice" by customer, ordered by issued_at desc? Accept the query in the design to index it.
 export const invoices = pgTable('invoices', {
   invoiceId: integer('invoice_id').primaryKey(),
   number: text('number').notNull(),

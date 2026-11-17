@@ -27,6 +27,7 @@ class Migration(migrations.Migration):
             ],
             options={"db_table": "customers"},
         ),
+        # TODO: does the application read "Order" by customer, ordered by placedAt desc? Accept the query in the design to index it.
         migrations.CreateModel(
             name="Order",
             fields=[

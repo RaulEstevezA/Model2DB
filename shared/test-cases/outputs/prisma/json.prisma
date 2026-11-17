@@ -9,6 +9,7 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// TODO: does the application read "Invoice" by customer, ordered by issued_at desc? Accept the query in the design to index it.
 model Invoice {
   invoiceId  Int @id(map: "pk_invoices") @map("invoice_id")
   number     String

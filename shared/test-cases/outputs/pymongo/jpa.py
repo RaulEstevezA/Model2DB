@@ -87,6 +87,7 @@ INDEXES = {
 }
 
 
+# TODO: does the application read "Book" by author, ordered by publishedOn desc? Accept the query in the design to index it.
 def create_collections(db: Database) -> None:
     """Creates each collection with its validator, then its indexes."""
     for name, validator in VALIDATORS.items():

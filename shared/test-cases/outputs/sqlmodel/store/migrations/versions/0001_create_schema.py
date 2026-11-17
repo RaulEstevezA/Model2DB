@@ -29,6 +29,7 @@ def upgrade() -> None:
         sa.Column("shipping_address_country", sa.Text, nullable=False),
         sa.PrimaryKeyConstraint("id", name="pk_customers"),
     )
+    # TODO: does the application read "Order" by customer, ordered by placedAt desc? Accept the query in the design to index it.
     op.create_table(
         "orders",
         sa.Column("id", sa.BigInteger, nullable=False, autoincrement=False),

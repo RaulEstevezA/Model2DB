@@ -21,6 +21,7 @@ class Migration(migrations.Migration):
             ],
             options={"db_table": "authors"},
         ),
+        # TODO: does the application read "Book" by author, ordered by publishedOn desc? Accept the query in the design to index it.
         migrations.CreateModel(
             name="Book",
             fields=[

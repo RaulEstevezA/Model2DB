@@ -24,6 +24,7 @@ export class Author {
   books!: Book[]
 }
 
+// TODO: does the application read "Book" by author, ordered by publishedOn desc? Accept the query in the design to index it.
 @Check('ck_books_genre', 'genre IN (\'FICTION\', \'ESSAY\', \'POETRY\', \'SCIENCE\')')
 @Unique('uq_books_isbn', ['isbn'])
 @Index('ix_books_author_id', ['authorId'])

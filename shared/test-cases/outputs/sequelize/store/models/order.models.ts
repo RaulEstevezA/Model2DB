@@ -20,6 +20,7 @@ export class Customer extends Model<InferAttributes<Customer>, InferCreationAttr
   declare shippingAddressCountry: string
 }
 
+// TODO: does the application read "Order" by customer, ordered by placedAt desc? Accept the query in the design to index it.
 export class Order extends Model<InferAttributes<Order>, InferCreationAttributes<Order>> {
   declare id: string
   declare status: OrderStatus

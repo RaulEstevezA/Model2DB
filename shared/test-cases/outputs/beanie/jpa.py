@@ -36,6 +36,7 @@ class Author(Document):
         indexes = [IndexModel([("email", ASCENDING)], name="uq_authors_email", unique=True)]
 
 
+# TODO: does the application read "Book" by author, ordered by publishedOn desc? Accept the query in the design to index it.
 class Book(Document):
     id: int = Field(alias="_id")
     isbn: str

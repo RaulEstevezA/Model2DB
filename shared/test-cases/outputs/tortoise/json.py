@@ -7,6 +7,7 @@ from tortoise import fields
 from tortoise.models import Model
 
 
+# TODO: does the application read "Invoice" by customer, ordered by issued_at desc? Accept the query in the design to index it.
 class Invoice(Model):
     invoice_id = fields.IntField(primary_key=True, generated=False)
     number = fields.TextField()

@@ -8,6 +8,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /** Entity written by Model2DB from Invoice. Review it before using it. */
+// TODO: does the application read "Invoice" by customer, ordered by issued_at desc? Accept the query in the design to index it.
 #[ORM\Entity]
 #[ORM\Table(name: 'invoices')]
 #[ORM\Index(name: 'ix_invoices_customer_id', columns: ['customer_id'])]

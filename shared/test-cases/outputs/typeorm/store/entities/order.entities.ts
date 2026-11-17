@@ -38,6 +38,7 @@ export class Customer {
   shippingAddressCountry!: string
 }
 
+// TODO: does the application read "Order" by customer, ordered by placedAt desc? Accept the query in the design to index it.
 @Check('ck_orders_status', 'status IN (\'draft\', \'paid\', \'shipped\', \'cancelled\')')
 @Index('ix_orders_customer_id', ['customerId'])
 @Entity({ name: 'orders' })

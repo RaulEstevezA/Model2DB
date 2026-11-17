@@ -7,6 +7,7 @@ from sqlalchemy import BigInteger, Boolean, Column, DateTime, Double, ForeignKey
 from sqlmodel import Field, Relationship, SQLModel
 
 
+# TODO: does the application read "Invoice" by customer, ordered by issued_at desc? Accept the query in the design to index it.
 class Invoice(SQLModel, table=True):
     __tablename__ = "invoices"
 

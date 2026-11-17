@@ -44,6 +44,7 @@ class Author(Base):
     books: Mapped[list[Book]] = relationship(back_populates="author", foreign_keys="Book.author_id")
 
 
+# TODO: does the application read "Book" by author, ordered by publishedOn desc? Accept the query in the design to index it.
 class Book(Base):
     __tablename__ = "books"
 

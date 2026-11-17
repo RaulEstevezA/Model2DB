@@ -38,6 +38,7 @@ class Author(SQLModel, table=True):
     books: list["Book"] = Relationship(back_populates="author", sa_relationship_kwargs={"foreign_keys": "Book.author_id"})
 
 
+# TODO: does the application read "Book" by author, ordered by publishedOn desc? Accept the query in the design to index it.
 class Book(SQLModel, table=True):
     __tablename__ = "books"
 

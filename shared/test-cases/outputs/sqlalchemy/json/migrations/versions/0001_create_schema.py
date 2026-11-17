@@ -26,6 +26,7 @@ def upgrade() -> None:
         sa.Column("billing_address_zip_code", sa.Text, nullable=False),
         sa.PrimaryKeyConstraint("customer_id", name="pk_customers"),
     )
+    # TODO: does the application read "Invoice" by customer, ordered by issued_at desc? Accept the query in the design to index it.
     op.create_table(
         "invoices",
         sa.Column("invoice_id", sa.Integer, nullable=False, autoincrement=False),

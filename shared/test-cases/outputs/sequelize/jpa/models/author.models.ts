@@ -15,6 +15,7 @@ export class Author extends Model<InferAttributes<Author>, InferCreationAttribut
   declare books?: NonAttribute<Book[]>
 }
 
+// TODO: does the application read "Book" by author, ordered by publishedOn desc? Accept the query in the design to index it.
 export class Book extends Model<InferAttributes<Book>, InferCreationAttributes<Book>> {
   declare id: CreationOptional<string>
   declare isbn: string

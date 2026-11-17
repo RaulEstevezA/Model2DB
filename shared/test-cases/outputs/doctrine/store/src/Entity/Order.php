@@ -9,6 +9,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /** Entity written by Model2DB from Order. Review it before using it. */
+// TODO: does the application read "Order" by customer, ordered by placedAt desc? Accept the query in the design to index it.
 #[ORM\Entity]
 #[ORM\Table(name: 'orders')]
 #[ORM\Index(name: 'ix_orders_customer_id', columns: ['customer_id'])]

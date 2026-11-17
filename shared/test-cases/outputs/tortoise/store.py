@@ -31,6 +31,7 @@ class Customer(Model):
         table = "customers"
 
 
+# TODO: does the application read "Order" by customer, ordered by placedAt desc? Accept the query in the design to index it.
 class Order(Model):
     id = fields.BigIntField(primary_key=True, generated=False)
     status = fields.CharEnumField(OrderStatus, max_length=20)

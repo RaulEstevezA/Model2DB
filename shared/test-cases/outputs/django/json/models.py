@@ -3,6 +3,7 @@
 from django.db import models
 
 
+# TODO: does the application read "Invoice" by customer, ordered by issued_at desc? Accept the query in the design to index it.
 class Invoice(models.Model):
     invoice_id = models.IntegerField(primary_key=True)
     number = models.TextField()

@@ -30,6 +30,7 @@ class Author(me.Document):
     meta = {"collection": "authors"}
 
 
+# TODO: does the application read "Book" by author, ordered by publishedOn desc? Accept the query in the design to index it.
 class Book(me.Document):
     id = me.LongField(primary_key=True)
     isbn = me.StringField(required=True, unique=True)

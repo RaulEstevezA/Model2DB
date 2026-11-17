@@ -9,6 +9,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /** Entity written by Model2DB from Author. Review it before using it. */
+// TODO: does the application read "Book" by author, ordered by publishedOn desc? Accept the query in the design to index it.
 #[ORM\Entity]
 #[ORM\Table(name: 'books')]
 #[ORM\Index(name: 'ix_books_author_id', columns: ['author_id'])]

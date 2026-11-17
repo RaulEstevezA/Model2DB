@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /** Model written by Model2DB from Order. Review it before using it. */
+// TODO: does the application read "Order" by customer, ordered by placedAt desc? Accept the query in the design to index it.
 class Order extends Model
 {
     protected $table = 'orders';

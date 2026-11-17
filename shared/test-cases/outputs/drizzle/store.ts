@@ -14,6 +14,7 @@ export const customers = pgTable('customers', {
   shippingAddressCountry: text('shipping_address_country').notNull(),
 })
 
+// TODO: does the application read "Order" by customer, ordered by placedAt desc? Accept the query in the design to index it.
 export const orders = pgTable('orders', {
   id: bigint('id', { mode: 'number' }).primaryKey(),
   status: varchar('status', { length: 20 }).notNull(),

@@ -39,6 +39,10 @@ export interface Index {
   name: string
   columns: string[]
   unique: boolean
+  /** Columns kept in descending order (a query reads the newest first) */
+  descending?: string[]
+  /** The query of the design it serves (`Post` by `userId`, `createdAt` descending), for the notes */
+  query?: string
 }
 
 export interface Check {
@@ -53,7 +57,7 @@ export interface Todo {
   params: Record<string, string>
 }
 
-export type TodoCode = 'relationPending' | 'keyPending' | 'targetNotStored' | 'foreignKeyTargetNotStored'
+export type TodoCode = 'relationPending' | 'keyPending' | 'targetNotStored' | 'foreignKeyTargetNotStored' | 'queryPending'
 
 export type TableKind = 'entity' | 'list' | 'map' | 'join' | 'lookup'
 
@@ -109,6 +113,10 @@ export type NoteCode =
   | 'compositeKeyReadOnly'
   /** Written by an output: the database has no unique indexes, so the application keeps the value unique */
   | 'uniqueInApplication'
+  /** Indexes come from the queries of the design: check them with the real queries and data */
+  | 'queryIndexes'
+  /** A query uses a field that is not stored as a column of its own, so it has no index */
+  | 'queryNotIndexed'
 
 export interface RelationalSchema {
   kind: 'relational'

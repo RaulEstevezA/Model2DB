@@ -47,6 +47,7 @@ public class Customer
     public string ShippingAddressCountry { get; set; } = null!;
 }
 
+// TODO: does the application read "Order" by customer, ordered by placedAt desc? Accept the query in the design to index it.
 public class Order
 {
     public long Id { get; set; }

@@ -8,6 +8,7 @@
 --   email: text
 CREATE COLLECTION `app`.`_default`.`authors` IF NOT EXISTS;
 
+-- TODO: does the application read "Book" by author, ordered by publishedOn desc? Accept the query in the design to index it.
 -- Each document of “books” is stored under a key: the value of the model's key field, written as text. Its fields:
 --   isbn: text
 --   title: text

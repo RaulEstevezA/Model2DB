@@ -19,6 +19,7 @@ CREATE TABLE customers (
 --rollback DROP TABLE customers;
 
 --changeset model2db:create-table-orders
+-- TODO: does the application read "Order" by customer, ordered by placedAt desc? Accept the query in the design to index it.
 CREATE TABLE orders (
   id BIGINT NOT NULL,
   status VARCHAR(20) NOT NULL,

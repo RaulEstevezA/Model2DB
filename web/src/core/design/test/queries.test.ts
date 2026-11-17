@@ -1,17 +1,29 @@
 import { describe, expect, it } from 'vitest'
 import { pendingDecisions } from '../../../app/workspace.ts'
 import { schemaOf } from '../../test/helpers.ts'
+import { findOutput, generate, type OutputSettings } from '../../generate/outputs.ts'
 import { modelRoles } from '../../physical/roles.ts'
-import { addQuery, decide, reconcile, removeQuery, setQuery } from '../edit.ts'
+import { acceptQuery, addQuery, decide, reconcile, removeQuery, setFieldInclude, setQuery } from '../edit.ts'
 import { proposeDesign } from '../propose.ts'
-import { findModelDesign, type Design } from '../types.ts'
+import { findModelDesign, type Design, type StorageTarget } from '../types.ts'
 
 const BLOG = `
 interface User { id: number; email: string }
 interface Post { id: number; userId: number; title: string; createdAt: Date; updatedAt: Date }
 `
 const blog = () => schemaOf(BLOG, 'typescript')
+const settings: OutputSettings = {
+  naming: { tables: 'plural', columns: 'snake' },
+  strings: 'auto',
+  engine: 'postgresql',
+  migrations: false,
+}
 const queries = (design: Design, model = 'Post') => findModelDesign(design, model)?.queries
+const code = (design: Design, output: string, engine: OutputSettings['engine'] = 'postgresql') =>
+  generate(blog(), design, findOutput(output), { ...settings, engine })
+    .files.map((file) => file.content)
+    .join('\n')
+const accepted = (target: StorageTarget) => acceptQuery(proposeDesign(blog(), target), 'Post', 0)
 
 describe('proposed queries', () => {
   it('proposes the rows of an owner, newest first, and waits for the user', () => {
@@ -49,6 +61,55 @@ describe('proposed queries', () => {
     const pending = pendingDecisions(design, modelRoles(blog(), design)).filter((item) => item.ref.kind === 'query')
     expect(pending).toEqual([{ ref: { kind: 'query', model: 'Post', index: 0 }, reasons: queries(design)![0].reasons }])
     expect(queries(decide(design, pending[0].ref))![0].status).toBe('active')
+  })
+})
+
+describe('query indexes', () => {
+  it('leaves a TODO while the query is pending', () => {
+    const sql = code(proposeDesign(blog(), 'relational'), 'postgresql')
+    expect(sql).toContain('-- TODO: does the application read "Post" by userId, ordered by createdAt desc?')
+    expect(sql).toContain('CREATE INDEX ix_posts_user_id ON posts (user_id);')
+  })
+
+  it('becomes one index on the filter and the order, which replaces the foreign key index', () => {
+    for (const engine of ['postgresql', 'mysql', 'mariadb', 'sqlite', 'sqlserver', 'oracle'] as const) {
+      const sql = code(accepted('relational'), engine)
+      expect(sql).toMatch(/CREATE INDEX "?ix_posts_user_id_created_at"? ON "?posts"? \("?user_id"?, "?created_at"? DESC\);/)
+      expect(sql).toContain('-- Query: Post by userId, ordered by createdAt desc')
+      expect(sql).not.toMatch(/ix_posts_user_id"? ON/)
+    }
+    const generated = generate(blog(), accepted('relational'), findOutput('postgresql'), settings)
+    expect(generated.physical.notes).toContainEqual({ code: 'queryIndexes', params: {} })
+  })
+
+  it('becomes a compound index in MongoDB', () => {
+    const script = code(accepted('document'), 'mongodb')
+    expect(script).toContain('// Query: Post by userId, ordered by createdAt desc')
+    expect(script).toContain(
+      'db.getCollection("posts").createIndex({ user_id: 1, created_at: -1 }, { name: "ix_posts_user_id_created_at" })',
+    )
+  })
+
+  it('adds nothing when the key or a unique constraint already covers it', () => {
+    const unique = decide(proposeDesign(blog(), 'relational'), { kind: 'unique', model: 'User', field: 'email' })
+    expect(code(addQuery(unique, 'User', ['email'], []), 'postgresql')).not.toContain('ix_users_email')
+    const byKey = addQuery(proposeDesign(blog(), 'relational'), 'Post', ['id'], [])
+    expect(code(byKey, 'postgresql')).not.toContain('ix_posts_id')
+  })
+
+  it('reads an index both ways: a reversed query adds nothing', () => {
+    const design = addQuery(accepted('relational'), 'Post', ['userId'], [{ field: 'createdAt', direction: 'asc' }])
+    const sql = code(design, 'postgresql')
+    expect(sql.match(/CREATE INDEX/g), sql).toHaveLength(1)
+  })
+
+  it('says when a field of the query is not stored', () => {
+    const design = setFieldInclude(accepted('relational'), 'Post', 'createdAt', false)
+    const generated = generate(blog(), design, findOutput('postgresql'), settings)
+    expect(generated.physical.notes).toContainEqual({
+      code: 'queryNotIndexed',
+      params: { model: 'Post', query: 'by userId, ordered by createdAt desc' },
+    })
   })
 })
 

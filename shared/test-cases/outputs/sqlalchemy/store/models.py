@@ -48,6 +48,7 @@ class Customer(Base):
     shipping_address_country: Mapped[str] = mapped_column(Text)
 
 
+# TODO: does the application read "Order" by customer, ordered by placedAt desc? Accept the query in the design to index it.
 class Order(Base):
     __tablename__ = "orders"
 

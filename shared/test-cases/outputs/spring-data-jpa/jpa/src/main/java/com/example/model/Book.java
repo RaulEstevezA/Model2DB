@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /** Entity written by Model2DB from Author. Review it before using it. */
+// TODO: does the application read "Book" by author, ordered by publishedOn desc? Accept the query in the design to index it.
 @Entity
 @Table(name = "books", uniqueConstraints = { @UniqueConstraint(name = "uq_books_isbn", columnNames = { "isbn" }) }, indexes = { @Index(name = "ix_books_author_id", columnList = "author_id") }, check = { @CheckConstraint(name = "ck_books_genre", constraint = "genre IN ('FICTION', 'ESSAY', 'POETRY', 'SCIENCE')") })
 public class Book {

@@ -21,6 +21,7 @@ db.createCollection("authors", {
 })
 db.getCollection("authors").createIndex({ email: 1 }, { name: "uq_authors_email", unique: true })
 
+// TODO: does the application read "Book" by author, ordered by publishedOn desc? Accept the query in the design to index it.
 db.createCollection("books", {
   validator: { $jsonSchema: {
     bsonType: "object",

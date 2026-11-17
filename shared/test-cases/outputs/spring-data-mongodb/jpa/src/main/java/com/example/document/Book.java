@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** Document written by Model2DB from Author. Review it before using it. */
+// TODO: does the application read "Book" by author, ordered by publishedOn desc? Accept the query in the design to index it.
 @Document(collection = "books")
 @CompoundIndexes({ @CompoundIndex(name = "uq_books_isbn", def = "{'isbn': 1}", unique = true), @CompoundIndex(name = "ix_books_author", def = "{'author': 1}") })
 public class Book {

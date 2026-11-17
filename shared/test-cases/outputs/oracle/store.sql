@@ -14,6 +14,7 @@ CREATE TABLE customers (
   CONSTRAINT pk_customers PRIMARY KEY (id)
 );
 
+-- TODO: does the application read "Order" by customer, ordered by placedAt desc? Accept the query in the design to index it.
 CREATE TABLE orders (
   id NUMBER(19) NOT NULL,
   status VARCHAR2(20 CHAR) NOT NULL,

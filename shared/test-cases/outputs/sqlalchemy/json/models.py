@@ -13,6 +13,7 @@ class Base(DeclarativeBase):
     pass
 
 
+# TODO: does the application read "Invoice" by customer, ordered by issued_at desc? Accept the query in the design to index it.
 class Invoice(Base):
     __tablename__ = "invoices"
 

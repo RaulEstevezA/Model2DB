@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** Entity written by Model2DB from Invoice. Review it before using it. */
+// TODO: does the application read "Invoice" by customer, ordered by issued_at desc? Accept the query in the design to index it.
 @Entity
 @Table(name = "invoices", indexes = { @Index(name = "ix_invoices_customer_id", columnList = "customer_id") })
 public class Invoice {

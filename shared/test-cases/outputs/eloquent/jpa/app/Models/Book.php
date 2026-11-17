@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /** Model written by Model2DB from Author. Review it before using it. */
+// TODO: does the application read "Book" by author, ordered by publishedOn desc? Accept the query in the design to index it.
 class Book extends Model
 {
     protected $table = 'books';

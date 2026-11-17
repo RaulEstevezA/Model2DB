@@ -19,6 +19,7 @@ class Author(models.Model):
         db_table = "authors"
 
 
+# TODO: does the application read "Book" by author, ordered by publishedOn desc? Accept the query in the design to index it.
 class Book(models.Model):
     id = models.BigAutoField(primary_key=True)
     isbn = models.CharField(max_length=13, unique=True)

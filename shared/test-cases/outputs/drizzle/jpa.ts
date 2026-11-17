@@ -10,6 +10,7 @@ export const authors = pgTable('authors', {
   unique('uq_authors_email').on(table.email),
 ])
 
+// TODO: does the application read "Book" by author, ordered by publishedOn desc? Accept the query in the design to index it.
 export const books = pgTable('books', {
   id: bigint('id', { mode: 'number' }).generatedByDefaultAsIdentity().primaryKey(),
   isbn: varchar('isbn', { length: 13 }).notNull(),

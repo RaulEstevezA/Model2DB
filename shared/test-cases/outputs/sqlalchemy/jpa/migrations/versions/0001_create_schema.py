@@ -24,6 +24,7 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id", name="pk_authors"),
         sa.UniqueConstraint("email", name="uq_authors_email"),
     )
+    # TODO: does the application read "Book" by author, ordered by publishedOn desc? Accept the query in the design to index it.
     op.create_table(
         "books",
         sa.Column("id", sa.BigInteger().with_variant(sa.Integer(), "sqlite"), sa.Identity(), nullable=False),

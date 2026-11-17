@@ -52,3 +52,23 @@ describe('query indexes in the Python ORMs', () => {
     expect(notes).toContainEqual({ code: 'indexOrderIgnored', params: { orm: 'Tortoise ORM', index: 'ix_posts_user_id_created_at' } })
   })
 })
+
+describe('query indexes in the TypeScript ORMs', () => {
+  it('Prisma, Sequelize and Drizzle keep the descending order', () => {
+    expect(write('prisma').code).toContain('@@index([userId, createdAt(sort: Desc)], map: "ix_posts_user_id_created_at")')
+    expect(write('sequelize').code).toContain("fields: ['user_id', { name: 'created_at', order: 'DESC' }]")
+    expect(write('drizzle').code).toContain("index('ix_posts_user_id_created_at').on(table.userId, table.createdAt.desc().nullsFirst())")
+    expect(write('drizzle', 'relational', 'sqlite').code).toContain(
+      "index('ix_posts_user_id_created_at').on(table.userId, sql`${table.createdAt} desc`)",
+    )
+  })
+
+  it('TypeORM keeps it in the migration and says the decorator cannot', () => {
+    const { code, notes } = write('typeorm')
+    expect(code).toContain('CREATE INDEX ix_posts_user_id_created_at ON posts (user_id, created_at DESC)')
+    expect(notes).toContainEqual({
+      code: 'indexOrderIgnored',
+      params: { orm: 'TypeORM', index: 'ix_posts_user_id_created_at', migration: 'yes' },
+    })
+  })
+})

@@ -196,6 +196,12 @@ function entitiesFile(view: EntityView, engine: Dialect, context: WriteContext):
     }
     for (const index of item.table.indexes) {
       writer.decorators.add('Index')
+      // The decorator has no column order: the migration, written in SQL, keeps it
+      if ((index.descending?.length ?? 0) > 0)
+        context.note({
+          code: 'indexOrderIgnored',
+          params: { orm: 'TypeORM', index: index.name, migration: context.settings.migrations ? 'yes' : '' },
+        })
       body.push(
         `@Index(${tsString(index.name)}, [${index.columns.map((column) => tsString(referenced(view, item.name, column))).join(', ')}])`,
       )

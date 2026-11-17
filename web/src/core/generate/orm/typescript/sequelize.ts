@@ -3,7 +3,7 @@ import type { Column, ColumnType, Dialect, PhysicalEnum, RelationalSchema } from
 import { schemaStatements } from '../../sql/statements.ts'
 import { todoText } from '../../todos.ts'
 import { fileBase, type GeneratedFile, type RelationalWriter, type WriteContext } from '../../types.ts'
-import { buildEntities, enumMembers, type Attribute, type EntityClass, type EntityView } from '../entities.ts'
+import { buildEntities, enumMembers, isDescending, type Attribute, type EntityClass, type EntityView } from '../entities.ts'
 import { tsEnum, tsKey, tsString, tsType } from './typescript.ts'
 
 /** Sequelize 6 models in TypeScript (`Model.init`), and a migration for sequelize-cli that runs the
@@ -162,7 +162,8 @@ function modelsFile(view: EntityView, engine: Dialect, context: WriteContext): s
   )
   for (const item of view.classes) {
     const indexes = item.table.indexes.map(
-      (index) => `{ name: ${tsString(index.name)}, unique: ${index.unique}, fields: [${index.columns.map(tsString).join(', ')}] }`,
+      (index) =>
+        `{ name: ${tsString(index.name)}, unique: ${index.unique}, fields: [${index.columns.map((column) => (isDescending(index, column) ? `{ name: ${tsString(column)}, order: 'DESC' }` : tsString(column))).join(', ')}] }`,
     )
     const uniques = item.table.uniques.map(
       (unique) => `{ name: ${tsString(unique.name)}, unique: true, fields: [${unique.columns.map(tsString).join(', ')}] }`,

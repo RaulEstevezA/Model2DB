@@ -3,7 +3,7 @@ import type { Column, ColumnType, Dialect, PhysicalEnum, Table } from '../../../
 import { pluralize } from '../../../physical/naming.ts'
 import { todoText } from '../../todos.ts'
 import type { GeneratedFile, RelationalWriter, WriteContext } from '../../types.ts'
-import { buildEntities, enumMembers, type Attribute, type EntityClass, type EntityView } from '../entities.ts'
+import { buildEntities, enumMembers, isDescending, type Attribute, type EntityClass, type EntityView } from '../entities.ts'
 
 /** A Prisma schema. Prisma writes its own migrations from it (`prisma migrate dev`), so none is written
  * here: a hand-written one would drift from what Prisma expects. */
@@ -135,7 +135,8 @@ function modelBlock(
     )
   for (const index of item.table.indexes) {
     if (index.columns.length === 1 && item.attributes.find((attribute) => attribute.column.name === index.columns[0])?.unique) continue
-    attributes.push(`@@index([${index.columns.map((column) => attributeName(item, column)).join(', ')}], map: ${prismaString(index.name)})`)
+    const columns = index.columns.map((column) => `${attributeName(item, column)}${isDescending(index, column) ? '(sort: Desc)' : ''}`)
+    attributes.push(`@@index([${columns.join(', ')}], map: ${prismaString(index.name)})`)
   }
   attributes.push(`@@map(${prismaString(item.table.name)})`)
   return { name: item.name, lines, attributes }

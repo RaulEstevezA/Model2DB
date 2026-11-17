@@ -1,9 +1,9 @@
 import { toCamelCase } from '../../../model/naming.ts'
 import type { Literal } from '../../../model/schema.ts'
-import type { Column, ColumnType, Dialect, PhysicalEnum, Table } from '../../../physical/types.ts'
+import type { Column, ColumnType, Dialect, Index, PhysicalEnum, Table } from '../../../physical/types.ts'
 import { todoText } from '../../todos.ts'
 import { fileBase, type GeneratedFile, type RelationalWriter, type WriteContext } from '../../types.ts'
-import { buildEntities, type EntityClass, type EntityView } from '../entities.ts'
+import { buildEntities, isDescending, type EntityClass, type EntityView } from '../entities.ts'
 import { tsKey, tsString } from './typescript.ts'
 
 /** A Drizzle ORM schema with its relations. drizzle-kit writes the migrations from it
@@ -262,10 +262,18 @@ function tableBlock(
     imports.core.add('unique')
     extras.push(`unique(${tsString(unique.name)}).on(${unique.columns.map((column) => `table.${attributeName(column)}`).join(', ')})`)
   }
+  // PostgreSQL columns order themselves in an index, nulls first as PostgreSQL's own DESC (Drizzle puts
+  // them last); the other flavors take the order as SQL
+  const descending = (index: Index, column: string, reference: string) => {
+    if (!isDescending(index, column)) return reference
+    if (flavor === 'pg') return `${reference}.desc().nullsFirst()`
+    imports.orm.add('sql')
+    return `sql\`\${${reference}} desc\``
+  }
   for (const index of table.indexes) {
     imports.core.add(index.unique ? 'uniqueIndex' : 'index')
     extras.push(
-      `${index.unique ? 'uniqueIndex' : 'index'}(${tsString(index.name)}).on(${index.columns.map((column) => `table.${attributeName(column)}`).join(', ')})`,
+      `${index.unique ? 'uniqueIndex' : 'index'}(${tsString(index.name)}).on(${index.columns.map((column) => descending(index, column, `table.${attributeName(column)}`)).join(', ')})`,
     )
   }
   for (const check of table.checks) {

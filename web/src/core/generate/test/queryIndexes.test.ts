@@ -107,7 +107,11 @@ describe('query indexes in the MongoDB libraries', () => {
   })
 })
 
-describe('queries in Redis, Cassandra and ScyllaDB', () => {
+describe('queries in Couchbase, Redis, Cassandra and ScyllaDB', () => {
+  it('Couchbase writes DESC in the index keys', () => {
+    expect(write('couchbase', 'document').code).toContain('ON `app`.`_default`.`posts`(`userId`, `createdAt` DESC);')
+  })
+
   it('Redis searches by the filter and sorts by the first order field', () => {
     const { code, notes } = write('redis', 'keyvalue')
     expect(code).toContain('FT.CREATE idx:posts ON HASH PREFIX 1 posts: SCHEMA user_id TAG created_at TAG SORTABLE')

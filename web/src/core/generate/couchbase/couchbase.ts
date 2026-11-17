@@ -59,7 +59,10 @@ export function indexesScript(schema: DocumentSchema, title: string): string | n
     if (indexes.length > 0) out.push('', `-- “${collection.name}”`)
     for (const index of indexes) {
       if (index.unique) out.push(`-- Couchbase has no unique indexes: check that “${index.columns[0]}” is unique before saving.`)
-      const keys = index.columns.map((column) => indexKey(column, collection.validator)).join(', ')
+      if (index.query) out.push(`-- Query: ${index.query}`)
+      const keys = index.columns
+        .map((column) => `${indexKey(column, collection.validator)}${index.descending?.includes(column) ? ' DESC' : ''}`)
+        .join(', ')
       out.push(`CREATE INDEX ${q(index.name)} IF NOT EXISTS ON ${keyspace(collection.name)}(${keys});`)
       count++
     }

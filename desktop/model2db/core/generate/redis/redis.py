@@ -96,8 +96,9 @@ def describe_keys(schema: dict, title: str, search_file: str | None) -> str:
                 "",
                 "## Search",
                 "",
-                f"`{search_file}` creates a search index for each hash, on the fields other keys point to and the "
-                f"ones chosen to be indexed. Run it with `redis-cli < {search_file}` on Redis 8, or Redis Stack.",
+                f"`{search_file}` creates a search index for each hash, on the fields other keys point to, the ones "
+                "chosen to be indexed and the ones the queries search or sort by (`FT.SEARCH ... SORTBY`). "
+                f"Run it with `redis-cli < {search_file}` on Redis 8, or Redis Stack.",
             ]
         )
     return "\n".join(out) + "\n"
@@ -107,7 +108,10 @@ def search_commands(schema: dict) -> str | None:
     """`FT.CREATE` for every hash with fields to search, or None when there are none."""
     lines = [
         f"FT.CREATE idx:{entry['prefix']} ON HASH PREFIX 1 {entry['prefix']}: SCHEMA "
-        + " ".join(f"{field['field']} {field['type']}" for field in entry["search"])
+        + " ".join(
+            f"{field['field']} {field['type']}{' SORTABLE' if field.get('sortable') else ''}"
+            for field in entry["search"]
+        )
         for entry in schema["entries"]
         if entry["search"]
     ]

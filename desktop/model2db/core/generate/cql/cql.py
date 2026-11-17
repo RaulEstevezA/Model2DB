@@ -65,11 +65,19 @@ def generate_cql(schema: dict, engine: str, title: str) -> str:
     for table in schema["tables"]:
         out.append("")
         out.extend(f"-- {todo_text(todo, table['model'], 'table')}" for todo in table["todos"])
+        if table.get("query"):
+            out.append(
+                f"-- Query: {table['query']}. A copy of the rows: write each one here too (in the same logged BATCH)."
+            )
+        descending = table.get("descending") or []
+        order = ", ".join(
+            f"{cql_name(column)} {'DESC' if column in descending else 'ASC'}" for column in table["clusteringKey"]
+        )
         lines = [
             f"CREATE TABLE IF NOT EXISTS {cql_name(table['name'])} (",
             *(f"  {cql_name(column['name'])} {_cql_type(column['type'])}," for column in table["columns"]),
             f"  {_primary_key(table)}",
-            ");",
+            f") WITH CLUSTERING ORDER BY ({order});" if descending else ");",
         ]
         # A table needs its key: until it is chosen, the table is written as a comment
         keyless = not table["partitionKey"]

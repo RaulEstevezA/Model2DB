@@ -57,7 +57,14 @@ def generate_mongo(schema: dict, title: str | None = None) -> str:
             ]
         )
         for index in collection["indexes"]:
-            keys = "{ " + ", ".join(f"{_key(column)}: 1" for column in index["columns"]) + " }"
+            descending = index.get("descending") or []
+            keys = (
+                "{ "
+                + ", ".join(f"{_key(column)}: {-1 if column in descending else 1}" for column in index["columns"])
+                + " }"
+            )
+            if index.get("query"):
+                out.append(f"// Query: {index['query']}")
             settings = f"{{ name: {json_string(index['name'])}{', unique: true' if index['unique'] else ''} }}"
             out.append(f"db.getCollection({name}).createIndex({keys}, {settings})")
     return "\n".join(out) + "\n"

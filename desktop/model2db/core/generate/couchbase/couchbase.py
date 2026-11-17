@@ -73,7 +73,13 @@ def indexes_script(schema: dict, title: str) -> str | None:
                 out.append(
                     f"-- Couchbase has no unique indexes: check that “{index['columns'][0]}” is unique before saving."
                 )
-            keys = ", ".join(_index_key(column, collection["validator"]) for column in index["columns"])
+            if index.get("query"):
+                out.append(f"-- Query: {index['query']}")
+            descending = index.get("descending") or []
+            keys = ", ".join(
+                f"{_index_key(column, collection['validator'])}{' DESC' if column in descending else ''}"
+                for column in index["columns"]
+            )
             out.append(f"CREATE INDEX {_q(index['name'])} IF NOT EXISTS ON {_keyspace(collection['name'])}({keys});")
             count += 1
     return "\n".join(out) + "\n" if count > 0 else None
